@@ -143,7 +143,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "ℹ️ 无变更，跳过提交"
           else
-            git commit -m "EPG更新: $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M')"
+            git commit -m "EPG Update: $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M')"
             git push
             echo "✅ 推送成功"
           fi
