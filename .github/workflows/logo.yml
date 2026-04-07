@@ -28,20 +28,22 @@ jobs:
           set -euo pipefail
           # 配置格式：仓库URL|源目录列表(多目录逗号分隔 img,logo，支持 img/cctv 多级路径)
           REPOS=(
-            "https://github.com/fanmingming/live.git|tv",
-            "https://github.com/zzzz0317/beijing-unicom-iptv-playlist.git|img",
-            "https://github.com/wanglindl/TVlogo.git|img",
-            "https://github.com/mytv-android/myTVlogo.git|img",
+            "https://github.com/fanmingming/live.git|tv"
+            "https://github.com/zzzz0317/beijing-unicom-iptv-playlist.git|img"
+            "https://github.com/wanglindl/TVlogo.git|img"
+            "https://github.com/mytv-android/myTVlogo.git|img"
             "https://github.com/sumingyd/IPTV-Scanner-Editor-Pro.git|logo"
-            "https://github.com//drangjchen/IPTV.git|Logo"
+            "https://github.com/drangjchen/IPTV.git|Logo"
           )
           for REPO in "${REPOS[@]}"; do
             IFS='|' read -r URL SRC_DIRS <<< "$REPO"
             TEMP_DIR="temp_repo"
             
             echo "处理仓库：$URL"
+            rm -rf "$TEMP_DIR"
             git clone --depth 1 --sparse --filter=blob:none "$URL" "$TEMP_DIR" 2>/dev/null || { 
               echo "克隆失败，跳过"; 
+              rm -rf "$TEMP_DIR"
               continue; 
             }
             [ ! -d "$TEMP_DIR" ] && continue
@@ -51,11 +53,11 @@ jobs:
             for DIR in "${DIR_LIST[@]}"; do
               echo "  处理目录：$DIR"
               cd "$TEMP_DIR" && git sparse-checkout set "$DIR" 2>/dev/null || { 
-                cd ..; 
+                cd .. || exit
                 echo "    目录 $DIR 不存在，跳过"; 
                 continue; 
               }
-              cd ..
+              cd .. || exit
               
               # 已存在则跳过，只保留【先出现的文件】
               find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" | while read -r file; do
@@ -72,17 +74,16 @@ jobs:
           find "$LOGO_DIR" -type f -name "*.$FILE_EXT" ! -size +"$MIN_FILE_SIZE" -delete
 
       - name: 暂存文件
-        run: git add "$LOGO_DIR/*.$FILE_EXT"
+        run: git add "${LOGO_DIR}/*.${FILE_EXT}"
         continue-on-error: true
         
       - name: 提交并推送
         run: |
           git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.email "github-actions[bot]@users.nore.github.com"
           if git diff --cached --name-only | grep -q .; then
-            git fetch origin main
             git commit -m "Logo Update: $(date +'%Y-%m-%d %H:%M') (CST)"
-            git push origin HEAD:$GITHUB_REF_NAME --force
+            git push origin HEAD:"$GITHUB_REF_NAME" --force-with-lease
             echo "✅ 推送完成"
           else
             echo "ℹ️ 无变更，跳过"
