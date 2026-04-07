@@ -35,13 +35,18 @@ jobs:
             "https://github.com/sumingyd/IPTV-Scanner-Editor-Pro.git|logo"
             "https://github.com/drangjchen/IPTV.git|Logo"
           )
+          
+          # 记录当前工作目录，用于安全跳转
+          ORIGIN_DIR=$(pwd)
+          
           for REPO in "${REPOS[@]}"; do
             IFS='|' read -r URL SRC_DIRS <<< "$REPO"
             TEMP_DIR="temp_repo"
             
             echo "处理仓库：$URL"
             rm -rf "$TEMP_DIR"
-            git clone --depth 1 --sparse --filter=blob:none "$URL" "$TEMP_DIR" 2>/dev/null || { 
+            # 克隆时不检出文件，仅拉取元数据，提升速度
+            git clone --depth 1 --sparse --filter=blob:none --no-checkout "$URL" "$TEMP_DIR" 2>/dev/null || { 
               echo "克隆失败，跳过"; 
               rm -rf "$TEMP_DIR"
               continue; 
@@ -50,19 +55,28 @@ jobs:
             
             # 处理所有源目录（支持 img/cctv 多级路径）
             IFS=',' read -ra DIR_LIST <<< "$SRC_DIRS"
+            # 一次性设置所有需要的目录，避免覆盖
+            git -C "$TEMP_DIR" sparse-checkout set --no-cone "${DIR_LIST[@]}" 2>/dev/null || {
+              echo "  目录配置失败，跳过该仓库";
+              rm -rf "$TEMP_DIR"
+              continue;
+            }
+            # 检出配置的目录文件
+            git -C "$TEMP_DIR" checkout
+            
+            # 遍历所有目录，复制文件（已存在则跳过，保留先出现的文件）
             for DIR in "${DIR_LIST[@]}"; do
               echo "  处理目录：$DIR"
-              cd "$TEMP_DIR" && git sparse-checkout set "$DIR" 2>/dev/null || { 
-                cd .. || exit
-                echo "    目录 $DIR 不存在，跳过"; 
-                continue; 
+              SOURCE_PATH="$TEMP_DIR/$DIR"
+              [ ! -d "$SOURCE_PATH" ] && {
+                echo "    目录 $DIR 不存在，跳过";
+                continue;
               }
-              cd .. || exit
               
-              # 已存在则跳过，只保留【先出现的文件】
-              find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" | while read -r file; do
+              # 复制文件，仅覆盖不存在的目标文件
+              find "$SOURCE_PATH" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" | while read -r file; do
                 filename=$(basename "$file")
-                target="$LOGO_DIR/$filename"
+                target="$ORIGIN_DIR/$LOGO_DIR/$filename"
                 [ ! -f "$target" ] && cp -f "$file" "$target"
               done
             done
@@ -80,7 +94,7 @@ jobs:
       - name: 提交并推送
         run: |
           git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.nore.github.com"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           if git diff --cached --name-only | grep -q .; then
             git commit -m "Logo Update: $(date +'%Y-%m-%d %H:%M') (CST)"
             git push origin HEAD:"$GITHUB_REF_NAME" --force-with-lease
