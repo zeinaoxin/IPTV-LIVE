@@ -36,47 +36,36 @@ jobs:
             "https://github.com/drangjchen/IPTV.git|Logo"
           )
           
-          # 记录当前工作目录，用于安全跳转
-          ORIGIN_DIR=$(pwd)
-          
           for REPO in "${REPOS[@]}"; do
             IFS='|' read -r URL SRC_DIRS <<< "$REPO"
             TEMP_DIR="temp_repo"
             
             echo "处理仓库：$URL"
             rm -rf "$TEMP_DIR"
-            # 克隆时不检出文件，仅拉取元数据，提升速度
-            git clone --depth 1 --sparse --filter=blob:none --no-checkout "$URL" "$TEMP_DIR" 2>/dev/null || { 
+            
+            git clone --depth 1 --sparse --filter=blob:none "$URL" "$TEMP_DIR" 2>/dev/null || { 
               echo "克隆失败，跳过"; 
               rm -rf "$TEMP_DIR"
               continue; 
             }
-            [ ! -d "$TEMP_DIR" ] && continue
             
-            # 处理所有源目录（支持 img/cctv 多级路径）
+            # 拆分目录并循环处理
             IFS=',' read -ra DIR_LIST <<< "$SRC_DIRS"
-            # 一次性设置所有需要的目录，避免覆盖
-            git -C "$TEMP_DIR" sparse-checkout set --no-cone "${DIR_LIST[@]}" 2>/dev/null || {
-              echo "  目录配置失败，跳过该仓库";
-              rm -rf "$TEMP_DIR"
-              continue;
-            }
-            # 检出配置的目录文件
-            git -C "$TEMP_DIR" checkout
-            
-            # 遍历所有目录，复制文件（已存在则跳过，保留先出现的文件）
             for DIR in "${DIR_LIST[@]}"; do
               echo "  处理目录：$DIR"
-              SOURCE_PATH="$TEMP_DIR/$DIR"
-              [ ! -d "$SOURCE_PATH" ] && {
-                echo "    目录 $DIR 不存在，跳过";
-                continue;
-              }
               
-              # 复制文件，仅覆盖不存在的目标文件
-              find "$SOURCE_PATH" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" | while read -r file; do
+              cd "$TEMP_DIR" || continue
+              git sparse-checkout set "$DIR" 2>/dev/null || {
+                cd ..
+                echo "    目录 $DIR 不存在，跳过"
+                continue
+              }
+              cd ..
+              
+              # 复制文件（已存在不覆盖）
+              find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" | while read -r file; do
                 filename=$(basename "$file")
-                target="$ORIGIN_DIR/$LOGO_DIR/$filename"
+                target="$LOGO_DIR/$filename"
                 [ ! -f "$target" ] && cp -f "$file" "$target"
               done
             done
