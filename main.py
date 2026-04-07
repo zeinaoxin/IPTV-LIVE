@@ -12,7 +12,7 @@ ORDERED_CHANNEL_TYPES = ["央视频道", "卫视频道", "港澳台", "电影频
 REMOVAL_LIST = [
     "「IPV4」", "「IPV6」", "[ipv6]", "[ipv4]", "_电信", "电信", "（HD）", "[超清]",
     "高清", "超清", "-HD", "(HK)", "AKtv", "@", "IPV6", "🎞️", "🎦", " ",
-    "[BD]", "[VGA]", "[HD]", "[SD]", "(1080p)", "(720p)", "(480p)", "HD"
+    "[BD]", "[VGA]", "[HD]", "[SD]", "(1080p)", "(720p)", "(480p)", "HD","｜"
 ]
 # 网络请求配置
 USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"
