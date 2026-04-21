@@ -4,6 +4,7 @@ import re
 import os
 from datetime import datetime, timedelta, timezone
 import opencc
+import time
 
 # ===================== 全局核心配置 =====================
 # 指定按TXT文件内顺序排列的分类，其余自动字典序排序，按需增删
@@ -17,22 +18,20 @@ REMOVAL_LIST = [
     "(1080p)", "(720p)", "(480p)", "HD", "｜"
 ]
 
-# 网络请求配置
+# 网络请求配置 - 优化超时时间，优先速度
 USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"
-URL_FETCH_TIMEOUT = 10
-
-# 白名单测速阈值(ms)
-RESPONSE_TIME_THRESHOLD = 2000
+URL_FETCH_TIMEOUT = 5  # 减少超时时间
+RESPONSE_TIME_THRESHOLD = 1500  # 降低响应时间阈值，优先快速源
 
 # M3U相关配置
 TVG_URL = "https://ghfast.top/https://github.com/CCSH/IPTV/raw/refs/heads/main/e.xml.gz"
 LOGO_URL_TPL = "https://ghfast.top/https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/logo/{}.png"
 
-# 所有单个频道最多保留的有效源数量，可直接修改数字（-1=无限制）
-SINGLE_CHANNEL_MAX_COUNT = 30
+# 所有单个频道最多保留的有效源数量，-1=无限制
+SINGLE_CHANNEL_MAX_COUNT = 20  # 减少每个频道的源数量，优先速度
 
-# ===================== Live Update 新增：域名/后缀拦截 =====================
-# 坏域名（整域拦截，不区分子域名）
+# ===================== Live Update 新增：域名/后缀拦截（优化速度） =====================
+# 坏域名（整域拦截，不区分子域名）- 优先快速过滤
 BLOCK_DOMAINS = {
     "iptv.catvod.com",
     "dd.ddzb.fun",
@@ -41,9 +40,12 @@ BLOCK_DOMAINS = {
     "alist.xicp.fun",
     "rihou.cc",
     "php.jdshipin.com",
+    "t.freetv.fun",
+    "stream1.freetv.fun",
+    "stream2.freetv.fun",
 }
 
-# 点播/图片类域名（拦截但不一定整域）
+# 点播/图片类域名（拦截但不一定整域）- 优先快速过滤
 VOD_DOMAINS = {
     "kwimgs.com",
     "kuaishou.com",
@@ -52,6 +54,9 @@ VOD_DOMAINS = {
     "tiktokcdn.com",
     "bdstatic.com",
     "byteimg.com",
+    "txmov2.a.kwimgs.com",
+    "alimov2.a.kwimgs.com",
+    "p6-dy.byteimg.com",
 }
 
 # 点播/图片后缀（不含.flv，.flv可能是直播推流）
@@ -63,37 +68,31 @@ IMAGE_EXTENSIONS = {
 }
 
 def is_domain_blocked(url: str) -> bool:
-    """整域拦截：iptv.catvod.com 等"""
+    """整域拦截：iptv.catvod.com 等 - 优化速度，使用集合快速查找"""
     try:
         from urllib.parse import urlparse
         host = (urlparse(url).hostname or "").lower()
         if not host:
             return False
-        for d in BLOCK_DOMAINS:
-            if host == d or host.endswith("." + d):
-                return True
+        return host in BLOCK_DOMAINS or any(host.endswith("." + d) for d in BLOCK_DOMAINS)
     except Exception:
-        pass
-    return False
+        return False
 
 def is_vod_or_image_url(url: str) -> bool:
-    """判断是否为点播文件或图片（非直播流）"""
+    """判断是否为点播文件或图片（非直播流）- 优化速度"""
     try:
         from urllib.parse import urlparse
         host = (urlparse(url).hostname or "").lower()
         path = (urlparse(url).path or "").lower()
-        # 域名匹配
-        for d in VOD_DOMAINS:
-            if host == d or host.endswith("." + d):
-                return True
+        # 域名匹配 - 使用集合快速查找
+        if host in VOD_DOMAINS or any(host.endswith("." + d) for d in VOD_DOMAINS):
+            return True
         # 图片后缀
-        for ext in IMAGE_EXTENSIONS:
-            if path.endswith(ext):
-                return True
+        if any(path.endswith(ext) for ext in IMAGE_EXTENSIONS):
+            return True
         # 点播后缀（排除.flv）
-        for ext in VOD_EXTENSIONS:
-            if path.endswith(ext):
-                return True
+        if any(path.endswith(ext) for ext in VOD_EXTENSIONS):
+            return True
     except Exception:
         pass
     return False
@@ -284,6 +283,8 @@ class ChannelClassifier:
         self.all_urls = {}   # key: chn_type, value: set of urls
         # 全局单频道限流计数器
         self.single_chn_count = {}  # key: 频道名, value: 已添加源数量
+        # 存储源的速度信息，用于排序
+        self.source_speeds = {}  # key: url, value: response_time
 
         # 初始化分类数据
         for chn_type in list(main_dict.keys()) + list(local_dict.keys()):
@@ -301,11 +302,13 @@ class ChannelClassifier:
         current_count = self.single_chn_count.get(channel_name, 0)
         return current_count >= SINGLE_CHANNEL_MAX_COUNT
 
-    def add_channel_line(self, chn_type: str, line: str, url: str):
+    def add_channel_line(self, chn_type: str, line: str, url: str, response_time: float = None):
         self.channel_data[chn_type].append(line)
         self.all_urls[chn_type].add(url)
         channel_name = line.split(',')[0].strip()
         self.single_chn_count[channel_name] = self.single_chn_count.get(channel_name, 0) + 1
+        if response_time is not None:
+            self.source_speeds[url] = response_time
 
     def add_other_line(self, line: str, url: str):
         if url not in self.other_urls and url not in self.blacklist:
@@ -328,19 +331,19 @@ class ChannelClassifier:
             return True
         return False
 
-    def classify(self, channel_name: str, channel_url: str, line: str):
+    def classify(self, channel_name: str, channel_url: str, line: str, response_time: float = None):
         # 先判断：拦截/空URL/单频道达上限 → 跳过
         if self.should_skip(channel_url) or not channel_url or self.is_single_chn_limit(channel_name):
             return
 
         for chn_type, chn_names in self.main_dict.items():
             if channel_name in chn_names and not self.check_url_exist(chn_type, channel_url):
-                self.add_channel_line(chn_type, line, channel_url)
+                self.add_channel_line(chn_type, line, channel_url, response_time)
                 return
 
         for chn_type, chn_names in self.local_dict.items():
             if channel_name in chn_names and not self.check_url_exist(chn_type, channel_url):
-                self.add_channel_line(chn_type, line, channel_url)
+                self.add_channel_line(chn_type, line, channel_url, response_time)
                 return
 
         self.add_other_line(line, channel_url)
@@ -350,6 +353,16 @@ class ChannelClassifier:
 
     def get_all_other(self) -> list:
         return self.other_lines
+
+    def sort_sources_by_speed(self, sources: list) -> list:
+        """按响应速度排序源，优先快速源"""
+        def speed_key(source):
+            url = source.split(',')[1].strip()
+            # 获取响应时间，如果没有则设为较大值
+            speed = self.source_speeds.get(url, float('inf'))
+            return speed
+        
+        return sorted(sources, key=speed_key)
 
 # ===================== 数据处理与生成 =====================
 def is_m3u_content(text: str) -> bool:
@@ -377,7 +390,7 @@ def convert_m3u_to_txt(m3u_content: str) -> list:
 def process_single_line(line: str, classifier: ChannelClassifier, corrections: dict):
     if not line or ',' not in line:
         return
-    # 兼容部分“双逗号”情况，取最后一个逗号作为分隔
+    # 兼容部分"双逗号"情况，取最后一个逗号作为分隔
     idx = line.rfind(',')
     channel_name_raw = line[:idx].strip()
     channel_url_raw = line[idx+1:].strip()
@@ -410,11 +423,31 @@ def process_remote_url(url: str, classifier: ChannelClassifier, corrections: dic
     except Exception as e:
         print(f"[ERROR] 远程源处理失败: {url} - {str(e)}")
 
-def sort_channel_data(channel_data: list, chn_type: str, chn_names_list: list or None) -> list:
+def sort_channel_data(channel_data: list, chn_type: str, chn_names_list: list or None, classifier: ChannelClassifier) -> list:
     if not chn_names_list:
         return channel_data
     name_to_order = {name: idx for idx, name in enumerate(chn_names_list)}
-    return sorted(channel_data, key=lambda line: name_to_order.get(line.split(',')[0].strip(), 999))
+    # 先按频道顺序排序，再按速度排序
+    sorted_data = sorted(channel_data, key=lambda line: name_to_order.get(line.split(',')[0].strip(), 999))
+    # 对每个频道的源按速度排序
+    result = []
+    current_channel = None
+    current_sources = []
+    
+    for line in sorted_data:
+        channel_name = line.split(',')[0].strip()
+        if channel_name != current_channel:
+            if current_sources:
+                result.extend(classifier.sort_sources_by_speed(current_sources))
+            current_channel = channel_name
+            current_sources = [line]
+        else:
+            current_sources.append(line)
+    
+    if current_sources:
+        result.extend(classifier.sort_sources_by_speed(current_sources))
+    
+    return result
 
 def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
     formatted_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y%m%d %H:%M")
@@ -430,7 +463,7 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
     ]
     for chn_type in lite_sort_types:
         chn_data = classifier.get_channel_data(chn_type)
-        sorted_data = sort_channel_data(chn_data, chn_type, main_dict.get(chn_type, []))
+        sorted_data = sort_channel_data(chn_data, chn_type, main_dict.get(chn_type, []), classifier)
         lite_lines += [f"{chn_type},#genre#"] + sorted_data + ['\n']
     lite_lines = lite_lines[:-1] if lite_lines and lite_lines[-1] == '\n' else lite_lines
 
@@ -449,7 +482,7 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
     for chn_type in full_other_types:
         chn_data = classifier.get_channel_data(chn_type)
         sort_list = main_dict.get(chn_type, []) or classifier.local_dict.get(chn_type, [])
-        sorted_data = sort_channel_data(chn_data, chn_type, sort_list)
+        sorted_data = sort_channel_data(chn_data, chn_type, sort_list, classifier)
         full_lines += [f"{chn_type},#genre#"] + sorted_data + ['\n']
     full_lines = full_lines[:-1] if full_lines and full_lines[-1] == '\n' else full_lines
 
@@ -522,7 +555,7 @@ if __name__ == "__main__":
             url_part = next((p for p in parts[1:] if '://' in p), None)
             if not url_part:
                 continue
-            # 若原始行包含频道名（如 "CCTV1,http://..."）则保留；否则用URL作为“无名源”
+            # 若原始行包含频道名（如 "CCTV1,http://..."）则保留；否则用URL作为"无名源"
             channel_part = parts[1].split(',')[0].strip() if ',' in parts[1] else ""
             combined_line = f"{channel_part},{url_part}" if channel_part else f"_白名单测速,{url_part}"
             process_single_line(combined_line, classifier, corrections)
