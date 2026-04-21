@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-直播源响应时间检测工具（优化版 v3）
-基于线上 live.txt 实测反馈全面重构：
-
-核心改进：
-1. 扩大域名黑名单（iptv.catvod.com 等），并自动从 blacklist_auto.txt 补充域名
-2. 源内容解析时做格式清洗（去双逗号、去多余后缀如延迟/分辨率、去URL内部换行）
-3. 过滤点播地址（kwimgs.com 等点播平台、.mp4/.mkv 单文件）
-4. Content-Type 为 text/html 或首包像 HTML 的直接判定不可用（网页/鉴权页）
-5. 首包真流判定 + HLS 二次验证
-6. 全链路去重（URL 级别），避免同一 URL 重复检测
-7. 输出 whitelist_auto.txt（清洗后），确保 main.py 回退时数据也干净
+直播源响应时间检测工具（优化版 v4）
+针对线上 live.txt 实测反馈的 7 大问题全面重构：
+1) 修复：catvod 等坏域名仍然大量出现（增强域名黑名单 + 输出阶段拦截）
+2) 修复：URL 被自动换行截断（输出时强制单行 + 去内部换行）
+3) 修复：点播 MP4/图片混入直播列表（增加更多点播域名/后缀/图片路径过滤）
+4) 修复：双逗号“频道名,,URL”与尾部垃圾字段（只取最后一个逗号分割，并截断 URL 后多余逗号）
+5) 改进：单频道多源无优先级（保留 media_kind/stream/playlist/unknown/timeout 供主程序排序，本脚本保证输出格式一致）
+6) 修复：no_host 等异常字段暴露（清洗阶段去除 URL 后的 ,no_host,- 等附加信息）
+7) 保留：HLS 二次验证、全链路 URL 去重、自动域名黑名单累积
 """
 
 import urllib.request
@@ -70,25 +68,30 @@ class Config:
     MIN_FIRST_CHUNK_FOR_STREAM = 256
     HLS_SAMPLE_SEGMENTS = 2
     HLS_SEGMENT_TIMEOUT = 2.5
+    # 同一频道最多保留多少源（本脚本暂不做频道名聚合，留给 main.py；此处仅做 URL 去重）
+    MAX_SOURCES_PER_CHANNEL = 50  # 防止极端情况
 
-# ===================== 域名黑名单 =====================
+# ===================== 域名黑名单（更强） =====================
 DOMAIN_BLACKLIST: Set[str] = set()
 
 def _init_domain_blacklist():
     """
     初始化域名黑名单：
-    1. 硬编码已知坏域名
-    2. 从 blacklist_auto.txt 自动提取所有域名（累积效果）
+    1) 硬编码已知坏域名
+    2) 从 blacklist_auto.txt 自动补充域名（累积效果）
     """
     global DOMAIN_BLACKLIST
-    # 硬编码：已确认不可用的域名
     hardcoded = {
         "iptv.catvod.com",
-        # 如果发现更多坏域名，加在这里：
-        # "bad.example.com",
+        # 其他反馈较多的坏域名（可根据后续反馈继续追加）
+        "dd.ddzb.fun",
+        "goodiptv.club",
+        "jiaojirentv.top",
+        "alist.xicp.fun",
+        "rihou.cc",
+        "php.jdshipin.com",
     }
 
-    # 从 blacklist_auto.txt 自动补充域名
     auto_domains: Set[str] = set()
     try:
         if os.path.exists(FILE_PATHS["blacklist_auto"]):
@@ -108,12 +111,11 @@ def _init_domain_blacklist():
         pass
 
     DOMAIN_BLACKLIST = hardcoded | auto_domains
-    if auto_domains:
-        logger.info(f"域名黑名单: 硬编码 {len(hardcoded)} + 自动补充 {len(auto_domains)} = {len(DOMAIN_BLACKLIST)} 个域名")
-
+    logger.info(
+        f"域名黑名单: 硬编码 {len(hardcoded)} + 自动补充 {len(auto_domains)} = {len(DOMAIN_BLACKLIST)} 个域名"
+    )
 
 _init_domain_blacklist()
-
 
 def url_matches_domain_blacklist(url: str) -> bool:
     """精确匹配或后缀匹配"""
@@ -130,36 +132,44 @@ def url_matches_domain_blacklist(url: str) -> bool:
         pass
     return False
 
-
-# ===================== 点播过滤 =====================
+# ===================== 点播/图片 过滤 =====================
 VOD_DOMAINS: Set[str] = {
     "kwimgs.com",
     "kuaishou.com",
     "ixigua.com",
     "douyin.com",
     "tiktokcdn.com",
+    "bdstatic.com",        # 百度点播/短视频
+    "byteimg.com",         # 字节图片
+    "a.kwimgs.com",        # 快手资源
 }
 VOD_EXTENSIONS: Set[str] = {
-    ".mp4", ".mkv", ".avi", ".wmv", ".mov", ".rmvb", ".flv",
+    ".mp4", ".mkv", ".avi", ".wmv", ".mov", ".rmvb",  # 不含 .flv（可能是直播）
 }
 
+IMAGE_EXTENSIONS: Set[str] = {
+    ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg",
+}
 
-def is_vod_url(url: str) -> bool:
-    """判断是否为点播地址（单文件视频 / 已知点播平台）"""
+def is_vod_or_image_url(url: str) -> bool:
+    """判断是否为点播地址/图片（单文件视频 / 图片 / 已知点播平台）"""
     try:
         host = (urlparse(url).hostname or "").lower()
         for vd in VOD_DOMAINS:
             if host == vd or host.endswith("." + vd):
                 return True
         path = urlparse(url).path.lower()
-        # .flv 可能是直播流（某些推流平台），仅过滤其他
+        # 图片路径直接过滤
+        for ext in IMAGE_EXTENSIONS:
+            if path.endswith(ext):
+                return True
+        # 视频（排除 .flv）
         for ext in VOD_EXTENSIONS:
-            if ext != ".flv" and path.endswith(ext):
+            if path.endswith(ext):
                 return True
     except Exception:
         pass
     return False
-
 
 # ===================== 行格式清洗 =====================
 # 清洗原因常量
@@ -170,12 +180,13 @@ CLEAN_BAD_URL = "bad_url"
 CLEAN_DOMAIN_BL = "domain_blacklist"
 CLEAN_VOD = "vod_filtered"
 
-
 def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
     """
     清洗单行源数据。
+    - 去内部换行、去多余空格
+    - 解决“双逗号”、“尾部垃圾字段（,no_host,- / ,0.47,1920x1080 等）”
+    - 域名黑名单/点播过滤
     返回 ((频道名, url), reason)
-    处理：去内部换行、去双逗号、只取前两列、过滤域名黑名单、过滤点播。
     """
     if not line:
         return None, CLEAN_NO_FORMAT
@@ -196,7 +207,7 @@ def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
     # URL 前面的部分（可能包含频道名和多余逗号）
     prefix = line[:proto_idx - 1]  # 去掉 "http" 或 "https"
 
-    # 取 prefix 中最后一个逗号作为分隔符
+    # 取 prefix 中最后一个逗号作为分隔符（避免双逗号）
     comma_pos = prefix.rfind(',')
     if comma_pos < 0:
         return None, CLEAN_NO_FORMAT
@@ -207,7 +218,7 @@ def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
     if not name:
         return None, CLEAN_EMPTY_NAME
 
-    # URL 及其后可能的多余字段（延迟、分辨率等）
+    # URL 及其后可能的多余字段（延迟、分辨率、no_host 等）
     rest = line[comma_pos + 1:].strip()
 
     # 只取第一个逗号前的内容作为 URL（逗号不是合法 URL 字符）
@@ -222,12 +233,11 @@ def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
     if url_matches_domain_blacklist(url):
         return None, CLEAN_DOMAIN_BL
 
-    # 点播过滤
-    if is_vod_url(url):
+    # 点播/图片过滤
+    if is_vod_or_image_url(url):
         return None, CLEAN_VOD
 
     return (name, url), CLEAN_OK
-
 
 # ===================== 媒体类型判定 =====================
 STREAM_LIKE_CT = [
@@ -239,19 +249,16 @@ STREAM_LIKE_CT = [
     "text/xml", "text/plain",
 ]
 
-
 def is_stream_like_ct(ct: str) -> bool:
     if not ct:
         return False
     ct_lower = ct.lower()
     return any(p in ct_lower for p in STREAM_LIKE_CT)
 
-
 def is_html_ct(ct: str) -> bool:
     if not ct:
         return False
     return "text/html" in ct.lower()
-
 
 def _read_first_chunk(resp, max_bytes=4096):
     try:
@@ -259,7 +266,6 @@ def _read_first_chunk(resp, max_bytes=4096):
         return chunk if chunk else b""
     except Exception:
         return b""
-
 
 def _looks_like_media(data: bytes) -> bool:
     """检查首包是否像媒体容器（TS/FLV/FMP4/ID3）"""
@@ -278,7 +284,6 @@ def _looks_like_media(data: bytes) -> bool:
         return True
     return False
 
-
 def _looks_like_html(data: bytes) -> bool:
     """检查首包是否像 HTML 页面 / JSON 鉴权响应"""
     if not data:
@@ -296,7 +301,6 @@ def _looks_like_html(data: bytes) -> bool:
     if len(d) < 200 and (b"403" in d[:50] or b"404" in d[:50] or b"forbidden" in d[:100].lower()):
         return True
     return False
-
 
 # ===================== HLS 解析 =====================
 def parse_m3u8_segments(content: str) -> List[str]:
@@ -317,7 +321,6 @@ def parse_m3u8_segments(content: str) -> List[str]:
         elif line.startswith("#EXT-X-ENDLIST"):
             break
     return segments
-
 
 # ===================== StreamChecker =====================
 class StreamChecker:
@@ -433,7 +436,7 @@ class StreamChecker:
     def check_http(self, url: str, timeout: float):
         """
         返回 (success, elapsed_ms, code_or_reason, media_kind)
-        新增：text/html / 首包像 HTML → 直接判定不可用
+        - text/html 或首包像 HTML → 直接判定不可用
         """
         start = time.perf_counter()
         try:
@@ -750,6 +753,10 @@ class StreamChecker:
         return to_check, pre_fail
 
     # ---------- 输出 ----------
+    def _ensure_single_line(text: str) -> str:
+        """确保单行输出（去掉可能的内部换行）"""
+        return text.replace('\r', '').replace('\n', ' ').strip()
+
     def save_respotime(self, items: List[Tuple[str, float, str, str]]):
         try:
             bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
@@ -758,7 +765,9 @@ class StreamChecker:
                 f.write("更新时间,#genre#\n")
                 f.write(f"{bj_time.strftime('%Y%m%d %H:%M')},url,耗时ms,状态码/备注,媒体类型\n\n")
                 for url, elapsed, code_or_reason, kind in items:
-                    f.write(f"{elapsed},{url},{code_or_reason or '-'},{kind or '-'}\n")
+                    url_single = self._ensure_single_line(url)
+                    line = f"{elapsed},{url_single},{code_or_reason or '-'},{kind or '-'}"
+                    f.write(line + "\n")
             logger.info(f"测速结果 → {FILE_PATHS['whitelist_respotime']} ({len(items)} 条)")
         except Exception as e:
             logger.error(f"保存测速结果失败: {e}")
@@ -766,8 +775,7 @@ class StreamChecker:
     def save_whitelist_auto(self, items: List[Tuple[str, float, str, str]]):
         """
         同时输出 whitelist_auto.txt（清洗后的可用源列表）。
-        格式: 频道名,url（仅保留成功且非 timeout 的条目）
-        供 main.py 回退时使用，确保回退数据也是干净的。
+        格式: url（仅保留成功且非 timeout/blacklist 的条目）
         """
         try:
             bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
@@ -776,7 +784,8 @@ class StreamChecker:
                 f.write(f"{bj_time.strftime('%Y%m%d %H:%M')}\n\n")
                 for url, elapsed, code_or_reason, kind in items:
                     if kind not in ("timeout", "blacklist"):
-                        f.write(f"{url}\n")
+                        url_single = self._ensure_single_line(url)
+                        f.write(url_single + "\n")
             count = sum(1 for _, _, _, k in items if k not in ("timeout", "blacklist"))
             logger.info(f"自动白名单 → {FILE_PATHS['whitelist_auto']} ({count} 条)")
         except Exception as e:
@@ -829,7 +838,7 @@ class StreamChecker:
 
         results_sorted = sorted(results, key=sort_key)
 
-        # 写盘
+        # 写盘（强制单行输出）
         self.save_respotime(results_sorted)
         self.save_whitelist_auto(results_sorted)
 
