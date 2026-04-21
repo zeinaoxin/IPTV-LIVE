@@ -16,7 +16,8 @@ def get_file_paths():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
     return {
-        "urls": os.path.join(parent_dir, 'urls.txt'),
+        "urls": os.path.join(parent_dir, 'assets/urls.txt'),
+        "my_urls": os.path.join(parent_dir, 'assets/my_urls.txt'),  # 新增自定义源文件
         "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
         "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
         "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
@@ -55,7 +56,7 @@ class Config:
     HLS_SAMPLE_SEGMENTS = 2
     HLS_SEGMENT_TIMEOUT = 2.5
 
-# ===================== 域名黑名单（增强版） =====================
+# ===================== 域名黑名单 =====================
 DOMAIN_BLACKLIST: Set[str] = set()
 
 def _init_domain_blacklist():
@@ -110,7 +111,7 @@ def url_matches_domain_blacklist(url: str) -> bool:
         pass
     return False
 
-# ===================== 点播/图片过滤（增强版） =====================
+# ===================== 点播/图片过滤 =====================
 VOD_DOMAINS: Set[str] = {
     "kwimgs.com", "kuaishou.com", "ixigua.com", "douyin.com", "tiktokcdn.com",
     "bdstatic.com", "byteimg.com", "a.kwimgs.com", "txmov2.a.kwimgs.com",
@@ -688,11 +689,21 @@ class StreamChecker:
         logger.info(f"===== 程序开始: {self.start_time.strftime('%Y%m%d %H:%M:%S')} =====")
         self.load_whitelist()
 
+        # 读取urls.txt和my_urls.txt两个文件
         lines: List[str] = []
+        
+        # 读取标准urls.txt
         urls = self.read_file(FILE_PATHS["urls"])
         if urls:
             remote_lines = self.fetch_remote(urls)
             lines.extend(remote_lines)
+        
+        # 读取自定义my_urls.txt
+        my_urls = self.read_file(FILE_PATHS["my_urls"])
+        if my_urls:
+            remote_lines = self.fetch_remote(my_urls)
+            lines.extend(remote_lines)
+        
         lines.extend(self.whitelist_lines)
         for url in self.manual_urls:
             lines.append(url)
