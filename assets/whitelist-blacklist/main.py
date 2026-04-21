@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-直播源响应时间检测工具（优化版 v2）
-- 引入“黑名单域名”机制，直接拦截不可用域名（如 iptv.catvod.com）。
-- 对 HLS/M3U8 做二次验证：抓取分片 URL 并做轻量探测。
-- 判断“真流”依据首包数据（TS/FLV/FMP4 等特征）和首包最小体积。
-- 输出格式保持与上游兼容（whitelist_respotime.txt 前两列仍为 耗时ms,url）。
+直播源响应时间检测工具（优化版 v3）
+基于线上 live.txt 实测反馈全面重构：
+
+核心改进：
+1. 扩大域名黑名单（iptv.catvod.com 等），并自动从 blacklist_auto.txt 补充域名
+2. 源内容解析时做格式清洗（去双逗号、去多余后缀如延迟/分辨率、去URL内部换行）
+3. 过滤点播地址（kwimgs.com 等点播平台、.mp4/.mkv 单文件）
+4. Content-Type 为 text/html 或首包像 HTML 的直接判定不可用（网页/鉴权页）
+5. 首包真流判定 + HLS 二次验证
+6. 全链路去重（URL 级别），避免同一 URL 重复检测
+7. 输出 whitelist_auto.txt（清洗后），确保 main.py 回退时数据也干净
 """
 
 import urllib.request
@@ -20,7 +26,6 @@ import re
 from typing import List, Tuple, Set, Dict, Optional
 import logging
 import sys
-import io
 
 # ===================== 文件路径 =====================
 def get_file_paths():
@@ -50,135 +55,252 @@ logger = logging.getLogger(__name__)
 
 # ===================== 全局配置 =====================
 class Config:
-    # UA
     USER_AGENT = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
     )
     USER_AGENT_URL = "okhttp/3.14.9"
-
-    # 超时（秒）
-    TIMEOUT_FETCH = 5
-    TIMEOUT_CHECK = 3.0        # 普通源检测超时
-    TIMEOUT_WHITELIST = 4.5    # 白名单源给更长时间
+    TIMEOUT_FETCH = 6
+    TIMEOUT_CHECK = 3.0
+    TIMEOUT_WHITELIST = 4.5
     TIMEOUT_CONNECT = 1.5
     TIMEOUT_READ = 2.0
-
-    # 并发
     MAX_WORKERS = 30
+    FIRST_CHUNK_BYTES = 4096
+    MIN_FIRST_CHUNK_FOR_STREAM = 256
+    HLS_SAMPLE_SEGMENTS = 2
+    HLS_SEGMENT_TIMEOUT = 2.5
 
-    # 探测参数
-    FIRST_CHUNK_BYTES = 4096   # HTTP 探测时读取首包大小
-    MIN_FIRST_CHUNK_FOR_STREAM = 256  # 判定为“真流”的最小首包字节（防假流）
-
-    # HLS 二次验证：抽样分片数
-    HLS_SAMPLE_SEGMENTS = 2    # 至少抽查 2 个分片（索引中靠前、靠后各 1 个）
-    HLS_SEGMENT_TIMEOUT = 2.5  # 单个分片探测超时
-
-# ===================== 结果常量 =====================
-# result tuple: (success:bool, elapsed_ms:float, code_or_reason:str, media_kind:str|None)
-SUCCESS = 0
-ELAPSED_MS = 1
-CODE_OR_REASON = 2
-MEDIA_KIND = 3
-
-# ===================== 域名黑名单（可自定义追加） =====================
-# 注意：只保留域名部分，如 "iptv.catvod.com" 或 ".catvod.com"
+# ===================== 域名黑名单 =====================
 DOMAIN_BLACKLIST: Set[str] = set()
 
 def _init_domain_blacklist():
     """
-    初始化域名黑名单。
-    你可以直接在这里追加更多不可用域名，每行一个字符串。
+    初始化域名黑名单：
+    1. 硬编码已知坏域名
+    2. 从 blacklist_auto.txt 自动提取所有域名（累积效果）
     """
     global DOMAIN_BLACKLIST
-    # 示例：将用户反馈的 iptv.catvod.com 加入域名黑名单
-    DOMAIN_BLACKLIST = {
-        # 用户反馈不可用的域名
+    # 硬编码：已确认不可用的域名
+    hardcoded = {
         "iptv.catvod.com",
-        # 你可以继续追加：
-        # "bad-domain.example.com",
-        # ".catvod.com",  # 会匹配所有 catvod.com 的子域名
+        # 如果发现更多坏域名，加在这里：
+        # "bad.example.com",
     }
+
+    # 从 blacklist_auto.txt 自动补充域名
+    auto_domains: Set[str] = set()
+    try:
+        if os.path.exists(FILE_PATHS["blacklist_auto"]):
+            with open(FILE_PATHS["blacklist_auto"], 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith(('更新时间', 'blacklist', '#')):
+                        continue
+                    url = line.split(',')[-1].strip() if ',' in line else line
+                    try:
+                        host = urlparse(url).hostname
+                        if host:
+                            auto_domains.add(host.lower())
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
+    DOMAIN_BLACKLIST = hardcoded | auto_domains
+    if auto_domains:
+        logger.info(f"域名黑名单: 硬编码 {len(hardcoded)} + 自动补充 {len(auto_domains)} = {len(DOMAIN_BLACKLIST)} 个域名")
+
 
 _init_domain_blacklist()
 
+
 def url_matches_domain_blacklist(url: str) -> bool:
-    """
-    判断 URL 是否命中“域名黑名单”。
-    - 精确匹配：host == 黑名单条目
-    - 后缀匹配：host 以 “.” + 黑名单条目 结尾
-    """
+    """精确匹配或后缀匹配"""
     try:
         host = urlparse(url).hostname or ""
         if not host:
             return False
         host_lower = host.lower()
         for d in DOMAIN_BLACKLIST:
-            d_lower = d.lower().strip().lstrip(".")
-            if host_lower == d_lower:
-                return True
-            if host_lower.endswith("." + d_lower):
+            d_lower = d.lower()
+            if host_lower == d_lower or host_lower.endswith("." + d_lower):
                 return True
     except Exception:
         pass
     return False
 
-# ===================== 媒体类型判定辅助 =====================
-STREAM_LIKE_CONTENT_TYPE_PARTS = [
-    "video/mp2t",
-    "video/mp4",
-    "video/x-flv",
-    "video/fmp4",
+
+# ===================== 点播过滤 =====================
+VOD_DOMAINS: Set[str] = {
+    "kwimgs.com",
+    "kuaishou.com",
+    "ixigua.com",
+    "douyin.com",
+    "tiktokcdn.com",
+}
+VOD_EXTENSIONS: Set[str] = {
+    ".mp4", ".mkv", ".avi", ".wmv", ".mov", ".rmvb", ".flv",
+}
+
+
+def is_vod_url(url: str) -> bool:
+    """判断是否为点播地址（单文件视频 / 已知点播平台）"""
+    try:
+        host = (urlparse(url).hostname or "").lower()
+        for vd in VOD_DOMAINS:
+            if host == vd or host.endswith("." + vd):
+                return True
+        path = urlparse(url).path.lower()
+        # .flv 可能是直播流（某些推流平台），仅过滤其他
+        for ext in VOD_EXTENSIONS:
+            if ext != ".flv" and path.endswith(ext):
+                return True
+    except Exception:
+        pass
+    return False
+
+
+# ===================== 行格式清洗 =====================
+# 清洗原因常量
+CLEAN_OK = "ok"
+CLEAN_NO_FORMAT = "no_format"       # 无逗号或无协议
+CLEAN_EMPTY_NAME = "empty_name"
+CLEAN_BAD_URL = "bad_url"
+CLEAN_DOMAIN_BL = "domain_blacklist"
+CLEAN_VOD = "vod_filtered"
+
+
+def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
+    """
+    清洗单行源数据。
+    返回 ((频道名, url), reason)
+    处理：去内部换行、去双逗号、只取前两列、过滤域名黑名单、过滤点播。
+    """
+    if not line:
+        return None, CLEAN_NO_FORMAT
+
+    # 去内部换行与多余空白
+    line = line.replace('\r', '').replace('\n', ' ').strip()
+    if not line:
+        return None, CLEAN_NO_FORMAT
+
+    if ',' not in line or '://' not in line:
+        return None, CLEAN_NO_FORMAT
+
+    # 定位 URL 起始位置
+    proto_idx = line.find('://')
+    if proto_idx < 1:
+        return None, CLEAN_BAD_URL
+
+    # URL 前面的部分（可能包含频道名和多余逗号）
+    prefix = line[:proto_idx - 1]  # 去掉 "http" 或 "https"
+
+    # 取 prefix 中最后一个逗号作为分隔符
+    comma_pos = prefix.rfind(',')
+    if comma_pos < 0:
+        return None, CLEAN_NO_FORMAT
+
+    name = prefix[:comma_pos].strip()
+    # 去除频道名中的多余空格
+    name = re.sub(r'\s{2,}', ' ', name).strip()
+    if not name:
+        return None, CLEAN_EMPTY_NAME
+
+    # URL 及其后可能的多余字段（延迟、分辨率等）
+    rest = line[comma_pos + 1:].strip()
+
+    # 只取第一个逗号前的内容作为 URL（逗号不是合法 URL 字符）
+    url = rest.split(',')[0].strip() if ',' in rest else rest
+
+    # 清洗 URL
+    url = url.split('$')[0].strip().split('#')[0].strip()
+    if not url or '://' not in url:
+        return None, CLEAN_BAD_URL
+
+    # 域名黑名单
+    if url_matches_domain_blacklist(url):
+        return None, CLEAN_DOMAIN_BL
+
+    # 点播过滤
+    if is_vod_url(url):
+        return None, CLEAN_VOD
+
+    return (name, url), CLEAN_OK
+
+
+# ===================== 媒体类型判定 =====================
+STREAM_LIKE_CT = [
+    "video/mp2t", "video/mp4", "video/x-flv", "video/fmp4",
     "application/octet-stream",
-    "application/vnd.apple.mpegurl",
-    "application/x-mpegURL",
+    "application/vnd.apple.mpegurl", "application/x-mpegURL",
     "application/dash+xml",
-    "audio/mpegurl",
-    "audio/mpeg",
-    "audio/aac",
-    "audio/x-aac",
-    "text/xml",          # 有时 HLS/M3U 会是 text/xml
-    "text/plain",        # 部分源会返回纯文本分片列表
+    "audio/mpegurl", "audio/mpeg", "audio/aac", "audio/x-aac",
+    "text/xml", "text/plain",
 ]
 
-def is_stream_like_content_type(ct: str) -> bool:
+
+def is_stream_like_ct(ct: str) -> bool:
     if not ct:
         return False
     ct_lower = ct.lower()
-    return any(p in ct_lower for p in STREAM_LIKE_CONTENT_TYPE_PARTS)
+    return any(p in ct_lower for p in STREAM_LIKE_CT)
 
-def _read_first_chunk(resp, max_bytes: int = 4096) -> bytes:
-    """尽量从流中读一小段用于判断类型（不消耗过多带宽）"""
+
+def is_html_ct(ct: str) -> bool:
+    if not ct:
+        return False
+    return "text/html" in ct.lower()
+
+
+def _read_first_chunk(resp, max_bytes=4096):
     try:
         chunk = resp.read(max_bytes)
         return chunk if chunk else b""
     except Exception:
         return b""
 
-def _first_bytes_looks_like_media(data: bytes) -> bool:
-    """启发式：检查二进制是否像媒体/分片容器（TS/FLV/FMP4/ID3 等）"""
+
+def _looks_like_media(data: bytes) -> bool:
+    """检查首包是否像媒体容器（TS/FLV/FMP4/ID3）"""
     if not data:
         return False
     if data[:3] == b"FLV":
         return True
-    if data[:4] == b"\x00\x00\x00\x18\x66\x74\x79\x70":
-        return True
-    if data[:4] == b"\x00\x00\x00\x20\x66\x74\x79\x70":
+    if len(data) >= 8 and data[:4] == b"\x00\x00\x00" and data[4:8] in (b"ftyp", b"ftyp"):
         return True
     if data[:3] == b"ID3":
         return True
     if len(data) >= 188 and data[0] == 0x47:
         return True
+    # MP4 box: 00 00 00 xx 66 74 79 70
+    if len(data) >= 8 and data[4:8] == b"ftyp":
+        return True
     return False
 
-# ===================== HLS/M3U8 简易解析 =====================
-def parse_m3u8_index(content: str) -> List[str]:
-    """
-    从 M3U8 内容中提取分片 URL 列表（简单实现，覆盖绝大多数公开 HLS 源）。
-    - 支持绝对路径与相对路径
-    - 忽略加密信息、字幕流等
-    """
+
+def _looks_like_html(data: bytes) -> bool:
+    """检查首包是否像 HTML 页面 / JSON 鉴权响应"""
+    if not data:
+        return False
+    d = data.lstrip(b'\xef\xbb\xbf').lstrip()
+    if len(d) < 5:
+        return False
+    head = d[:20].lower()
+    if head.startswith(b"<!doc") or head.startswith(b"<html") or head.startswith(b"<head"):
+        return True
+    # JSON 鉴权页
+    if d[0:1] == b"{" and (b'"code"' in d[:500] or b'"error"' in d[:500] or b'"msg"' in d[:500]):
+        return True
+    # 纯文本错误页
+    if len(d) < 200 and (b"403" in d[:50] or b"404" in d[:50] or b"forbidden" in d[:100].lower()):
+        return True
+    return False
+
+
+# ===================== HLS 解析 =====================
+def parse_m3u8_segments(content: str) -> List[str]:
+    """从 M3U8 索引中提取分片路径列表"""
     lines = content.splitlines()
     segments: List[str] = []
     for i, line in enumerate(lines):
@@ -186,7 +308,6 @@ def parse_m3u8_index(content: str) -> List[str]:
         if not line:
             continue
         if line.startswith("#EXTINF"):
-            # 下一个非注释行大概率是分片路径
             for j in range(i + 1, len(lines)):
                 l = lines[j].strip()
                 if not l or l.startswith("#"):
@@ -197,7 +318,8 @@ def parse_m3u8_index(content: str) -> List[str]:
             break
     return segments
 
-# ===================== StreamChecker 主体 =====================
+
+# ===================== StreamChecker =====================
 class StreamChecker:
     def __init__(self, manual_urls=None):
         self.start_time = datetime.now()
@@ -207,36 +329,40 @@ class StreamChecker:
         self.whitelist_lines: List[str] = []
         self.new_failed_urls: Set[str] = set()
         self.manual_urls = manual_urls or []
+        # 清洗统计
+        self.clean_stats: Dict[str, int] = {
+            CLEAN_NO_FORMAT: 0,
+            CLEAN_EMPTY_NAME: 0,
+            CLEAN_BAD_URL: 0,
+            CLEAN_DOMAIN_BL: 0,
+            CLEAN_VOD: 0,
+        }
 
-    # ---------- 网络能力检测 ----------
     def _check_ipv6(self):
         try:
             sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             sock.settimeout(1)
-            result = sock.connect_ex(('2001:4860:4860::8888', 53))
+            r = sock.connect_ex(('2001:4860:4860::8888', 53))
             sock.close()
-            return result == 0
+            return r == 0
         except Exception:
             return False
 
-    # ---------- 黑名单读写 ----------
+    # ---------- 黑名单 ----------
     def _load_blacklist(self) -> Set[str]:
-        blacklist = set()
+        blacklist: Set[str] = set()
         try:
             if os.path.exists(FILE_PATHS["blacklist_auto"]):
                 with open(FILE_PATHS["blacklist_auto"], 'r', encoding='utf-8') as f:
                     for line in f:
                         line = line.strip()
-                        if not line or line.startswith('更新时间') or line.startswith('blacklist'):
+                        if not line or line.startswith(('更新时间', 'blacklist', '#')):
                             continue
-                        if ',' in line:
-                            parts = line.split(',')
-                            url = parts[-1].strip()
-                        else:
-                            url = line
+                        url = line.split(',')[-1].strip() if ',' in line else line
+                        url = url.split('$')[0].split('#')[0].strip()
                         if '://' in url:
                             blacklist.add(url)
-            logger.info(f"加载黑名单: {len(blacklist)} 个链接")
+            logger.info(f"加载 URL 黑名单: {len(blacklist)} 条")
         except Exception as e:
             logger.error(f"加载黑名单失败: {e}")
         return blacklist
@@ -245,42 +371,50 @@ class StreamChecker:
         if not self.new_failed_urls:
             return
         try:
-            existing_lines = []
+            existing_lines: List[str] = []
             has_header = False
             if os.path.exists(FILE_PATHS["blacklist_auto"]):
                 with open(FILE_PATHS["blacklist_auto"], 'r', encoding='utf-8') as f:
                     existing_lines = [line.rstrip('\n') for line in f]
-                for line in existing_lines[:3]:
+                for line in existing_lines[:5]:
                     if line.startswith('更新时间') or line.startswith('blacklist'):
                         has_header = True
-            all_content = []
+                        break
+
+            all_content: List[str] = []
             if not has_header:
                 bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
-                version = f"{bj_time.strftime('%Y%m%d %H:%M')},url"
-                all_content.extend(["更新时间,#genre#", version, "", "blacklist,#genre#"])
+                all_content.extend([
+                    "更新时间,#genre#",
+                    f"{bj_time.strftime('%Y%m%d %H:%M')},url",
+                    "",
+                    "blacklist,#genre#",
+                ])
 
-            existing_urls = set()
+            existing_urls: Set[str] = set()
             for line in existing_lines:
                 if (line
-                    and not line.startswith('更新时间')
-                    and not line.startswith('blacklist')
-                    and line.strip()):
+                        and not line.startswith('更新时间')
+                        and not line.startswith('blacklist')
+                        and line.strip()):
                     url = line.split(',')[-1].strip() if ',' in line else line.strip()
                     if url and '://' in url and url not in existing_urls:
                         existing_urls.add(url)
                         all_content.append(line)
+
             for url in self.new_failed_urls:
                 if url not in existing_urls:
                     existing_urls.add(url)
                     all_content.append(url)
+
             os.makedirs(os.path.dirname(FILE_PATHS["blacklist_auto"]), exist_ok=True)
             with open(FILE_PATHS["blacklist_auto"], 'w', encoding='utf-8') as f:
                 f.write('\n'.join(all_content))
-            logger.info(f"黑名单已更新: 新增 {len(self.new_failed_urls)} 个")
+            logger.info(f"黑名单已更新: 新增 {len(self.new_failed_urls)} 条")
         except Exception as e:
             logger.error(f"保存黑名单失败: {e}")
 
-    # ---------- 通用文件读取 ----------
+    # ---------- 文件读取 ----------
     def read_file(self, file_path):
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -289,29 +423,26 @@ class StreamChecker:
             return []
 
     # ---------- SSL ----------
-    def create_ssl_context(self):
-        context = ssl.create_default_context()
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
-        return context
+    def _ssl_ctx(self):
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
 
-    # ---------- HTTP：GET 轻量探测（读首包判断是否为媒体流） ----------
+    # ---------- HTTP 探测 ----------
     def check_http(self, url: str, timeout: float):
         """
-        返回 (success, elapsed_ms, code_or_reason, media_kind|None)
-        - media_kind: "stream"/"playlist"/"unknown"/"timeout"
-        - 对非 2xx 但可能是重定向（301/302）也视为成功（很多源是这样）
-        - 若首包过小且无媒体特征，则视为可疑（大概率不可播放），media_kind 设为 "unknown"，由上层排序降权
+        返回 (success, elapsed_ms, code_or_reason, media_kind)
+        新增：text/html / 首包像 HTML → 直接判定不可用
         """
         start = time.perf_counter()
         try:
-            headers = {
+            req = urllib.request.Request(url, headers={
                 "User-Agent": Config.USER_AGENT,
                 "Connection": "close",
-            }
-            req = urllib.request.Request(url, headers=headers, method="GET")
+            }, method="GET")
             opener = urllib.request.build_opener(
-                urllib.request.HTTPSHandler(context=self.create_ssl_context())
+                urllib.request.HTTPSHandler(context=self._ssl_ctx())
             )
             with opener.open(req, timeout=timeout) as resp:
                 code = resp.getcode()
@@ -322,30 +453,35 @@ class StreamChecker:
                 if not success:
                     return (False, elapsed, str(code), None)
 
-                # 判断是否为媒体流/播放列表
-                if is_stream_like_content_type(ct):
-                    # 对二进制类媒体流，增加“首包最小体积”约束
-                    if _first_bytes_looks_like_media(data) and len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM:
-                        return (True, elapsed, str(code), "stream")
-                    else:
-                        # 可能是假流或鉴权页
-                        return (True, elapsed, str(code), "unknown")
+                # ★ text/html → 网页/鉴权页，直接判定不可用
+                if is_html_ct(ct):
+                    return (False, elapsed, f"{code}/html", "timeout")
 
+                # ★ 首包像 HTML（即使 CT 不对）→ 也不可用
+                if _looks_like_html(data):
+                    return (False, elapsed, f"{code}/html_body", "timeout")
+
+                # 二进制媒体流
+                if is_stream_like_ct(ct) and not ct.lower().startswith("text/"):
+                    if _looks_like_media(data) and len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM:
+                        return (True, elapsed, str(code), "stream")
+                    # 能连通但首包不够/无特征 → 可疑
+                    return (True, elapsed, str(code), "unknown")
+
+                # 文本类 → 播放列表
                 if ct.lower().startswith("text/") or ct.lower().startswith("application/xml"):
-                    # 检查是否是 M3U/M3U8 播放列表
                     if b"#EXTM3U" in data or b"#EXTINF" in data or b"#EXT-X-" in data:
                         return (True, elapsed, str(code), "playlist")
-                    # 其他文本也当播放列表/索引
-                    return (True, elapsed, str(code), "playlist")
+                    return (True, elapsed, str(code), "unknown")
 
-                # 纯二进制且未给 CT，启发式判断
-                if _first_bytes_looks_like_media(data):
+                # 纯二进制无 CT
+                if _looks_like_media(data):
                     if len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM:
                         return (True, elapsed, str(code), "stream")
-                    else:
-                        return (True, elapsed, str(code), "unknown")
+                    return (True, elapsed, str(code), "unknown")
 
                 return (True, elapsed, str(code), "unknown")
+
         except urllib.error.HTTPError as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
             code = getattr(e, "code", None) or 0
@@ -354,102 +490,66 @@ class StreamChecker:
             return (False, elapsed, str(code), None)
         except Exception as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
-            reason = str(e) or "unknown"
-            return (False, elapsed, reason, "timeout")
+            return (False, elapsed, str(e) or "unknown", "timeout")
 
-    # ---------- HLS/M3U8 二次验证 ----------
+    # ---------- HLS 二次验证 ----------
     def _hls_probe_segment(self, seg_url: str, timeout: float) -> bool:
-        """
-        对单个 HLS 分片做轻量探测：
-        - 能连上且返回 2xx/3xx
-        - 首包至少 1 字节（只要能读出数据就先认为是“分片存在”）
-        - 优先判断媒体特征（0x47/FLV/FMP4/ID3），若无特征但能读到足够数据，也视为通过
-        """
         try:
-            start = time.perf_counter()
-            headers = {
+            req = urllib.request.Request(seg_url, headers={
                 "User-Agent": Config.USER_AGENT,
                 "Connection": "close",
-            }
-            req = urllib.request.Request(seg_url, headers=headers, method="GET")
+            }, method="GET")
             opener = urllib.request.build_opener(
-                urllib.request.HTTPSHandler(context=self.create_ssl_context())
+                urllib.request.HTTPSHandler(context=self._ssl_ctx())
             )
             with opener.open(req, timeout=timeout) as resp:
                 code = resp.getcode()
                 if not (200 <= code < 400 or code in (301, 302)):
                     return False
-                data = _read_first_chunk(resp, 2048)  # 分片只需很小一段
-                # 媒体特征
-                if _first_bytes_looks_like_media(data):
+                data = _read_first_chunk(resp, 2048)
+                if _looks_like_media(data):
                     return True
-                # 能读到足够数据也认为分片存在（避免误杀）
+                # 能读到足够数据也认为分片存在
                 return len(data) >= 64
         except Exception:
             return False
 
-    def _hls_validate_playlist(self, playlist_url: str, timeout: float) -> Tuple[bool, str]:
-        """
-        对 HLS 播放列表做“二次验证”：
-        - 先 GET 下载索引（受限长度，避免巨大索引）
-        - 解析出分片 URL 列表
-        - 抽样若干分片（前/中/后），调用 _hls_probe_segment
-        - 只要有一条分片通过，就认为该播放列表“可用”
-        返回 (是否验证通过, 原因)
-        """
+    def _hls_validate(self, playlist_url: str, timeout: float) -> bool:
+        """对 HLS 索引做二次验证：抽样检查分片是否真实存在"""
         try:
-            start = time.perf_counter()
-            headers = {
+            req = urllib.request.Request(playlist_url, headers={
                 "User-Agent": Config.USER_AGENT,
                 "Connection": "close",
-            }
-            req = urllib.request.Request(playlist_url, headers=headers, method="GET")
+            }, method="GET")
             opener = urllib.request.build_opener(
-                urllib.request.HTTPSHandler(context=self.create_ssl_context())
+                urllib.request.HTTPSHandler(context=self._ssl_ctx())
             )
-            # 限流：最多读 64KB 索引，避免抓巨大列表
             with opener.open(req, timeout=timeout) as resp:
                 code = resp.getcode()
                 if not (200 <= code < 400 or code in (301, 302)):
-                    return False, f"索引状态码={code}"
-                # 限制索引大小
+                    return False
                 content = resp.read(64 * 1024).decode("utf-8", errors="replace")
-                segments = parse_m3u8_index(content)
+                segments = parse_m3u8_segments(content)
                 if not segments:
-                    return False, "索引中未找到分片路径"
-                # 将相对路径转成绝对路径
-                abs_segments = [
+                    return False
+                # 相对路径转绝对路径
+                abs_segs = [
                     urljoin(playlist_url, s) if not s.startswith("http") else s
                     for s in segments
                 ]
-                # 抽样逻辑
-                sample_urls: List[str] = []
-                if len(abs_segments) == 1:
-                    sample_urls = [abs_segments[0]]
-                else:
-                    # 取前 1、后 1
-                    sample_urls.append(abs_segments[0])
-                    if len(abs_segments) > 1:
-                        sample_urls.append(abs_segments[-1])
-                    # 若长度允许，再加 1 个中间位置
-                    if len(abs_segments) > 2:
-                        mid = len(abs_segments) // 2
-                        sample_urls.append(abs_segments[mid])
-                    # 去重
-                    sample_urls = list(dict.fromkeys(sample_urls))
-                # 逐个探测分片
-                ok_count = 0
-                for seg_url in sample_urls[:Config.HLS_SAMPLE_SEGMENTS]:
-                    if self._hls_probe_segment(seg_url, Config.HLS_SEGMENT_TIMEOUT):
-                        ok_count += 1
-                if ok_count > 0:
-                    return True, f"分片抽样通过({ok_count}/{len(sample_urls[:Config.HLS_SAMPLE_SEGMENTS])})"
-                else:
-                    return False, f"分片抽样全部失败(0/{len(sample_urls[:Config.HLS_SAMPLE_SEGMENTS])})"
-        except Exception as e:
-            return False, f"索引解析异常({e})"
+                # 抽样：首 + 尾 + 中
+                samples = [abs_segs[0]]
+                if len(abs_segs) > 1:
+                    samples.append(abs_segs[-1])
+                if len(abs_segs) > 2:
+                    samples.append(abs_segs[len(abs_segs) // 2])
+                samples = list(dict.fromkeys(samples))[:Config.HLS_SAMPLE_SEGMENTS]
+                ok = sum(1 for s in samples if self._hls_probe_segment(s, Config.HLS_SEGMENT_TIMEOUT))
+                return ok > 0
+        except Exception:
+            return False
 
-    # ---------- RTMP/RTSP 探测（保持原有逻辑） ----------
+    # ---------- RTMP/RTSP ----------
     def check_rtmp_rtsp(self, url, timeout):
         start = time.perf_counter()
         try:
@@ -457,9 +557,11 @@ class StreamChecker:
             if not parsed.hostname:
                 return False, 0
             port = parsed.port or (1935 if url.startswith('rtmp') else 554)
-            ips = []
+            ips: List[Tuple[str, int]] = []
             try:
-                addrs = socket.getaddrinfo(parsed.hostname, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
+                addrs = socket.getaddrinfo(
+                    parsed.hostname, port, socket.AF_UNSPEC, socket.SOCK_STREAM
+                )
                 ips = [(a[4][0], a[0]) for a in addrs[:2]]
             except Exception:
                 pass
@@ -484,67 +586,61 @@ class StreamChecker:
         except Exception:
             return False, round((time.perf_counter() - start) * 1000, 2)
 
-    # ---------- 统一 URL 检测（带域名黑名单 + HLS 二次验证） ----------
+    # ---------- 统一 URL 检测 ----------
     def check_url(self, url: str, is_whitelist=False):
-        """
-        返回 (success, elapsed_ms, code_or_reason, media_kind|None)
-        - 新增：域名黑名单拦截；HLS 播放列表二次验证。
-        """
+        """返回 (success, elapsed_ms, code_or_reason, media_kind)"""
+        start = time.perf_counter()
         try:
             u = quote(unquote(url), safe=':/?&=#')
             t = Config.TIMEOUT_WHITELIST if is_whitelist else Config.TIMEOUT_CHECK
 
-            # 1) 域名黑名单拦截
+            # 域名黑名单
             if url_matches_domain_blacklist(u):
                 return (False, 0, "domain_blacklist", "blacklist")
 
-            if url.startswith(('http://', 'https://')):
+            if u.startswith(('http://', 'https://')):
                 succ, elapsed, code_or_reason, kind = self.check_http(u, t)
-                # 2) HLS 二次验证：若首次判定为 playlist 且成功，继续抽样分片
+
+                # HLS 二次验证
                 if succ and kind == "playlist":
-                    # 为了避免对非 HLS 的“假 M3U”误判，尽量只对典型 HLS 索引做二次验证
                     try:
                         with urllib.request.urlopen(
-                            urllib.request.Request(
-                                u,
-                                headers={"User-Agent": Config.USER_AGENT, "Connection": "close"},
-                                method="GET",
-                            ),
+                            urllib.request.Request(u, headers={
+                                "User-Agent": Config.USER_AGENT,
+                                "Connection": "close",
+                            }, method="GET"),
                             timeout=t,
                         ) as r:
                             sample = r.read(4096)
-                            # 只对明显是 HLS 索引的做二次验证
                             if b"#EXTM3U" in sample and (b"#EXT-X-" in sample or b"#EXTINF" in sample):
-                                valid, reason = self._hls_validate_playlist(u, Config.HLS_SEGMENT_TIMEOUT + 1)
-                                if not valid:
-                                    logger.debug(f"HLS二次验证失败: {u} ({reason})")
-                                    # 不视为“真可用”，降权
+                                if not self._hls_validate(u, Config.HLS_SEGMENT_TIMEOUT + 1):
+                                    # 索引能访问但分片全挂 → 降级
                                     return (True, elapsed, code_or_reason, "unknown")
                     except Exception:
                         pass
+
                 return (succ, elapsed, code_or_reason, kind)
-            elif url.startswith(('rtmp://', 'rtsp://')):
+
+            elif u.startswith(('rtmp://', 'rtsp://')):
                 ok, ms = self.check_rtmp_rtsp(u, t)
-                kind = "stream" if ok else "timeout"
-                return (ok, ms, None if ok else "rtmp/rtsp_fail", kind)
+                return (ok, ms, None if ok else "rtmp/rtsp_fail", "stream" if ok else "timeout")
+
             else:
-                start = time.perf_counter()
-                parsed = urlparse(url)
+                parsed = urlparse(u)
                 if not parsed.hostname:
-                    return False, 0, "no_host", None
-                p = parsed.port or 80
+                    return (False, 0, "no_host", None)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(Config.TIMEOUT_CONNECT)
-                s.connect((parsed.hostname, p))
+                s.connect((parsed.hostname, parsed.port or 80))
                 s.close()
-                return True, round((time.perf_counter() - start) * 1000, 2), "tcp_ok", None
-        except Exception as e:
-            elapsed = round((time.perf_counter() - start) * 1000, 2) if 'start' in dir() else 0
-            return (False, elapsed, str(e), "timeout")
+                return (True, round((time.perf_counter() - start) * 1000, 2), "tcp_ok", None)
 
-    # ---------- 远程源拉取 ----------
+        except Exception as e:
+            return (False, 0, str(e), "timeout")
+
+    # ---------- 远程源拉取（带清洗） ----------
     def fetch_remote(self, urls):
-        all_lines = []
+        all_lines: List[str] = []
         for url in urls:
             try:
                 req = urllib.request.Request(
@@ -553,19 +649,20 @@ class StreamChecker:
                 )
                 with urllib.request.urlopen(req, timeout=Config.TIMEOUT_FETCH) as r:
                     c = r.read().decode('utf-8', 'replace')
-                    if "#EXTM3U" in c:
-                        lines = self.parse_m3u(c)
+                    if "#EXTM3U" in c[:200]:
+                        lines = self._parse_m3u(c)
                     else:
-                        lines = [l.strip() for l in c.split('\n') if l.strip() and '://' in l and ',' in l]
+                        lines = self._parse_text(c)
                     all_lines.extend(lines)
-                    logger.info(f"获取 {url} → {len(lines)} 条")
+                    logger.info(f"获取 {url[:60]}... → {len(lines)} 条（清洗后）")
             except Exception as e:
-                logger.error(f"拉取失败 {url}: {e}")
+                logger.error(f"拉取失败 {url[:60]}... : {e}")
         return all_lines
 
-    # ---------- M3U 解析 ----------
-    def parse_m3u(self, content):
-        lines, name = [], ""
+    def _parse_m3u(self, content):
+        """解析 M3U 格式（带清洗）"""
+        lines: List[str] = []
+        name = ""
         for l in content.split('\n'):
             l = l.strip()
             if l.startswith("#EXTINF"):
@@ -573,89 +670,138 @@ class StreamChecker:
                 if m:
                     name = m.group(1).strip()
             elif l.startswith(('http://', 'https://', 'rtmp://', 'rtsp://')) and name:
-                lines.append(f"{name},{l}")
+                result, reason = clean_source_line(f"{name},{l}")
+                if result:
+                    lines.append(f"{result[0]},{result[1]}")
+                else:
+                    self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
                 name = ""
         return lines
 
-    # ---------- 白名单处理 ----------
+    def _parse_text(self, content):
+        """解析 DIYP / 纯文本格式（带清洗）"""
+        lines: List[str] = []
+        for l in content.split('\n'):
+            l = l.strip()
+            if not l or l.startswith('#'):
+                continue
+            # 跳过 genre 标记行
+            if l.endswith(',#genre#'):
+                continue
+            result, reason = clean_source_line(l)
+            if result:
+                lines.append(f"{result[0]},{result[1]}")
+            else:
+                self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
+        return lines
+
+    # ---------- 白名单 ----------
     def load_whitelist(self):
         for line in self.read_file(FILE_PATHS["whitelist_manual"]):
-            if ',' in line and '://' in line:
-                n, u = line.split(',', 1)
-                self.whitelist_urls.add(u.strip())
-                self.whitelist_lines.append(line)
-        logger.info(f"白名单: {len(self.whitelist_urls)} 个")
+            if line.startswith('#'):
+                continue
+            result, reason = clean_source_line(line)
+            if result:
+                name, url = result
+                self.whitelist_urls.add(url)
+                self.whitelist_lines.append(f"{name},{url}")
+            else:
+                self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
+        logger.info(f"手动白名单: {len(self.whitelist_urls)} 个频道")
 
     # ---------- 任务分组 ----------
     def prepare_lines(self, lines):
-        to_check, pre_fail, url2line = [], [], {}
+        to_check: List[Tuple[str, str]] = []     # (url, "name,url")
+        pre_fail: List[str] = []
         skip = 0
+        seen_urls: Set[str] = set()
+
         for line in lines:
-            if ',' not in line or '://' not in line:
-                continue
-            n, u = line.split(',', 1)
-            u = u.strip().split('#')[0].split('$')[0]
-            full = f"{n},{u}"
-            url2line[u] = full
-
-            # 优先使用域名黑名单拦截
-            if url_matches_domain_blacklist(u):
-                pre_fail.append(full)
-                skip += 1
+            result, reason = clean_source_line(line)
+            if not result:
+                self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
                 continue
 
-            if u in self.blacklist_urls and u not in self.whitelist_urls:
-                pre_fail.append(full)
+            name, url = result
+
+            # URL 级别去重
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+
+            if url in self.blacklist_urls and url not in self.whitelist_urls:
+                pre_fail.append(f"{name},{url}")
                 skip += 1
             else:
-                to_check.append((u, full))
-        logger.info(f"待检测 {len(to_check)} 条，跳过黑名单（含域名黑名单） {skip} 条")
-        return to_check, pre_fail, url2line
+                to_check.append((url, f"{name},{url}"))
 
-    # ---------- 输出写盘（保持与现有格式兼容） ----------
+        logger.info(
+            f"待检测 {len(to_check)} 条，"
+            f"跳过 {skip} 条（URL黑名单）"
+        )
+        # 打印清洗统计
+        stats_parts = []
+        for k, v in self.clean_stats.items():
+            if v > 0:
+                stats_parts.append(f"{k}={v}")
+        if stats_parts:
+            logger.info(f"格式清洗统计: {', '.join(stats_parts)}")
+
+        return to_check, pre_fail
+
+    # ---------- 输出 ----------
     def save_respotime(self, items: List[Tuple[str, float, str, str]]):
-        """
-        items: [(url, elapsed_ms, code_or_reason, media_kind|None), ...]
-        文件头部字段兼容：根目录 main.py 仍然按前两列“耗时ms,url”读取。
-        """
         try:
             bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
             with open(FILE_PATHS["whitelist_respotime"], 'w', encoding='utf-8') as f:
-                f.write(f"白名单测速,#genre#\n")
-                f.write(f"更新时间,#genre#\n")
+                f.write("白名单测速,#genre#\n")
+                f.write("更新时间,#genre#\n")
                 f.write(f"{bj_time.strftime('%Y%m%d %H:%M')},url,耗时ms,状态码/备注,媒体类型\n\n")
-
                 for url, elapsed, code_or_reason, kind in items:
-                    kind_str = kind or "-"
-                    f.write(f"{elapsed},{url},{code_or_reason or '-'},{kind_str}\n")
-            logger.info(f"白名单测速结果已写入: {FILE_PATHS['whitelist_respotime']} ({len(items)} 条)")
+                    f.write(f"{elapsed},{url},{code_or_reason or '-'},{kind or '-'}\n")
+            logger.info(f"测速结果 → {FILE_PATHS['whitelist_respotime']} ({len(items)} 条)")
         except Exception as e:
-            logger.error(f"保存白名单测速结果失败: {e}")
+            logger.error(f"保存测速结果失败: {e}")
+
+    def save_whitelist_auto(self, items: List[Tuple[str, float, str, str]]):
+        """
+        同时输出 whitelist_auto.txt（清洗后的可用源列表）。
+        格式: 频道名,url（仅保留成功且非 timeout 的条目）
+        供 main.py 回退时使用，确保回退数据也是干净的。
+        """
+        try:
+            bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
+            with open(FILE_PATHS["whitelist_auto"], 'w', encoding='utf-8') as f:
+                f.write(f"更新时间,#genre#\n")
+                f.write(f"{bj_time.strftime('%Y%m%d %H:%M')}\n\n")
+                for url, elapsed, code_or_reason, kind in items:
+                    if kind not in ("timeout", "blacklist"):
+                        f.write(f"{url}\n")
+            count = sum(1 for _, _, _, k in items if k not in ("timeout", "blacklist"))
+            logger.info(f"自动白名单 → {FILE_PATHS['whitelist_auto']} ({count} 条)")
+        except Exception as e:
+            logger.error(f"保存自动白名单失败: {e}")
 
     # ---------- 主流程 ----------
     def run(self):
-        logger.info(f"程序开始执行: {self.start_time.strftime('%Y%m%d %H:%M:%S')}")
-
-        # 加载白名单
+        logger.info(f"===== 程序开始: {self.start_time.strftime('%Y%m%d %H:%M:%S')} =====")
         self.load_whitelist()
 
-        # 收集需要测速的行
-        lines = []
+        # 收集所有频道行
+        lines: List[str] = []
         urls = self.read_file(FILE_PATHS["urls"])
         if urls:
             remote_lines = self.fetch_remote(urls)
             lines.extend(remote_lines)
         lines.extend(self.whitelist_lines)
-
-        # 合并手动输入的URL
         for url in self.manual_urls:
             lines.append(url)
 
-        # 任务分组（已含域名黑名单过滤）
-        to_check, pre_fail, url2line = self.prepare_lines(lines)
+        # 分组（含清洗 + 去重）
+        to_check, pre_fail = self.prepare_lines(lines)
 
         # 并发测速
-        results = []
+        results: List[Tuple[str, float, str, str]] = []
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as executor:
             future_to_url = {
                 executor.submit(self.check_url, u, is_whitelist=(u in self.whitelist_urls)): u
@@ -675,54 +821,58 @@ class StreamChecker:
         # 更新黑名单
         self._save_blacklist()
 
-        # 排序：成功优先，其次“stream/playlist > unknown > timeout”，同级别按耗时升序
+        # 排序：stream > playlist > unknown > timeout > blacklist
         def sort_key(item):
-            url, elapsed, code_or_reason, kind = item
-            if kind == "stream":
-                kind_order = 0
-            elif kind == "playlist":
-                kind_order = 1
-            elif kind == "unknown":
-                kind_order = 2
-            else:
-                kind_order = 3
-            succ = 0 if kind not in ("timeout",) else 1
-            return (succ, kind_order, elapsed)
+            _, elapsed, _, kind = item
+            order = {"stream": 0, "playlist": 1, "unknown": 2}.get(kind, 3)
+            return (order, elapsed)
 
         results_sorted = sorted(results, key=sort_key)
 
-        # 写盘（使用新版格式；根目录主程序只读第一、第二个逗号分隔字段，保持兼容）
+        # 写盘
         self.save_respotime(results_sorted)
+        self.save_whitelist_auto(results_sorted)
 
-        # 统计与耗时
-        ok_cnt = sum(1 for _, _, _, k in results if k not in ("timeout",))
-        stream_cnt = sum(1 for _, _, _, k in results if k == "stream")
-        playlist_cnt = sum(1 for _, _, _, k in results if k == "playlist")
-        unknown_cnt = sum(1 for _, _, _, k in results if k == "unknown")
+        # 统计
+        total = len(results)
+        stream_n = sum(1 for _, _, _, k in results if k == "stream")
+        playlist_n = sum(1 for _, _, _, k in results if k == "playlist")
+        unknown_n = sum(1 for _, _, _, k in results if k == "unknown")
+        timeout_n = sum(1 for _, _, _, k in results if k == "timeout")
+        blacklist_n = sum(1 for _, _, _, k in results if k == "blacklist")
+        elapsed_s = (datetime.now() - self.start_time).seconds
+
         logger.info(
-            f"检测完成: 总计 {len(results)} 条，"
-            f"成功 {ok_cnt}（流 {stream_cnt}，列表 {playlist_cnt}，未知 {unknown_cnt}），"
-            f"超时/失败 {len(results) - ok_cnt}"
+            f"===== 检测完成 =====\n"
+            f"  总计: {total} 条\n"
+            f"  ✅ 流: {stream_n}\n"
+            f"  ✅ 列表: {playlist_n}\n"
+            f"  ⚠️ 未知: {unknown_n}\n"
+            f"  ❌ 超时: {timeout_n}\n"
+            f"  🚫 域名黑名单: {blacklist_n}\n"
+            f"  耗时: {elapsed_s}s"
         )
-        logger.info(f"总耗时: {(datetime.now() - self.start_time).seconds}s")
+
 
 # ===================== CLI =====================
 def main():
-    checker = None
     try:
-        manual_urls = []
+        manual_urls: List[str] = []
         if not sys.stdin.isatty():
             for chunk in sys.stdin:
                 chunk = chunk.strip()
                 if not chunk:
                     continue
-                parts = re.split(r'[\s,]+', chunk)
-                manual_urls.extend(p for p in parts if p.startswith(('http://', 'https://', 'rtmp://', 'rtsp://')))
+                manual_urls.extend(
+                    p for p in re.split(r'[\s,]+', chunk)
+                    if p.startswith(('http://', 'https://', 'rtmp://', 'rtsp://'))
+                )
         checker = StreamChecker(manual_urls=manual_urls)
         checker.run()
     except Exception as e:
         logger.error(f"主流程异常: {e}")
         raise SystemExit(1)
+
 
 if __name__ == "__main__":
     main()
