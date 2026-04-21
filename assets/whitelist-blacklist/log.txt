@@ -1,99 +1,108 @@
-2026-04-21 13:25:58,742 - 加载黑名单: 212103 个链接
-2026-04-21 13:25:58,742 - 程序开始执行: 20260421 13:25:58
-2026-04-21 13:25:58,742 - 白名单: 168 个
-2026-04-21 13:25:58,815 - 获取 https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt → 1785 条
-2026-04-21 13:25:58,865 - 获取 https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt → 513 条
-2026-04-21 13:25:58,920 - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs/heads/master/live.m3u → 31 条
-2026-04-21 13:25:58,963 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u → 1223 条
-2026-04-21 13:25:59,025 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u → 862 条
-2026-04-21 13:25:59,232 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%92%AA%E5%92%95%E7%9B%B4%E6%92%AD.txt → 166 条
-2026-04-21 13:25:59,303 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%B0%8F%E8%82%A5%E7%BE%8A.m3u → 196 条
-2026-04-21 13:25:59,389 - 获取 https://raw.githubusercontent.com/skddyj/iptv/refs/heads/main/IPTV.m3u → 82 条
-2026-04-21 13:25:59,479 - 获取 https://raw.githubusercontent.com/cyalias/mytvs-github/refs/heads/main/mytv.txt → 1179 条
-2026-04-21 13:25:59,532 - 获取 https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/main/ipv4.txt → 164 条
-2026-04-21 13:25:59,595 - 获取 https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8 → 1894 条
-2026-04-21 13:25:59,627 - 获取 https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u → 129 条
-2026-04-21 13:25:59,700 - 获取 https://raw.githubusercontent.com/onlylove2023/iptv/refs/heads/main/IPTV.m3u → 61 条
-2026-04-21 13:25:59,749 - 拉取失败 https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/main/hycg.txt: HTTP Error 404: Not Found
-2026-04-21 13:25:59,807 - 获取 https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u → 82 条
-2026-04-21 13:25:59,864 - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs/heads/master/output/weishi.m3u → 70 条
-2026-04-21 13:26:00,028 - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/bbxx.txt → 18560 条
-2026-04-21 13:26:00,169 - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/others_output.txt → 14476 条
-2026-04-21 13:26:00,229 - 获取 https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs/heads/main/cnTV_AutoUpdate.m3u8 → 68 条
-2026-04-21 13:26:00,414 - 获取 https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_live/refs/heads/main/live_ipv4.txt → 12229 条
-2026-04-21 13:26:00,444 - 拉取失败 https://raw.githubusercontent.com/8080713/iptv-api666/refs/heads/main/output/result.m3u: HTTP Error 404: Not Found
-2026-04-21 13:26:00,557 - 获取 https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/heads/master/output/user_result.m3u → 395 条
-2026-04-21 13:26:00,611 - 获取 https://raw.githubusercontent.com/wwb521/live/refs/heads/main/tv.txt → 58 条
-2026-04-21 13:26:00,666 - 获取 https://raw.githubusercontent.com/zhi35/iptv/refs/heads/master/iptv.m3u → 501 条
-2026-04-21 13:26:00,719 - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/heads/master/output/cctv.m3u → 54 条
-2026-04-21 13:26:00,788 - 获取 https://raw.githubusercontent.com/0610840119/iptv-api/refs/heads/master/output/xp_result.m3u → 673 条
-2026-04-21 13:26:00,806 - 获取 https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/master/TV-IPV4.m3u → 58 条
-2026-04-21 13:26:00,871 - 获取 https://raw.githubusercontent.com/MemoryCollection/IPTV/refs/heads/main/hotel.txt → 50 条
-2026-04-21 13:26:00,899 - 获取 https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u → 119 条
-2026-04-21 13:26:00,938 - 获取 https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/main/iptv_list.txt → 5698 条
-2026-04-21 13:26:00,971 - 获取 https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3u → 371 条
-2026-04-21 13:26:00,992 - 获取 https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt → 202 条
-2026-04-21 13:26:01,012 - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt → 31 条
-2026-04-21 13:26:01,038 - 获取 https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.txt → 1061 条
-2026-04-21 13:26:01,071 - 获取 https://raw.githubusercontent.com/junge3333/juds6/main/yszb1.txt → 1468 条
-2026-04-21 13:26:01,092 - 获取 https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.txt → 92 条
-2026-04-21 13:26:01,118 - 获取 https://raw.githubusercontent.com/maitel2020/iptv-self-use/main/iptv.txt → 72 条
-2026-04-21 13:26:01,144 - 获取 https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/main/live.txt → 318 条
-2026-04-21 13:26:01,216 - 获取 https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/live.txt → 850 条
-2026-04-21 13:26:01,287 - 获取 https://raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt → 1206 条
-2026-04-21 13:26:01,358 - 获取 https://raw.githubusercontent.com/alienlu/iptv/refs/heads/master/iptv.txt → 332 条
-2026-04-21 13:26:01,423 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/台湾香港澳门2023.m3u → 151 条
-2026-04-21 13:26:01,478 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国内电视台2023.m3u8 → 286 条
-2026-04-21 13:26:01,531 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewTV.SiTV.CIBN.m3u → 43 条
-2026-04-21 13:26:01,574 - 获取 https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt → 364 条
-2026-04-21 13:26:01,803 - 获取 https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt → 13745 条
-2026-04-21 13:26:02,237 - 获取 https://iptv.catvod.com/tv.m3u → 35 条
-2026-04-21 13:26:15,435 - 获取 https://xn--6orr3pi6g9uu.top/zb/zb.txt → 164387 条
-2026-04-21 13:26:15,968 - 获取 https://tv.iill.top/m3u/Gather → 1311 条
-2026-04-21 13:26:17,455 - 获取 https://m.iill.top/Live.m3u → 642 条
-2026-04-21 13:26:17,493 - 获取 https://tv.iill.top/m3u/Sport → 41 条
-2026-04-21 13:26:22,556 - 拉取失败 https://live.freetv.top/huyayqk.m3u: The read operation timed out
-2026-04-21 13:26:26,886 - 获取 https://live.freetv.top/douyuyqk.m3u → 967 条
-2026-04-21 13:26:27,696 - 获取 https://live.zhoujie218.top/tv/iptv4.txt → 1061 条
-2026-04-21 13:26:28,133 - 获取 https://t.freetv.fun/m3u/playlist.txt → 4515 条
-2026-04-21 13:26:28,308 - 获取 https://t.freetv.fun/m3u/taiwan.txt → 322 条
-2026-04-21 13:26:28,451 - 获取 https://t.freetv.fun/m3u/hong_kong.txt → 175 条
-2026-04-21 13:26:28,495 - 获取 https://t.freetv.fun/m3u/macao.txt → 9 条
-2026-04-21 13:26:28,533 - 获取 https://t.freetv.fun/m3u/japan.txt → 32 条
-2026-04-21 13:26:28,848 - 获取 https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u → 348 条
-2026-04-21 13:26:29,113 - 获取 https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u → 53 条
-2026-04-21 13:26:29,355 - 获取 https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u → 13 条
-2026-04-21 13:26:29,631 - 获取 https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u → 33 条
-2026-04-21 13:26:29,902 - 获取 https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u → 117 条
-2026-04-21 13:26:30,166 - 获取 https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u → 5 条
-2026-04-21 13:26:30,431 - 获取 https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u → 3 条
-2026-04-21 13:26:30,679 - 获取 https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u → 43 条
-2026-04-21 13:26:30,941 - 获取 https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u → 5 条
-2026-04-21 13:26:31,189 - 获取 https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u → 39 条
-2026-04-21 13:26:31,439 - 获取 https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u → 1 条
-2026-04-21 13:26:31,695 - 获取 https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u → 1 条
-2026-04-21 13:26:31,946 - 获取 https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u → 77 条
-2026-04-21 13:26:32,202 - 获取 https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u → 3 条
-2026-04-21 13:26:32,471 - 获取 https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u → 1 条
-2026-04-21 13:26:33,360 - 获取 https://tv.850930.xyz/kdsb.txt → 5336 条
-2026-04-21 13:26:33,503 - 获取 https://tv.850930.xyz/pix.m3u → 59 条
-2026-04-21 13:26:33,602 - 获取 https://live.zbds.org/tv/iptv4.txt → 1061 条
-2026-04-21 13:26:33,857 - 获取 https://iptv.zsdc.eu.org/home/iptv.m3u8 → 151 条
-2026-04-21 13:26:34,600 - 获取 https://freetv.fun/test_channels_original_new.txt → 4515 条
-2026-04-21 13:26:35,968 - 获取 https://jihulab.com/-/snippets/5265/raw/main/.txt → 1 条
-2026-04-21 13:26:36,035 - 获取 https://iptv-org.github.io/iptv/languages/zho.m3u → 206 条
-2026-04-21 13:26:36,306 - 获取 https://iptv-org.github.io/iptv/countries/us.m3u → 1351 条
-2026-04-21 13:26:36,330 - 获取 https://iptv-org.github.io/iptv/countries/tw.m3u → 23 条
-2026-04-21 13:26:38,740 - 获取 https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-afc9-7b323e3e16c0/d4fe44c5-107c-4511-af02-aa08fb10dff7/2024-04-25/2024-04-25_17:22:21/1714036941087/98644330/wexiptv.txt → 1969 条
-2026-04-21 13:26:39,498 - 获取 https://fm1077.serv00.net/SmartTV.m3u → 561 条
-2026-04-21 13:26:39,596 - 获取 https://m3u.ibert.me/txt/fmml_ipv6.txt → 82 条
-2026-04-21 13:26:39,648 - 获取 https://m3u.ibert.me/txt/ycl_iptv.txt → 90 条
-2026-04-21 13:26:39,675 - 获取 https://m3u.ibert.me/txt/y_g.txt → 129 条
-2026-04-21 13:26:39,991 - 获取 https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt → 483 条
-2026-04-21 13:26:42,088 - 获取 https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F%A3/IPV6.txt → 254 条
-2026-04-21 13:26:42,643 - 获取 http://tot.totalh.net/tttt.txt → 760 条
-2026-04-21 13:26:44,816 - 待检测 30147 条，跳过黑名单（含域名黑名单） 243264 条
-2026-04-21 13:38:37,760 - 黑名单已更新: 新增 494 个
-2026-04-21 13:38:37,829 - 白名单测速结果已写入: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_respotime.txt (30147 条)
-2026-04-21 13:38:37,838 - 检测完成: 总计 30147 条，成功 29155（流 250，列表 640，未知 28013），超时/失败 992
-2026-04-21 13:38:37,838 - 总耗时: 759s
+2026-04-21 13:52:25,271 - 域名黑名单: 硬编码 1 + 自动补充 3036 = 3036 个域名
+2026-04-21 13:52:25,515 - 加载 URL 黑名单: 212367 条
+2026-04-21 13:52:25,515 - ===== 程序开始: 20260421 13:52:25 =====
+2026-04-21 13:52:25,627 - 手动白名单: 0 个频道
+2026-04-21 13:52:26,645 - 获取 https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/... → 52 条（清洗后）
+2026-04-21 13:52:26,918 - 获取 https://raw.githubusercontent.com/Supprise0901/TVBox_live/re... → 56 条（清洗后）
+2026-04-21 13:52:27,002 - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs... → 0 条（清洗后）
+2026-04-21 13:52:27,832 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 93 条（清洗后）
+2026-04-21 13:52:28,139 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 23 条（清洗后）
+2026-04-21 13:52:28,242 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 0 条（清洗后）
+2026-04-21 13:52:28,313 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 0 条（清洗后）
+2026-04-21 13:52:28,431 - 获取 https://raw.githubusercontent.com/skddyj/iptv/refs/heads/mai... → 0 条（清洗后）
+2026-04-21 13:52:28,921 - 获取 https://raw.githubusercontent.com/cyalias/mytvs-github/refs/... → 48 条（清洗后）
+2026-04-21 13:52:29,041 - 获取 https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/m... → 2 条（清洗后）
+2026-04-21 13:52:30,015 - 获取 https://raw.githubusercontent.com/Free-TV/IPTV/master/playli... → 539 条（清洗后）
+2026-04-21 13:52:30,097 - 获取 https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.... → 0 条（清洗后）
+2026-04-21 13:52:30,203 - 获取 https://raw.githubusercontent.com/onlylove2023/iptv/refs/hea... → 0 条（清洗后）
+2026-04-21 13:52:30,259 - 拉取失败 https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/ma... : HTTP Error 404: Not Found
+2026-04-21 13:52:30,325 - 获取 https://raw.githubusercontent.com/fanmingming/live/refs/head... → 0 条（清洗后）
+2026-04-21 13:52:30,448 - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs... → 0 条（清洗后）
+2026-04-21 13:52:38,107 - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/re... → 470 条（清洗后）
+2026-04-21 13:52:43,546 - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/re... → 538 条（清洗后）
+2026-04-21 13:52:43,657 - 获取 https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs... → 10 条（清洗后）
+2026-04-21 13:52:48,511 - 获取 https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_liv... → 30 条（清洗后）
+2026-04-21 13:52:48,554 - 拉取失败 https://raw.githubusercontent.com/8080713/iptv-api666/refs/h... : HTTP Error 404: Not Found
+2026-04-21 13:52:48,772 - 获取 https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/he... → 70 条（清洗后）
+2026-04-21 13:52:48,886 - 获取 https://raw.githubusercontent.com/wwb521/live/refs/heads/mai... → 10 条（清洗后）
+2026-04-21 13:52:49,180 - 获取 https://raw.githubusercontent.com/zhi35/iptv/refs/heads/mast... → 44 条（清洗后）
+2026-04-21 13:52:49,277 - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/h... → 0 条（清洗后）
+2026-04-21 13:52:49,629 - 获取 https://raw.githubusercontent.com/0610840119/iptv-api/refs/h... → 36 条（清洗后）
+2026-04-21 13:52:49,698 - 获取 https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/mas... → 0 条（清洗后）
+2026-04-21 13:52:49,813 - 获取 https://raw.githubusercontent.com/MemoryCollection/IPTV/refs... → 50 条（清洗后）
+2026-04-21 13:52:49,939 - 获取 https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/... → 5 条（清洗后）
+2026-04-21 13:52:52,075 - 获取 https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/m... → 0 条（清洗后）
+2026-04-21 13:52:52,333 - 获取 https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3... → 146 条（清洗后）
+2026-04-21 13:52:52,514 - 获取 https://raw.githubusercontent.com/gaotianliuyun/gao/master/l... → 0 条（清洗后）
+2026-04-21 13:52:52,586 - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/mast... → 0 条（清洗后）
+2026-04-21 13:52:53,084 - 获取 https://raw.githubusercontent.com/vbskycn/iptv/master/tv/ipt... → 87 条（清洗后）
+2026-04-21 13:52:53,581 - 获取 https://raw.githubusercontent.com/junge3333/juds6/main/yszb1... → 11 条（清洗后）
+2026-04-21 13:52:53,729 - 获取 https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.t... → 0 条（清洗后）
+2026-04-21 13:52:53,824 - 获取 https://raw.githubusercontent.com/maitel2020/iptv-self-use/m... → 0 条（清洗后）
+2026-04-21 13:52:54,066 - 获取 https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/... → 17 条（清洗后）
+2026-04-21 13:52:54,485 - 获取 https://raw.githubusercontent.com/xiongjian83/TvBox/refs/hea... → 6 条（清洗后）
+2026-04-21 13:52:55,104 - 获取 https://raw.githubusercontent.com/yoursmile66/TVBox/refs/hea... → 49 条（清洗后）
+2026-04-21 13:52:55,218 - 获取 https://raw.githubusercontent.com/alienlu/iptv/refs/heads/ma... → 0 条（清洗后）
+2026-04-21 13:52:55,403 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 8 条（清洗后）
+2026-04-21 13:52:55,586 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 5 条（清洗后）
+2026-04-21 13:52:55,668 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 0 条（清洗后）
+2026-04-21 13:52:55,835 - 获取 https://raw.githubusercontent.com/develop202/migu_video/refs... → 11 条（清洗后）
+2026-04-21 13:53:01,578 - 获取 https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/m... → 30 条（清洗后）
+2026-04-21 13:53:02,030 - 获取 https://iptv.catvod.com/tv.m3u... → 0 条（清洗后）
+2026-04-21 13:54:31,040 - 获取 https://xn--6orr3pi6g9uu.top/zb/zb.txt... → 155 条（清洗后）
+2026-04-21 13:54:32,024 - 获取 https://tv.iill.top/m3u/Gather... → 41 条（清洗后）
+2026-04-21 13:54:33,905 - 获取 https://m.iill.top/Live.m3u... → 0 条（清洗后）
+2026-04-21 13:54:33,971 - 获取 https://tv.iill.top/m3u/Sport... → 0 条（清洗后）
+2026-04-21 13:54:40,047 - 拉取失败 https://live.freetv.top/huyayqk.m3u... : The read operation timed out
+2026-04-21 13:54:45,368 - 获取 https://live.freetv.top/douyuyqk.m3u... → 0 条（清洗后）
+2026-04-21 13:54:46,479 - 获取 https://live.zhoujie218.top/tv/iptv4.txt... → 87 条（清洗后）
+2026-04-21 13:54:47,561 - 获取 https://t.freetv.fun/m3u/playlist.txt... → 1 条（清洗后）
+2026-04-21 13:54:47,674 - 获取 https://t.freetv.fun/m3u/taiwan.txt... → 0 条（清洗后）
+2026-04-21 13:54:47,749 - 获取 https://t.freetv.fun/m3u/hong_kong.txt... → 0 条（清洗后）
+2026-04-21 13:54:47,791 - 获取 https://t.freetv.fun/m3u/macao.txt... → 0 条（清洗后）
+2026-04-21 13:54:47,843 - 获取 https://t.freetv.fun/m3u/japan.txt... → 0 条（清洗后）
+2026-04-21 13:54:48,595 - 获取 https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u... → 42 条（清洗后）
+2026-04-21 13:54:49,123 - 获取 https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u... → 5 条（清洗后）
+2026-04-21 13:54:49,622 - 获取 https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u... → 2 条（清洗后）
+2026-04-21 13:54:50,152 - 获取 https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u... → 7 条（清洗后）
+2026-04-21 13:54:50,462 - 获取 https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u... → 17 条（清洗后）
+2026-04-21 13:54:50,973 - 获取 https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:51,498 - 获取 https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:52,023 - 获取 https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u... → 4 条（清洗后）
+2026-04-21 13:54:52,298 - 获取 https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:52,816 - 获取 https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u... → 2 条（清洗后）
+2026-04-21 13:54:53,333 - 获取 https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:53,603 - 获取 https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:54,167 - 获取 https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u... → 2 条（清洗后）
+2026-04-21 13:54:54,409 - 获取 https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:54,929 - 获取 https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u... → 0 条（清洗后）
+2026-04-21 13:54:57,505 - 获取 https://tv.850930.xyz/kdsb.txt... → 148 条（清洗后）
+2026-04-21 13:54:57,815 - 获取 https://tv.850930.xyz/pix.m3u... → 0 条（清洗后）
+2026-04-21 13:54:58,373 - 获取 https://live.zbds.org/tv/iptv4.txt... → 87 条（清洗后）
+2026-04-21 13:54:58,678 - 获取 https://iptv.zsdc.eu.org/home/iptv.m3u8... → 0 条（清洗后）
+2026-04-21 13:55:00,097 - 获取 https://freetv.fun/test_channels_original_new.txt... → 1 条（清洗后）
+2026-04-21 13:55:05,071 - 获取 https://jihulab.com/-/snippets/5265/raw/main/.txt... → 0 条（清洗后）
+2026-04-21 13:55:05,216 - 获取 https://iptv-org.github.io/iptv/languages/zho.m3u... → 26 条（清洗后）
+2026-04-21 13:55:05,982 - 获取 https://iptv-org.github.io/iptv/countries/us.m3u... → 630 条（清洗后）
+2026-04-21 13:55:06,051 - 获取 https://iptv-org.github.io/iptv/countries/tw.m3u... → 6 条（清洗后）
+2026-04-21 13:55:09,827 - 获取 https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-a... → 3 条（清洗后）
+2026-04-21 13:55:10,913 - 获取 https://fm1077.serv00.net/SmartTV.m3u... → 561 条（清洗后）
+2026-04-21 13:55:11,017 - 获取 https://m3u.ibert.me/txt/fmml_ipv6.txt... → 0 条（清洗后）
+2026-04-21 13:55:11,089 - 获取 https://m3u.ibert.me/txt/ycl_iptv.txt... → 0 条（清洗后）
+2026-04-21 13:55:11,195 - 获取 https://m3u.ibert.me/txt/y_g.txt... → 0 条（清洗后）
+2026-04-21 13:55:11,583 - 获取 https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt... → 2 条（清洗后）
+2026-04-21 13:55:14,892 - 获取 https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F... → 1 条（清洗后）
+2026-04-21 13:55:15,861 - 获取 http://tot.totalh.net/tttt.txt... → 0 条（清洗后）
+2026-04-21 13:55:18,670 - 待检测 2764 条，跳过 50 条（URL黑名单）
+2026-04-21 13:55:18,670 - 格式清洗统计: no_format=805, empty_name=1, domain_blacklist=268572, vod_filtered=488
+2026-04-21 13:56:15,479 - 黑名单已更新: 新增 204 条
+2026-04-21 13:56:15,503 - 测速结果 → /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_respotime.txt (2764 条)
+2026-04-21 13:56:15,505 - 自动白名单 → /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_auto.txt (2563 条)
+2026-04-21 13:56:15,506 - ===== 检测完成 =====
+  总计: 2764 条
+  ✅ 流: 55
+  ✅ 列表: 10
+  ⚠️ 未知: 2493
+  ❌ 超时: 201
+  🚫 域名黑名单: 0
+  耗时: 230s
