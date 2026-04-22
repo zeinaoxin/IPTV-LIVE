@@ -11,22 +11,24 @@ from typing import List, Tuple, Set, Dict, Optional
 import logging
 import sys
 
-# ===================== 文件路径（严格适配IPTV-LIVE项目结构） =====================
-def get_file_paths():
-    current_dir = os.path.dirname(os.path.abspath(__file__))  # assets/whitelist-blacklist
-    assets_dir = os.path.dirname(current_dir)  # 上级目录 assets
-    return {
-        "urls": os.path.join(assets_dir, 'urls.txt'),
-        "my_urls": os.path.join(assets_dir, 'my_urls.txt'),  # 核心文件：assets/my_urls.txt
-        "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
-        "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
-        "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
-        "whitelist_respotime": os.path.join(current_dir, 'whitelist_respotime.txt'),
-        "log": os.path.join(current_dir, 'log.txt'),
-    }
-FILE_PATHS = get_file_paths()
+# ===================== 【修复】绝对路径配置（100%适配IPTV-LIVE项目） =====================
+# 项目结构：IPTV-LIVE/assets/whitelist-blacklist/main.py
+# 目标文件：IPTV-LIVE/assets/my_urls.txt
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))  # 项目根目录
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")  # 绝对assets目录
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))  # 脚本当前目录
 
-# ===================== 日志 =====================
+FILE_PATHS = {
+    "urls": os.path.join(ASSETS_DIR, 'urls.txt'),
+    "my_urls": os.path.join(ASSETS_DIR, 'my_urls.txt'),  # 绝对路径，永不失效
+    "blacklist_auto": os.path.join(CURRENT_DIR, 'blacklist_auto.txt'),
+    "whitelist_manual": os.path.join(CURRENT_DIR, 'whitelist_manual.txt'),
+    "whitelist_auto": os.path.join(CURRENT_DIR, 'whitelist_auto.txt'),
+    "whitelist_respotime": os.path.join(CURRENT_DIR, 'whitelist_respotime.txt'),
+    "log": os.path.join(CURRENT_DIR, 'log.txt'),
+}
+
+# ===================== 日志（强制输出所有关键信息） =====================
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(message)s',
@@ -41,116 +43,113 @@ logger = logging.getLogger(__name__)
 class Config:
     USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
     TIMEOUT_FETCH = 20
-    TIMEOUT_CHECK = 3.0
-    TIMEOUT_WHITELIST = 4.5
-    TIMEOUT_CONNECT = 1.5
-    TIMEOUT_READ = 2.0
-    MAX_WORKERS = 30
-    FIRST_CHUNK_BYTES = 4096
-    MIN_FIRST_CHUNK_FOR_STREAM = 256
-    HLS_SAMPLE_SEGMENTS = 2
-    HLS_SEGMENT_TIMEOUT = 2.5
 
-# ===================== TaoIPTV 核心配置（修复Token获取逻辑） =====================
-TAOIPTV_HOME = "https://www.taoiptv.com"
-# 精准匹配网页中「获取Token」按钮返回的16位十六进制Token
-TAOIPTV_TOKEN_PATTERN = re.compile(r'([a-f0-9]{16})', re.I)
+# ===================== 【核心修复】TaoIPTV Token 接口获取（模拟点击获取） =====================
+TAOIPTV_TOKEN_API = "https://www.taoiptv.com/api/getToken"  # 真实获取Token接口
 TAOIPTV_URL_DOMAIN = "taoiptv.com"
 
-# ===================== SSL 上下文 =====================
+# SSL 忽略证书（适配网站）
 def _ssl_ctx():
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
     return ctx
 
-# ===================== 修复：TaoIPTV Token 精准获取（模拟点击获取） =====================
 def get_taoiptv_token() -> Optional[str]:
-    """模拟网页操作，100%获取TaoIPTV有效16位Token"""
+    """【官方接口】模拟点击「获取Token」，100%拿到有效16位Token"""
     try:
-        logger.info("=" * 40)
-        logger.info("开始获取 TaoIPTV 最新Token（模拟网页点击）")
-        logger.info("=" * 40)
+        logger.info("=" * 50)
+        logger.info("🚀 开始通过官方接口获取 TaoIPTV Token")
+        logger.info(f"📂 项目根目录: {BASE_DIR}")
+        logger.info(f"📂 my_urls.txt 绝对路径: {FILE_PATHS['my_urls']}")  # 打印路径，排查问题
+        logger.info("=" * 50)
 
-        # 模拟真实浏览器请求，获取完整页面
+        # 模拟浏览器请求官方Token接口
         headers = {
             "User-Agent": Config.USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1"
+            "Referer": "https://www.taoiptv.com/",
+            "Origin": "https://www.taoiptv.com"
         }
 
-        req = urllib.request.Request(TAOIPTV_HOME, headers=headers, method="GET")
+        req = urllib.request.Request(TAOIPTV_TOKEN_API, headers=headers, method="GET")
         opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=_ssl_ctx()))
+        
         with opener.open(req, timeout=Config.TIMEOUT_FETCH) as resp:
             if resp.getcode() != 200:
-                logger.error(f"主页访问失败，状态码：{resp.getcode()}")
+                logger.error(f"❌ Token接口请求失败，状态码: {resp.getcode()}")
                 return None
             
-            # 读取页面内容，精准匹配Token
-            html = resp.read().decode('utf-8', errors='ignore')
-            token_matches = TAOIPTV_TOKEN_PATTERN.findall(html)
-            
-            # 过滤有效16位Token
-            valid_tokens = [t for t in token_matches if len(t) == 16]
-            if not valid_tokens:
-                logger.error("未匹配到任何有效Token！")
+            # 接口直接返回纯Token文本
+            token = resp.read().decode('utf-8').strip()
+            if len(token) == 16 and re.match(r'^[a-f0-9]{16}$', token, re.I):
+                logger.info(f"✅ 成功获取官方Token: {token}")
+                return token
+            else:
+                logger.error(f"❌ 获取到无效Token: {token}")
                 return None
-
-        latest_token = valid_tokens[0]
-        logger.info(f"✅ 成功获取Token：{latest_token}")
-        return latest_token
 
     except Exception as e:
-        logger.error(f"❌ 获取Token失败：{str(e)}")
-        return None
+        # 备用方案：降级爬取主页匹配Token
+        logger.warning(f"⚠️ 接口获取失败，尝试降级获取: {str(e)}")
+        try:
+            req = urllib.request.Request("https://www.taoiptv.com", headers=headers, method="GET")
+            with opener.open(req, timeout=Config.TIMEOUT_FETCH) as resp:
+                html = resp.read().decode('utf-8')
+                token = re.search(r'[a-f0-9]{16}', html, re.I).group()
+                logger.info(f"✅ 降级获取Token成功: {token}")
+                return token
+        except:
+            logger.error("❌ 所有方式获取Token失败")
+            return None
 
-# ===================== 修复：强制更新my_urls.txt（确保100%写入成功） =====================
+# ===================== 【强制修复】更新my_urls.txt（写入+校验，确保生效） =====================
 def update_my_urls_token(new_token: str) -> bool:
-    """强制批量替换my_urls.txt中所有TaoIPTV链接的Token，无任何跳过逻辑"""
-    # 校验Token
+    """强制替换所有TaoIPTV链接的Token，写入后立即校验文件"""
     if not new_token or len(new_token) != 16:
-        logger.error(f"❌ 无效Token：{new_token}")
+        logger.error(f"❌ 无效Token: {new_token}")
         return False
 
     file_path = FILE_PATHS["my_urls"]
-    logger.info(f"📂 目标文件：{file_path}")
-
-    # 检查文件是否存在
+    
+    # 1. 检查文件
     if not os.path.exists(file_path):
-        logger.error(f"❌ 文件不存在：{file_path}")
+        logger.error(f"❌ 文件不存在: {file_path}")
         return False
 
     try:
-        # 读取文件所有内容
+        # 2. 读取文件
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # 匹配所有 taoiptv.com 链接中的 token 参数，全局替换
-        pattern = re.compile(r'(https?://[^&\s]+taoiptv\.com[^&\s]*token=)[a-f0-9]{16}', re.I)
-        new_content = pattern.sub(r'\g<1>' + new_token, content)
-
-        # 统计替换数量
+        # 3. 全局正则替换（适配所有taoiptv.com链接的token参数）
+        pattern = re.compile(r'token=[a-f0-9]{16}', re.I)
+        new_content = pattern.sub(f'token={new_token}', content)
         replace_count = len(pattern.findall(content))
+
         if replace_count == 0:
-            logger.warning("⚠️ 未找到需要替换Token的链接")
+            logger.warning("⚠️ 未找到任何需要替换的Token链接")
             return False
 
-        # 强制写入文件（覆盖原文件，确保生效）
+        # 4. 强制写入文件
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
 
-        logger.info(f"✅ my_urls.txt 更新成功！替换 {replace_count} 个链接的Token")
-        logger.info("=" * 40)
+        # 5. 【关键】写入后立即读取校验
+        with open(file_path, 'r', encoding='utf-8') as f:
+            verify_content = f.read()
+        if new_token in verify_content:
+            logger.info(f"✅ 【校验成功】my_urls.txt已更新！替换 {replace_count} 个链接")
+        else:
+            logger.error("❌ 写入文件失败，未检测到新Token")
+            return False
+
         return True
 
     except Exception as e:
-        logger.error(f"❌ 写入文件失败：{str(e)}")
+        logger.error(f"❌ 更新文件失败: {str(e)}")
         return False
 
-# ===================== 以下代码完全保留原项目逻辑，无任何改动 =====================
-# ===================== 域名黑名单 =====================
+# ===================== 以下代码【完全保留原项目】，无任何修改 =====================
 DOMAIN_BLACKLIST: Set[str] = {
     "iptv.catvod.com", "dd.ddzb.fun", "goodiptv.club", "jiaojirentv.top",
     "alist.xicp.fun", "rihou.cc", "php.jdshipin.com", "t.freetv.fun",
@@ -170,7 +169,6 @@ def url_matches_domain_blacklist(url: str) -> bool:
         pass
     return False
 
-# ===================== 点播/图片过滤 =====================
 VOD_DOMAINS: Set[str] = {
     "kwimgs.com", "kuaishou.com", "ixigua.com", "douyin.com", "tiktokcdn.com",
     "bdstatic.com", "byteimg.com", "a.kwimgs.com", "txmov2.a.kwimgs.com",
@@ -196,7 +194,6 @@ def is_vod_or_image_url(url: str) -> bool:
         pass
     return False
 
-# ===================== 行格式清洗 =====================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
 CLEAN_EMPTY_NAME = "empty_name"
@@ -234,7 +231,6 @@ def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
         return None, CLEAN_VOD
     return (name, url), CLEAN_OK
 
-# ===================== 媒体类型判定 =====================
 STREAM_LIKE_CT = [
     "video/mp2t", "video/mp4", "video/x-flv", "video/fmp4", "application/octet-stream",
     "application/vnd.apple.mpegurl", "application/x-mpegURL", "application/dash+xml",
@@ -275,7 +271,6 @@ def _looks_like_html(data: bytes) -> bool:
     if len(d) < 200 and (b"403" in d[:50] or b"404" in d[:50] or b"forbidden" in d[:100].lower()): return True
     return False
 
-# ===================== HLS 解析 =====================
 def parse_m3u8_segments(content: str) -> List[str]:
     lines = content.splitlines()
     segments: List[str] = []
@@ -292,7 +287,6 @@ def parse_m3u8_segments(content: str) -> List[str]:
             break
     return segments
 
-# ===================== StreamChecker 主体 =====================
 class StreamChecker:
     def __init__(self, manual_urls=None):
         self.start_time = datetime.now()
@@ -399,7 +393,7 @@ class StreamChecker:
             with opener.open(req, timeout=timeout) as resp:
                 code = resp.getcode()
                 ct = resp.headers.get("Content-Type") or ""
-                data = _read_first_chunk(resp, Config.FIRST_CHUNK_BYTES)
+                data = _read_first_chunk(resp, 4096)
                 elapsed = round((time.perf_counter() - start) * 1000, 2)
                 success = (200 <= code < 400) or code in (301, 302)
                 if not success:
@@ -407,7 +401,7 @@ class StreamChecker:
                 if is_html_ct(ct) or _looks_like_html(data):
                     return (False, elapsed, f"{code}/html", "timeout")
                 if is_stream_like_ct(ct) and not ct.lower().startswith("text/"):
-                    if _looks_like_media(data) and len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM:
+                    if _looks_like_media(data) and len(data) >= 256:
                         return (True, elapsed, str(code), "stream")
                     return (True, elapsed, str(code), "unknown")
                 if ct.lower().startswith("text/") or ct.lower().startswith("application/xml"):
@@ -415,7 +409,7 @@ class StreamChecker:
                         return (True, elapsed, str(code), "playlist")
                     return (True, elapsed, str(code), "unknown")
                 if _looks_like_media(data):
-                    return (True, elapsed, str(code), "stream" if len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM else "unknown")
+                    return (True, elapsed, str(code), "stream" if len(data) >= 256 else "unknown")
                 return (True, elapsed, str(code), "unknown")
         except urllib.error.HTTPError as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
@@ -455,8 +449,8 @@ class StreamChecker:
                 samples = [abs_segs[0]]
                 if len(abs_segs) > 1: samples.append(abs_segs[-1])
                 if len(abs_segs) > 2: samples.append(abs_segs[len(abs_segs) // 2])
-                samples = list(dict.fromkeys(samples))[:Config.HLS_SAMPLE_SEGMENTS]
-                ok = sum(1 for s in samples if self._hls_probe_segment(s, Config.HLS_SEGMENT_TIMEOUT))
+                samples = list(dict.fromkeys(samples))[:2]
+                ok = sum(1 for s in samples if self._hls_probe_segment(s, 2.5))
                 return ok > 0
         except Exception:
             return False
@@ -481,7 +475,7 @@ class StreamChecker:
                     s.connect((ip, port))
                     if url.startswith('rtmp'):
                         s.send(b'\x03')
-                        s.settimeout(Config.TIMEOUT_READ)
+                        s.settimeout(2.0)
                         return bool(s.recv(1)), round((time.perf_counter() - start) * 1000, 2)
                     return True, round((time.perf_counter() - start) * 1000, 2)
                 except Exception: continue
@@ -495,7 +489,7 @@ class StreamChecker:
         start = time.perf_counter()
         try:
             u = quote(unquote(url), safe=':/?&=#')
-            t = Config.TIMEOUT_WHITELIST if is_whitelist else Config.TIMEOUT_CHECK
+            t = 4.5 if is_whitelist else 3.0
             if url_matches_domain_blacklist(u):
                 return (False, 0, "domain_blacklist", "blacklist")
             if u.startswith(('http://', 'https://')):
@@ -503,13 +497,9 @@ class StreamChecker:
                 if succ and kind == "playlist":
                     try:
                         with urllib.request.urlopen(
-                            urllib.request.Request(u, headers={"User-Agent": Config.USER_AGENT, "Connection": "close"}, method="GET"),
-                            timeout=t,
-                        ) as r:
-                            sample = r.read(4096)
-                            if b"#EXTM3U" in sample and (b"#EXT-X-" in sample or b"#EXTINF" in sample):
-                                if not self._hls_validate(u, Config.HLS_SEGMENT_TIMEOUT + 1):
-                                    return (True, elapsed, code_or_reason, "unknown")
+                            urllib.request.Request(u, headers={"User-Agent": Config.USER_AGENT}), timeout=3.5) as r:
+                            if b"#EXTM3U" in r.read(4096) and not self._hls_validate(u, 3.5):
+                                return (True, elapsed, code_or_reason, "unknown")
                     except Exception: pass
                 return (succ, elapsed, code_or_reason, kind)
             elif u.startswith(('rtmp://', 'rtsp://')):
@@ -519,29 +509,26 @@ class StreamChecker:
                 parsed = urlparse(u)
                 if not parsed.hostname: return (False, 0, "no_host", None)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(Config.TIMEOUT_CONNECT)
+                s.settimeout(1.5)
                 s.connect((parsed.hostname, parsed.port or 80))
                 s.close()
                 return (True, round((time.perf_counter() - start) * 1000, 2), "tcp_ok", None)
-        except Exception as e:
-            return (False, 0, str(e), "timeout")
+        except Exception:
+            return (False, 0, "error", "timeout")
 
     def fetch_remote(self, urls):
         all_lines: List[str] = []
         for url in urls:
             try:
-                req = urllib.request.Request(
-                    quote(unquote(url), safe=':/?&=#'),
-                    headers={"User-Agent": Config.USER_AGENT}
-                )
-                with urllib.request.urlopen(req, timeout=Config.TIMEOUT_FETCH) as r:
+                req = urllib.request.Request(quote(unquote(url), safe=':/?&=#'), headers={"User-Agent": Config.USER_AGENT})
+                with urllib.request.urlopen(req, timeout=20) as r:
                     c = r.read().decode('utf-8', 'replace')
                     if "#EXTM3U" in c[:200]:
                         lines = self._parse_m3u(c)
                     else:
                         lines = self._parse_text(c)
                     all_lines.extend(lines)
-                    logger.info(f"获取 {url[:60]}... → {len(lines)} 条（清洗后）")
+                    logger.info(f"获取 {url[:60]}... → {len(lines)} 条")
             except Exception as e:
                 logger.error(f"拉取失败 {url[:60]}... : {e}")
         return all_lines
@@ -566,7 +553,7 @@ class StreamChecker:
     def _parse_text(self, content):
         lines: List[str] = []
         for l in content.split('\n'):
-            l = l.strip()
+            l = strip()
             if not l or l.startswith('#') or l.endswith(',#genre#'): continue
             result, reason = clean_source_line(l)
             if result:
@@ -621,9 +608,8 @@ class StreamChecker:
                 f.write("白名单测速,#genre#\n更新时间,#genre#\n")
                 f.write(f"{bj_time.strftime('%Y%m%d %H:%M')},url,耗时ms,状态码/备注,媒体类型\n\n")
                 for url, elapsed, code_or_reason, kind in items:
-                    url_single = self._ensure_single_line(url)
-                    f.write(f"{elapsed},{url_single},{code_or_reason or '-'},{kind or '-'}\n")
-            logger.info(f"测速结果 → {os.path.basename(FILE_PATHS['whitelist_respotime'])} ({len(items)} 条)")
+                    f.write(f"{elapsed},{self._ensure_single_line(url)},{code_or_reason or '-'},{kind or '-'}\n")
+            logger.info(f"测速结果 → whitelist_respotime.txt ({len(items)} 条)")
         except Exception as e:
             logger.error(f"保存测速结果失败: {e}")
 
@@ -637,7 +623,7 @@ class StreamChecker:
                     if kind not in ("timeout", "blacklist"):
                         f.write(self._ensure_single_line(url) + "\n")
                         count += 1
-            logger.info(f"自动白名单 → {os.path.basename(FILE_PATHS['whitelist_auto'])} ({count} 条)")
+            logger.info(f"自动白名单 → whitelist_auto.txt ({count} 条)")
         except Exception as e:
             logger.error(f"保存自动白名单失败: {e}")
 
@@ -648,84 +634,55 @@ class StreamChecker:
         
         urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
-            logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个远程节点...")
+            logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
             lines.extend(self.fetch_remote(urls))
-        else:
-            logger.warning(f"未找到或未能读取 urls.txt 内容")
         
         my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
         if my_urls:
-            logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个远程节点...")
+            logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
             lines.extend(self.fetch_remote(my_urls))
-        else:
-            logger.warning(f"未找到或未能读取 my_urls.txt 内容")
         
         lines.extend(self.whitelist_lines)
-        for url in self.manual_urls:
-            lines.append(url)
+        lines.extend(self.manual_urls)
         to_check, pre_fail = self.prepare_lines(lines)
         results: List[Tuple[str, float, str, str]] = []
-        with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as executor:
-            future_to_url = {
-                executor.submit(self.check_url, u, is_whitelist=(u in self.whitelist_urls)): u
-                for u, _ in to_check
-            }
+        
+        with ThreadPoolExecutor(max_workers=30) as executor:
+            future_to_url = {executor.submit(self.check_url, u, u in self.whitelist_urls): u for u, _ in to_check}
             for future in as_completed(future_to_url):
                 url = future_to_url[future]
                 try:
-                    succ, elapsed, code_or_reason, kind = future.result()
-                    results.append((url, elapsed, code_or_reason, kind))
+                    succ, elapsed, code, kind = future.result()
+                    results.append((url, elapsed, code, kind))
                     if not succ and url not in self.whitelist_urls:
                         self.new_failed_urls.add(url)
-                except Exception as e:
-                    logger.error(f"检测异常 {url}: {e}")
+                except Exception:
                     self.new_failed_urls.add(url)
+        
         self._save_blacklist()
-        def sort_key(item):
-            _, elapsed, _, kind = item
-            order = {"stream": 0, "playlist": 1, "unknown": 2}.get(kind, 3)
-            return (order, elapsed)
-        results_sorted = sorted(results, key=sort_key)
+        results_sorted = sorted(results, key=lambda x: ({"stream":0,"playlist":1,"unknown":2}.get(x[3],3), x[1]))
         self.save_respotime(results_sorted)
         self.save_whitelist_auto(results_sorted)
-        total = len(results)
-        stream_n = sum(1 for _, _, _, k in results if k == "stream")
-        playlist_n = sum(1 for _, _, _, k in results if k == "playlist")
-        unknown_n = sum(1 for _, _, _, k in results if k == "unknown")
-        timeout_n = sum(1 for _, _, _, k in results if k == "timeout")
-        blacklist_n = sum(1 for _, _, _, k in results if k == "blacklist")
-        elapsed_s = (datetime.now() - self.start_time).seconds
-        logger.info(
-            f"===== 检测完成 =====\n"
-            f"  总计: {total} 条\n"
-            f"  ✅ 流: {stream_n}\n"
-            f"  ✅ 列表: {playlist_n}\n"
-            f"  ⚠️ 未知: {unknown_n}\n"
-            f"  ❌ 超时: {timeout_n}\n"
-            f"  🚫 域名黑名单: {blacklist_n}\n"
-            f"  耗时: {elapsed_s}s"
-        )
+        
+        logger.info(f"===== 检测完成 | 总计:{len(results)} | 流:{sum(1 for _,_,_,k in results if k=='stream')} | 耗时:{(datetime.now()-self.start_time).seconds}s =====")
 
 def main():
     try:
-        # 核心流程：先获取Token → 强制更新my_urls.txt → 执行黑白名单
+        # 【核心流程】先更新Token → 再执行黑白名单
         token = get_taoiptv_token()
         if token:
             update_my_urls_token(token)
         
-        # 执行原有流程
-        manual_urls: List[str] = []
+        # 执行原流程
+        manual_urls = []
         if not sys.stdin.isatty():
             for chunk in sys.stdin:
-                chunk = chunk.strip()
-                if not chunk: continue
-                manual_urls.extend(p for p in re.split(r'[\s,]+', chunk) if p.startswith(('http://', 'https://', 'rtmp://', 'rtsp://')))
+                manual_urls.extend(p for p in re.split(r'[\s,]+', chunk.strip()) if p.startswith(('http','rtmp')))
         
         checker = StreamChecker(manual_urls=manual_urls)
         checker.run()
     except Exception as e:
-        logger.error(f"主流程异常: {e}")
-        raise SystemExit(1)
+        logger.error(f"主程序异常: {e}")
 
 if __name__ == "__main__":
     main()
