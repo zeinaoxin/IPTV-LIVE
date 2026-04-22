@@ -14,10 +14,12 @@ import sys
 # ===================== 文件路径 =====================
 def get_file_paths():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
+    # 修复路径Bug：current_dir 是 .../assets/whitelist-blacklist
+    # assets_dir 是 .../assets
+    assets_dir = os.path.dirname(current_dir)
     return {
-        "urls": os.path.join(parent_dir, 'assets/urls.txt'),
-        "my_urls": os.path.join(parent_dir, 'assets/my_urls.txt'),  # 新增自定义源文件
+        "urls": os.path.join(assets_dir, 'urls.txt'),           # 修正：不再重复拼接 assets
+        "my_urls": os.path.join(assets_dir, 'my_urls.txt'),     # 修正：不再重复拼接 assets
         "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
         "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
         "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
@@ -44,7 +46,7 @@ class Config:
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
     )
-    TIMEOUT_FETCH = 15       # 增加拉取远程文件的超时时间，防止Actions网络波动丢源
+    TIMEOUT_FETCH = 15       
     TIMEOUT_CHECK = 3.0
     TIMEOUT_WHITELIST = 4.5
     TIMEOUT_CONNECT = 1.5
@@ -56,8 +58,6 @@ class Config:
     HLS_SEGMENT_TIMEOUT = 2.5
 
 # ===================== 域名黑名单 =====================
-# 【修复核心】绝对不能从 blacklist_auto.txt 自动提取域名！
-# 只能硬编码那些提供假源/死链的非法域名，避免因临时超时导致整个CDN被误杀。
 DOMAIN_BLACKLIST: Set[str] = {
     "iptv.catvod.com",
     "dd.ddzb.fun",
@@ -294,11 +294,18 @@ class StreamChecker:
         except Exception as e:
             logger.error(f"保存黑名单失败: {e}")
 
-    def read_file(self, file_path):
+    def read_file(self, file_path, split_by_space=False):
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
-                return [line.strip() for line in f if line.strip()]
-        except Exception:
+                content = f.read()
+            if split_by_space:
+                # 修复Bug：专门适配 urls.txt 和 my_urls.txt 这种纯 URL 用空格隔开的格式
+                return [line.strip() for line in re.split(r'[\s\t\n]+', content) if line.strip() and line.strip().startswith('http')]
+            else:
+                # 正常按行读取（用于白名单、黑名单等包含逗号的文件）
+                return [line.strip() for line in content.splitlines() if line.strip()]
+        except Exception as e:
+            logger.warning(f"读取文件失败 {file_path}: {e}")
             return []
 
     def _ssl_ctx(self):
@@ -461,7 +468,7 @@ class StreamChecker:
             try:
                 req = urllib.request.Request(
                     quote(unquote(url), safe=':/?&=#'),
-                    headers={"User-Agent": Config.USER_AGENT}  # 使用浏览器UA防拦截
+                    headers={"User-Agent": Config.USER_AGENT}
                 )
                 with urllib.request.urlopen(req, timeout=Config.TIMEOUT_FETCH) as r:
                     c = r.read().decode('utf-8', 'replace')
@@ -557,7 +564,7 @@ class StreamChecker:
                 for url, elapsed, code_or_reason, kind in items:
                     url_single = self._ensure_single_line(url)
                     f.write(f"{elapsed},{url_single},{code_or_reason or '-'},{kind or '-'}\n")
-            logger.info(f"测速结果 → {FILE_PATHS['whitelist_respotime']} ({len(items)} 条)")
+            logger.info(f"测速结果 → {os.path.basename(FILE_PATHS['whitelist_respotime'])} ({len(items)} 条)")
         except Exception as e:
             logger.error(f"保存测速结果失败: {e}")
 
@@ -571,7 +578,7 @@ class StreamChecker:
                     if kind not in ("timeout", "blacklist"):
                         f.write(self._ensure_single_line(url) + "\n")
                         count += 1
-            logger.info(f"自动白名单 → {FILE_PATHS['whitelist_auto']} ({count} 条)")
+            logger.info(f"自动白名单 → {os.path.basename(FILE_PATHS['whitelist_auto'])} ({count} 条)")
         except Exception as e:
             logger.error(f"保存自动白名单失败: {e}")
 
@@ -581,17 +588,21 @@ class StreamChecker:
 
         lines: List[str] = []
         
-        # 读取并拉取标准 urls.txt
-        urls = self.read_file(FILE_PATHS["urls"])
+        # 读取并拉取标准 urls.txt (注意开启 split_by_space 兼容空格分隔)
+        urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
             logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个远程节点...")
             lines.extend(self.fetch_remote(urls))
+        else:
+            logger.warning(f"未找到或未能读取 urls.txt 内容")
         
-        # 读取并拉取自定义 my_urls.txt
-        my_urls = self.read_file(FILE_PATHS["my_urls"])
+        # 读取并拉取自定义 my_urls.txt (注意开启 split_by_space 兼容空格分隔)
+        my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
         if my_urls:
             logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个远程节点...")
             lines.extend(self.fetch_remote(my_urls))
+        else:
+            logger.warning(f"未找到或未能读取 my_urls.txt 内容")
         
         lines.extend(self.whitelist_lines)
         for url in self.manual_urls:
