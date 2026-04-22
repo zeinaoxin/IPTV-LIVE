@@ -1,12 +1,12 @@
-2026-04-21 15:33:12,407 - 域名黑名单: 硬编码 10 + 自动补充 3109 = 3110 个域名
-2026-04-21 15:33:12,656 - 加载 URL 黑名单: 212591 条
-2026-04-21 15:33:12,656 - ===== 程序开始: 20260421 15:33:12 =====
-2026-04-21 15:33:12,749 - 手动白名单: 0 个频道
-2026-04-21 15:33:12,749 - 待检测 0 条，跳过 0 条（URL黑名单）
-2026-04-21 15:33:12,749 - 格式清洗统计: no_format=5, domain_blacklist=173
-2026-04-21 15:33:12,749 - 测速结果 → /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_respotime.txt (0 条)
-2026-04-21 15:33:12,749 - 自动白名单 → /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_auto.txt (0 条)
-2026-04-21 15:33:12,750 - ===== 检测完成 =====
+2026-04-22 08:18:09,303 - 域名黑名单: 硬编码 10 + 自动补充 3109 = 3110 个域名
+2026-04-22 08:18:09,545 - 加载 URL 黑名单: 212591 条
+2026-04-22 08:18:09,545 - ===== 程序开始: 20260422 08:18:09 =====
+2026-04-22 08:18:09,594 - 手动白名单: 0 个频道
+2026-04-22 08:18:09,595 - 待检测 0 条，跳过 0 条（URL黑名单）
+2026-04-22 08:18:09,595 - 格式清洗统计: no_format=5, domain_blacklist=173
+2026-04-22 08:18:09,595 - 测速结果 → /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_respotime.txt (0 条)
+2026-04-22 08:18:09,595 - 自动白名单 → /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/whitelist_auto.txt (0 条)
+2026-04-22 08:18:09,595 - ===== 检测完成 =====
   总计: 0 条
   ✅ 流: 0
   ✅ 列表: 0
