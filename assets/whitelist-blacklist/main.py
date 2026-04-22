@@ -59,7 +59,7 @@ class Config:
 
 # ===================== 域名黑名单 =====================
 DOMAIN_BLACKLIST: Set[str] = {
-    "iptv.catvod.com",
+    "iptv.catvod.com"，
     "dd.ddzb.fun",
     "goodiptv.club",
     "jiaojirentv.top",
@@ -68,6 +68,7 @@ DOMAIN_BLACKLIST: Set[str] = {
     "php.jdshipin.com",
     "t.freetv.fun",
     "stream1.freetv.fun",
+	"hlsztemgsplive.miguvideo",
     "stream2.freetv.fun",
 }
 
@@ -271,7 +272,7 @@ class StreamChecker:
                     "更新时间,#genre#",
                     f"{bj_time.strftime('%Y%m%d %H:%M')},url",
                     "",
-                    "blacklist,#genre#",
+                    "blacklist,#genre#"，
                 ])
 
             existing_urls: Set[str] = set()
