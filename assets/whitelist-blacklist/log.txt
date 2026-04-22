@@ -1,214 +1,210 @@
-2026-04-22 14:52:08,751 - INFO - 域名黑名单: 仅使用硬编码绝对坏域名 11 个
-2026-04-22 14:52:08,752 - INFO - ===== 开始执行 =====
-2026-04-22 14:52:08,752 - INFO - 正在获取TaoIPTV Token...
-2026-04-22 14:52:10,350 - INFO - ✅ 成功获取Token: 8c78df7c7c0f4844
-2026-04-22 14:52:10,352 - INFO - ✅ 成功更新 98 个链接的Token
-2026-04-22 14:52:10,352 - INFO - ===== 开始WhiteList BlackList流程 =====
-2026-04-22 14:52:10,592 - INFO - 加载 URL 精确黑名单: 214229 条
-2026-04-22 14:52:10,592 - INFO - ===== 程序开始: 20260422 14:52:10 =====
-2026-04-22 14:52:10,596 - INFO - 手动白名单: 168 个频道
-2026-04-22 14:52:10,596 - INFO - 开始拉取 urls.txt 中的 91 个远程节点...
-2026-04-22 14:52:10,787 - INFO - 获取 https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/... → 1013 条（清洗后）
-2026-04-22 14:52:10,874 - INFO - 获取 https://raw.githubusercontent.com/Supprise0901/TVBox_live/re... → 379 条（清洗后）
-2026-04-22 14:52:11,001 - INFO - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs... → 31 条（清洗后）
-2026-04-22 14:52:11,339 - INFO - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 1125 条（清洗后）
-2026-04-22 14:52:11,464 - INFO - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 798 条（清洗后）
-2026-04-22 14:52:11,562 - INFO - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 166 条（清洗后）
-2026-04-22 14:52:11,650 - INFO - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 97 条（清洗后）
-2026-04-22 14:52:11,728 - INFO - 获取 https://raw.githubusercontent.com/skddyj/iptv/refs/heads/mai... → 82 条（清洗后）
-2026-04-22 14:52:11,857 - INFO - 获取 https://raw.githubusercontent.com/cyalias/mytvs-github/refs/... → 706 条（清洗后）
-2026-04-22 14:52:11,976 - INFO - 获取 https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/m... → 184 条（清洗后）
-2026-04-22 14:52:12,104 - INFO - 获取 https://raw.githubusercontent.com/Free-TV/IPTV/master/playli... → 1892 条（清洗后）
-2026-04-22 14:52:12,139 - INFO - 获取 https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.... → 125 条（清洗后）
-2026-04-22 14:52:12,251 - INFO - 获取 https://raw.githubusercontent.com/onlylove2023/iptv/refs/hea... → 61 条（清洗后）
-2026-04-22 14:52:12,315 - ERROR - 拉取失败 https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/ma... : HTTP Error 404: Not Found
-2026-04-22 14:52:12,405 - INFO - 获取 https://raw.githubusercontent.com/fanmingming/live/refs/head... → 82 条（清洗后）
-2026-04-22 14:52:12,486 - INFO - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs... → 70 条（清洗后）
-2026-04-22 14:52:12,970 - INFO - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/re... → 15494 条（清洗后）
-2026-04-22 14:52:13,425 - INFO - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/re... → 12362 条（清洗后）
-2026-04-22 14:52:13,507 - INFO - 获取 https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs... → 66 条（清洗后）
-2026-04-22 14:52:13,910 - INFO - 获取 https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_liv... → 10692 条（清洗后）
-2026-04-22 14:52:13,964 - ERROR - 拉取失败 https://raw.githubusercontent.com/8080713/iptv-api666/refs/h... : HTTP Error 404: Not Found
-2026-04-22 14:52:14,129 - INFO - 获取 https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/he... → 385 条（清洗后）
-2026-04-22 14:52:14,220 - INFO - 获取 https://raw.githubusercontent.com/wwb521/live/refs/heads/mai... → 57 条（清洗后）
-2026-04-22 14:52:14,344 - INFO - 获取 https://raw.githubusercontent.com/zhi35/iptv/refs/heads/mast... → 508 条（清洗后）
-2026-04-22 14:52:14,437 - INFO - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/h... → 54 条（清洗后）
-2026-04-22 14:52:14,594 - INFO - 获取 https://raw.githubusercontent.com/0610840119/iptv-api/refs/h... → 669 条（清洗后）
-2026-04-22 14:52:14,682 - INFO - 获取 https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/mas... → 58 条（清洗后）
-2026-04-22 14:52:14,795 - INFO - 获取 https://raw.githubusercontent.com/MemoryCollection/IPTV/refs... → 50 条（清洗后）
-2026-04-22 14:52:14,885 - INFO - 获取 https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/... → 80 条（清洗后）
-2026-04-22 14:52:15,100 - INFO - 获取 https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/m... → 5698 条（清洗后）
-2026-04-22 14:52:15,229 - INFO - 获取 https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3... → 342 条（清洗后）
-2026-04-22 14:52:15,367 - INFO - 获取 https://raw.githubusercontent.com/gaotianliuyun/gao/master/l... → 202 条（清洗后）
-2026-04-22 14:52:15,537 - INFO - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/mast... → 31 条（清洗后）
-2026-04-22 14:52:15,677 - INFO - 获取 https://raw.githubusercontent.com/vbskycn/iptv/master/tv/ipt... → 1041 条（清洗后）
-2026-04-22 14:52:15,796 - INFO - 获取 https://raw.githubusercontent.com/junge3333/juds6/main/yszb1... → 1447 条（清洗后）
-2026-04-22 14:52:15,878 - INFO - 获取 https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.t... → 92 条（清洗后）
-2026-04-22 14:52:15,982 - INFO - 获取 https://raw.githubusercontent.com/maitel2020/iptv-self-use/m... → 71 条（清洗后）
-2026-04-22 14:52:16,089 - INFO - 获取 https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/... → 314 条（清洗后）
-2026-04-22 14:52:16,188 - INFO - 获取 https://raw.githubusercontent.com/xiongjian83/TvBox/refs/hea... → 662 条（清洗后）
-2026-04-22 14:52:16,296 - INFO - 获取 https://raw.githubusercontent.com/yoursmile66/TVBox/refs/hea... → 933 条（清洗后）
-2026-04-22 14:52:16,392 - INFO - 获取 https://raw.githubusercontent.com/alienlu/iptv/refs/heads/ma... → 332 条（清洗后）
-2026-04-22 14:52:16,499 - INFO - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 151 条（清洗后）
-2026-04-22 14:52:16,612 - INFO - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 286 条（清洗后）
-2026-04-22 14:52:16,696 - INFO - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 43 条（清洗后）
-2026-04-22 14:52:16,752 - INFO - 获取 https://raw.githubusercontent.com/develop202/migu_video/refs... → 368 条（清洗后）
-2026-04-22 14:52:17,391 - INFO - 获取 https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/m... → 12183 条（清洗后）
-2026-04-22 14:52:17,769 - INFO - 获取 https://iptv.catvod.com/tv.m3u... → 2 条（清洗后）
-2026-04-22 14:52:32,224 - INFO - 获取 https://xn--6orr3pi6g9uu.top/zb/zb.txt... → 331 条（清洗后）
-2026-04-22 14:52:32,837 - INFO - 获取 https://tv.iill.top/m3u/Gather... → 1303 条（清洗后）
-2026-04-22 14:52:34,234 - INFO - 获取 https://m.iill.top/Live.m3u... → 0 条（清洗后）
-2026-04-22 14:52:34,287 - INFO - 获取 https://tv.iill.top/m3u/Sport... → 36 条（清洗后）
-2026-04-22 14:52:39,325 - INFO - 获取 https://live.freetv.top/huyayqk.m3u... → 2 条（清洗后）
-2026-04-22 14:52:43,836 - INFO - 获取 https://live.freetv.top/douyuyqk.m3u... → 2 条（清洗后）
-2026-04-22 14:52:45,450 - INFO - 获取 https://live.zhoujie218.top/tv/iptv4.txt... → 1041 条（清洗后）
-2026-04-22 14:52:45,556 - INFO - 获取 https://t.freetv.fun/m3u/playlist.txt... → 197 条（清洗后）
-2026-04-22 14:52:45,588 - INFO - 获取 https://t.freetv.fun/m3u/taiwan.txt... → 17 条（清洗后）
-2026-04-22 14:52:45,615 - INFO - 获取 https://t.freetv.fun/m3u/hong_kong.txt... → 0 条（清洗后）
-2026-04-22 14:52:45,642 - INFO - 获取 https://t.freetv.fun/m3u/macao.txt... → 0 条（清洗后）
-2026-04-22 14:52:45,982 - INFO - 获取 https://t.freetv.fun/m3u/japan.txt... → 0 条（清洗后）
-2026-04-22 14:52:46,252 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u... → 350 条（清洗后）
-2026-04-22 14:52:46,487 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u... → 44 条（清洗后）
-2026-04-22 14:52:46,706 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u... → 12 条（清洗后）
-2026-04-22 14:52:46,933 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u... → 33 条（清洗后）
-2026-04-22 14:52:47,140 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u... → 114 条（清洗后）
-2026-04-22 14:52:47,371 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u... → 5 条（清洗后）
-2026-04-22 14:52:47,595 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u... → 3 条（清洗后）
-2026-04-22 14:52:47,810 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u... → 42 条（清洗后）
-2026-04-22 14:52:48,040 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u... → 5 条（清洗后）
-2026-04-22 14:52:48,260 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u... → 38 条（清洗后）
-2026-04-22 14:52:48,469 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u... → 1 条（清洗后）
-2026-04-22 14:52:48,675 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u... → 1 条（清洗后）
-2026-04-22 14:52:48,893 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u... → 77 条（清洗后）
-2026-04-22 14:52:49,090 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u... → 3 条（清洗后）
-2026-04-22 14:52:49,305 - INFO - 获取 https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u... → 0 条（清洗后）
-2026-04-22 14:52:50,424 - INFO - 获取 https://tv.850930.xyz/kdsb.txt... → 5197 条（清洗后）
-2026-04-22 14:52:50,562 - INFO - 获取 https://tv.850930.xyz/pix.m3u... → 59 条（清洗后）
-2026-04-22 14:52:50,679 - INFO - 获取 https://live.zbds.org/tv/iptv4.txt... → 1041 条（清洗后）
-2026-04-22 14:52:51,007 - INFO - 获取 https://iptv.zsdc.eu.org/home/iptv.m3u8... → 151 条（清洗后）
-2026-04-22 14:52:51,461 - INFO - 获取 https://freetv.fun/test_channels_original_new.txt... → 22 条（清洗后）
-2026-04-22 14:52:52,980 - INFO - 获取 https://jihulab.com/-/snippets/5265/raw/main/.txt... → 0 条（清洗后）
-2026-04-22 14:52:53,051 - INFO - 获取 https://iptv-org.github.io/iptv/languages/zho.m3u... → 206 条（清洗后）
-2026-04-22 14:52:53,128 - INFO - 获取 https://iptv-org.github.io/iptv/countries/us.m3u... → 1352 条（清洗后）
-2026-04-22 14:52:53,186 - INFO - 获取 https://iptv-org.github.io/iptv/countries/tw.m3u... → 23 条（清洗后）
-2026-04-22 14:52:55,362 - INFO - 获取 https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-a... → 1872 条（清洗后）
-2026-04-22 14:52:55,961 - ERROR - 拉取失败 https://fm1077.serv00.net/SmartTV.m3u... : HTTP Error 403: Forbidden
-2026-04-22 14:52:56,043 - INFO - 获取 https://m3u.ibert.me/txt/fmml_ipv6.txt... → 82 条（清洗后）
-2026-04-22 14:52:56,112 - INFO - 获取 https://m3u.ibert.me/txt/ycl_iptv.txt... → 90 条（清洗后）
-2026-04-22 14:52:56,181 - INFO - 获取 https://m3u.ibert.me/txt/y_g.txt... → 125 条（清洗后）
-2026-04-22 14:52:56,474 - INFO - 获取 https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt... → 483 条（清洗后）
-2026-04-22 14:52:58,456 - INFO - 获取 https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F... → 184 条（清洗后）
-2026-04-22 14:52:58,986 - INFO - 获取 http://tot.totalh.net/tttt.txt... → 759 条（清洗后）
-2026-04-22 14:52:58,988 - INFO - 开始拉取 my_urls.txt 中的 98 个远程节点...
-2026-04-22 14:53:00,117 - INFO - 获取 https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:00,822 - INFO - 获取 https://taoiptv.com/lives/44025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:01,531 - INFO - 获取 https://taoiptv.com/lives/43025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:02,247 - INFO - 获取 https://taoiptv.com/lives/42025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:02,953 - INFO - 获取 https://taoiptv.com/lives/41025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:03,655 - INFO - 获取 https://taoiptv.com/lives/31025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:04,351 - INFO - 获取 https://taoiptv.com/lives/11025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:05,072 - INFO - 获取 https://taoiptv.com/lives/51015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:05,776 - INFO - 获取 https://taoiptv.com/lives/45015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:06,485 - INFO - 获取 https://taoiptv.com/lives/44015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:07,198 - INFO - 获取 https://taoiptv.com/lives/43015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:07,914 - INFO - 获取 https://taoiptv.com/lives/42015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:08,628 - INFO - 获取 https://taoiptv.com/lives/41015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:09,345 - INFO - 获取 https://taoiptv.com/lives/34015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:10,046 - INFO - 获取 https://taoiptv.com/lives/22015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:10,748 - INFO - 获取 https://taoiptv.com/lives/31015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:11,462 - INFO - 获取 https://taoiptv.com/lives/11015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:12,181 - INFO - 获取 https://taoiptv.com/lives/45023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:12,888 - INFO - 获取 https://taoiptv.com/lives/44023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:13,611 - INFO - 获取 https://taoiptv.com/lives/43023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:14,321 - INFO - 获取 https://taoiptv.com/lives/42023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:15,059 - INFO - 获取 https://taoiptv.com/lives/41023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:15,774 - INFO - 获取 https://taoiptv.com/lives/37023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:16,473 - INFO - 获取 https://taoiptv.com/lives/36023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:17,160 - INFO - 获取 https://taoiptv.com/lives/35023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:17,883 - INFO - 获取 https://taoiptv.com/lives/34023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:18,617 - INFO - 获取 https://taoiptv.com/lives/33023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:19,322 - INFO - 获取 https://taoiptv.com/lives/32023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:20,034 - INFO - 获取 https://taoiptv.com/lives/31023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:20,756 - INFO - 获取 https://taoiptv.com/lives/22023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:21,472 - INFO - 获取 https://taoiptv.com/lives/21023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:22,187 - INFO - 获取 https://taoiptv.com/lives/15023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:22,886 - INFO - 获取 https://taoiptv.com/lives/14023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:23,595 - INFO - 获取 https://taoiptv.com/lives/13023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:24,306 - INFO - 获取 https://taoiptv.com/lives/12023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:25,008 - INFO - 获取 https://taoiptv.com/lives/11023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:25,709 - INFO - 获取 https://taoiptv.com/lives/65013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:26,427 - INFO - 获取 https://taoiptv.com/lives/62013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:27,151 - INFO - 获取 https://taoiptv.com/lives/61013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:27,847 - INFO - 获取 https://taoiptv.com/lives/52013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:28,553 - INFO - 获取 https://taoiptv.com/lives/51013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:29,262 - INFO - 获取 https://taoiptv.com/lives/45013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:29,974 - INFO - 获取 https://taoiptv.com/lives/44013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:30,686 - INFO - 获取 https://taoiptv.com/lives/43013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:31,395 - INFO - 获取 https://taoiptv.com/lives/42013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:32,101 - INFO - 获取 https://taoiptv.com/lives/41013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:32,808 - INFO - 获取 https://taoiptv.com/lives/37013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:33,519 - INFO - 获取 https://taoiptv.com/lives/34013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:34,242 - INFO - 获取 https://taoiptv.com/lives/33013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:34,937 - INFO - 获取 https://taoiptv.com/lives/32013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:35,632 - INFO - 获取 https://taoiptv.com/lives/31013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:36,340 - INFO - 获取 https://taoiptv.com/lives/23013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:37,039 - INFO - 获取 https://taoiptv.com/lives/22013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:37,748 - INFO - 获取 https://taoiptv.com/lives/21013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:38,483 - INFO - 获取 https://taoiptv.com/lives/14013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:39,176 - INFO - 获取 https://taoiptv.com/lives/13013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:39,903 - INFO - 获取 https://taoiptv.com/lives/11013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:40,601 - INFO - 获取 https://taoiptv.com/lives/64024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:41,296 - INFO - 获取 https://taoiptv.com/lives/63024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:42,002 - INFO - 获取 https://taoiptv.com/lives/51024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:42,717 - INFO - 获取 https://taoiptv.com/lives/50024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:43,440 - INFO - 获取 https://taoiptv.com/lives/46024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:44,170 - INFO - 获取 https://taoiptv.com/lives/44024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:44,873 - INFO - 获取 https://taoiptv.com/lives/42024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:45,589 - INFO - 获取 https://taoiptv.com/lives/41024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:46,276 - INFO - 获取 https://taoiptv.com/lives/37024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:46,978 - INFO - 获取 https://taoiptv.com/lives/35024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:47,695 - INFO - 获取 https://taoiptv.com/lives/31024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:48,399 - INFO - 获取 https://taoiptv.com/lives/23024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:49,110 - INFO - 获取 https://taoiptv.com/lives/22024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:49,810 - INFO - 获取 https://taoiptv.com/lives/21024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:50,528 - INFO - 获取 https://taoiptv.com/lives/15024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:51,234 - INFO - 获取 https://taoiptv.com/lives/14024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:51,951 - INFO - 获取 https://taoiptv.com/lives/13024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:52,653 - INFO - 获取 https://taoiptv.com/lives/12024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:53,356 - INFO - 获取 https://taoiptv.com/lives/11024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:54,092 - INFO - 获取 https://taoiptv.com/lives/62014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:54,811 - INFO - 获取 https://taoiptv.com/lives/61014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:55,523 - INFO - 获取 https://taoiptv.com/lives/51014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:56,231 - INFO - 获取 https://taoiptv.com/lives/50014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:56,940 - INFO - 获取 https://taoiptv.com/lives/46014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:57,632 - INFO - 获取 https://taoiptv.com/lives/45014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:58,335 - INFO - 获取 https://taoiptv.com/lives/44014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:59,049 - INFO - 获取 https://taoiptv.com/lives/43014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:53:59,774 - INFO - 获取 https://taoiptv.com/lives/42014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:00,498 - INFO - 获取 https://taoiptv.com/lives/41014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:01,210 - INFO - 获取 https://taoiptv.com/lives/37014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:01,916 - INFO - 获取 https://taoiptv.com/lives/36014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:02,603 - INFO - 获取 https://taoiptv.com/lives/34014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:03,313 - INFO - 获取 https://taoiptv.com/lives/33014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:04,019 - INFO - 获取 https://taoiptv.com/lives/31014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:04,738 - INFO - 获取 https://taoiptv.com/lives/22014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:05,449 - INFO - 获取 https://taoiptv.com/lives/21014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:06,174 - INFO - 获取 https://taoiptv.com/lives/15014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:06,886 - INFO - 获取 https://taoiptv.com/lives/14014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:07,597 - INFO - 获取 https://taoiptv.com/lives/13014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:08,300 - INFO - 获取 https://taoiptv.com/lives/12014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:09,016 - INFO - 获取 https://taoiptv.com/lives/11014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
-2026-04-22 14:54:10,746 - INFO - 待检测 4731 条，跳过 45165 条（URL黑名单）
-2026-04-22 14:54:10,746 - INFO - 格式清洗统计: no_format=1837, empty_name=1, domain_blacklist=19554, vod_filtered=165510
-2026-04-22 14:57:17,624 - INFO - 黑名单已更新: 新增 48 条
-2026-04-22 14:57:17,658 - INFO - 测速结果 → whitelist_respotime.txt (4731 条)
-2026-04-22 14:57:17,661 - INFO - 自动白名单 → whitelist_auto.txt (4517 条)
-2026-04-22 14:57:17,664 - INFO - ===== 检测完成 =====
-  总计: 4731 条
-  ✅ 流: 172
-  ✅ 列表: 59
-  ⚠️ 未知: 4282
-  ❌ 超时: 214
-  🚫 域名黑名单: 0
-  耗时: 307s
-2026-04-22 14:57:17,672 - INFO - ===== 全部执行完成 =====
+2026-04-22 15:00:48,099 - 域名黑名单: 仅使用硬编码绝对坏域名 11 个
+2026-04-22 15:00:48,348 - 加载 URL 精确黑名单: 214277 条
+2026-04-22 15:00:48,348 - ===== 程序开始: 20260422 15:00:48 =====
+2026-04-22 15:00:50,194 - 获取到 taoiptv Token: 8c78df7c7c0f4844
+2026-04-22 15:00:50,195 - 已更新 /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls.txt 中 98 个 taoiptv Token
+2026-04-22 15:00:50,199 - 手动白名单: 168 个频道
+2026-04-22 15:00:50,200 - 开始拉取 urls.txt 中的 91 个远程节点...
+2026-04-22 15:00:50,497 - 获取 https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/... → 1013 条（清洗后）
+2026-04-22 15:00:50,531 - 获取 https://raw.githubusercontent.com/Supprise0901/TVBox_live/re... → 379 条（清洗后）
+2026-04-22 15:00:50,807 - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs... → 31 条（清洗后）
+2026-04-22 15:00:51,205 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 1125 条（清洗后）
+2026-04-22 15:00:51,400 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 798 条（清洗后）
+2026-04-22 15:00:51,559 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 166 条（清洗后）
+2026-04-22 15:00:51,716 - 获取 https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/... → 97 条（清洗后）
+2026-04-22 15:00:51,889 - 获取 https://raw.githubusercontent.com/skddyj/iptv/refs/heads/mai... → 82 条（清洗后）
+2026-04-22 15:00:52,046 - 获取 https://raw.githubusercontent.com/cyalias/mytvs-github/refs/... → 706 条（清洗后）
+2026-04-22 15:00:52,171 - 获取 https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/m... → 184 条（清洗后）
+2026-04-22 15:00:52,405 - 获取 https://raw.githubusercontent.com/Free-TV/IPTV/master/playli... → 1892 条（清洗后）
+2026-04-22 15:00:52,570 - 获取 https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.... → 125 条（清洗后）
+2026-04-22 15:00:52,715 - 获取 https://raw.githubusercontent.com/onlylove2023/iptv/refs/hea... → 61 条（清洗后）
+2026-04-22 15:00:52,860 - 拉取失败 https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/ma... : HTTP Error 404: Not Found
+2026-04-22 15:00:52,972 - 获取 https://raw.githubusercontent.com/fanmingming/live/refs/head... → 82 条（清洗后）
+2026-04-22 15:00:53,230 - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs... → 70 条（清洗后）
+2026-04-22 15:00:54,010 - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/re... → 15494 条（清洗后）
+2026-04-22 15:00:54,644 - 获取 https://raw.githubusercontent.com/kimwang1978/collect-txt/re... → 12362 条（清洗后）
+2026-04-22 15:00:54,812 - 获取 https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs... → 66 条（清洗后）
+2026-04-22 15:00:55,438 - 获取 https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_liv... → 10692 条（清洗后）
+2026-04-22 15:00:55,557 - 拉取失败 https://raw.githubusercontent.com/8080713/iptv-api666/refs/h... : HTTP Error 404: Not Found
+2026-04-22 15:00:55,734 - 获取 https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/he... → 385 条（清洗后）
+2026-04-22 15:00:55,922 - 获取 https://raw.githubusercontent.com/wwb521/live/refs/heads/mai... → 57 条（清洗后）
+2026-04-22 15:00:56,056 - 获取 https://raw.githubusercontent.com/zhi35/iptv/refs/heads/mast... → 508 条（清洗后）
+2026-04-22 15:00:56,187 - 获取 https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/h... → 54 条（清洗后）
+2026-04-22 15:00:56,418 - 获取 https://raw.githubusercontent.com/0610840119/iptv-api/refs/h... → 669 条（清洗后）
+2026-04-22 15:00:56,516 - 获取 https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/mas... → 58 条（清洗后）
+2026-04-22 15:00:56,658 - 获取 https://raw.githubusercontent.com/MemoryCollection/IPTV/refs... → 50 条（清洗后）
+2026-04-22 15:00:56,680 - 获取 https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/... → 80 条（清洗后）
+2026-04-22 15:00:57,266 - 获取 https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/m... → 5698 条（清洗后）
+2026-04-22 15:00:57,432 - 获取 https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3... → 342 条（清洗后）
+2026-04-22 15:00:57,575 - 获取 https://raw.githubusercontent.com/gaotianliuyun/gao/master/l... → 202 条（清洗后）
+2026-04-22 15:00:57,720 - 获取 https://raw.githubusercontent.com/zwc456baby/iptv_alive/mast... → 31 条（清洗后）
+2026-04-22 15:00:57,903 - 获取 https://raw.githubusercontent.com/vbskycn/iptv/master/tv/ipt... → 1041 条（清洗后）
+2026-04-22 15:00:58,115 - 获取 https://raw.githubusercontent.com/junge3333/juds6/main/yszb1... → 1447 条（清洗后）
+2026-04-22 15:00:58,335 - 获取 https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.t... → 92 条（清洗后）
+2026-04-22 15:00:58,469 - 获取 https://raw.githubusercontent.com/maitel2020/iptv-self-use/m... → 71 条（清洗后）
+2026-04-22 15:00:58,637 - 获取 https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/... → 314 条（清洗后）
+2026-04-22 15:00:58,794 - 获取 https://raw.githubusercontent.com/xiongjian83/TvBox/refs/hea... → 662 条（清洗后）
+2026-04-22 15:00:58,977 - 获取 https://raw.githubusercontent.com/yoursmile66/TVBox/refs/hea... → 933 条（清洗后）
+2026-04-22 15:00:59,136 - 获取 https://raw.githubusercontent.com/alienlu/iptv/refs/heads/ma... → 332 条（清洗后）
+2026-04-22 15:00:59,252 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 151 条（清洗后）
+2026-04-22 15:00:59,400 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 286 条（清洗后）
+2026-04-22 15:00:59,529 - 获取 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u... → 43 条（清洗后）
+2026-04-22 15:00:59,672 - 获取 https://raw.githubusercontent.com/develop202/migu_video/refs... → 368 条（清洗后）
+2026-04-22 15:01:00,298 - 获取 https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/m... → 12183 条（清洗后）
+2026-04-22 15:01:00,408 - 获取 https://iptv.catvod.com/tv.m3u... → 2 条（清洗后）
+2026-04-22 15:01:14,258 - 获取 https://xn--6orr3pi6g9uu.top/zb/zb.txt... → 331 条（清洗后）
+2026-04-22 15:01:14,833 - 获取 https://tv.iill.top/m3u/Gather... → 1303 条（清洗后）
+2026-04-22 15:01:16,214 - 获取 https://m.iill.top/Live.m3u... → 1 条（清洗后）
+2026-04-22 15:01:16,304 - 获取 https://tv.iill.top/m3u/Sport... → 36 条（清洗后）
+2026-04-22 15:01:21,828 - 获取 https://live.freetv.top/huyayqk.m3u... → 2 条（清洗后）
+2026-04-22 15:01:26,160 - 获取 https://live.freetv.top/douyuyqk.m3u... → 2 条（清洗后）
+2026-04-22 15:01:26,918 - 获取 https://live.zhoujie218.top/tv/iptv4.txt... → 1041 条（清洗后）
+2026-04-22 15:01:27,119 - 获取 https://t.freetv.fun/m3u/playlist.txt... → 197 条（清洗后）
+2026-04-22 15:01:27,146 - 获取 https://t.freetv.fun/m3u/taiwan.txt... → 17 条（清洗后）
+2026-04-22 15:01:27,573 - 获取 https://t.freetv.fun/m3u/hong_kong.txt... → 0 条（清洗后）
+2026-04-22 15:01:27,974 - 获取 https://t.freetv.fun/m3u/macao.txt... → 0 条（清洗后）
+2026-04-22 15:01:28,200 - 获取 https://t.freetv.fun/m3u/japan.txt... → 0 条（清洗后）
+2026-04-22 15:01:28,403 - 获取 https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u... → 350 条（清洗后）
+2026-04-22 15:01:28,567 - 获取 https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u... → 44 条（清洗后）
+2026-04-22 15:01:28,734 - 获取 https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u... → 12 条（清洗后）
+2026-04-22 15:01:28,899 - 获取 https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u... → 33 条（清洗后）
+2026-04-22 15:01:29,084 - 获取 https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u... → 114 条（清洗后）
+2026-04-22 15:01:29,256 - 获取 https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u... → 5 条（清洗后）
+2026-04-22 15:01:29,431 - 获取 https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u... → 3 条（清洗后）
+2026-04-22 15:01:29,610 - 获取 https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u... → 42 条（清洗后）
+2026-04-22 15:01:29,776 - 获取 https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u... → 5 条（清洗后）
+2026-04-22 15:01:29,937 - 获取 https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u... → 38 条（清洗后）
+2026-04-22 15:01:30,102 - 获取 https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u... → 1 条（清洗后）
+2026-04-22 15:01:30,265 - 获取 https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u... → 1 条（清洗后）
+2026-04-22 15:01:30,435 - 获取 https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u... → 77 条（清洗后）
+2026-04-22 15:01:30,597 - 获取 https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u... → 3 条（清洗后）
+2026-04-22 15:01:30,765 - 获取 https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u... → 0 条（清洗后）
+2026-04-22 15:01:32,066 - 获取 https://tv.850930.xyz/kdsb.txt... → 5197 条（清洗后）
+2026-04-22 15:01:32,409 - 获取 https://tv.850930.xyz/pix.m3u... → 59 条（清洗后）
+2026-04-22 15:01:32,498 - 获取 https://live.zbds.org/tv/iptv4.txt... → 1041 条（清洗后）
+2026-04-22 15:01:32,672 - 获取 https://iptv.zsdc.eu.org/home/iptv.m3u8... → 151 条（清洗后）
+2026-04-22 15:01:33,691 - 获取 https://freetv.fun/test_channels_original_new.txt... → 22 条（清洗后）
+2026-04-22 15:01:34,879 - 获取 https://jihulab.com/-/snippets/5265/raw/main/.txt... → 0 条（清洗后）
+2026-04-22 15:01:35,043 - 获取 https://iptv-org.github.io/iptv/languages/zho.m3u... → 206 条（清洗后）
+2026-04-22 15:01:35,109 - 获取 https://iptv-org.github.io/iptv/countries/us.m3u... → 1352 条（清洗后）
+2026-04-22 15:01:35,222 - 获取 https://iptv-org.github.io/iptv/countries/tw.m3u... → 23 条（清洗后）
+2026-04-22 15:01:36,847 - 获取 https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-a... → 1872 条（清洗后）
+2026-04-22 15:01:37,844 - 获取 https://fm1077.serv00.net/SmartTV.m3u... → 561 条（清洗后）
+2026-04-22 15:01:37,997 - 获取 https://m3u.ibert.me/txt/fmml_ipv6.txt... → 82 条（清洗后）
+2026-04-22 15:01:38,104 - 获取 https://m3u.ibert.me/txt/ycl_iptv.txt... → 90 条（清洗后）
+2026-04-22 15:01:38,230 - 获取 https://m3u.ibert.me/txt/y_g.txt... → 125 条（清洗后）
+2026-04-22 15:01:38,506 - 获取 https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt... → 483 条（清洗后）
+2026-04-22 15:01:40,425 - 获取 https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F... → 184 条（清洗后）
+2026-04-22 15:01:42,460 - 获取 http://tot.totalh.net/tttt.txt... → 759 条（清洗后）
+2026-04-22 15:01:42,462 - 开始拉取 my_urls.txt 中的 98 个远程节点...
+2026-04-22 15:01:43,453 - 获取 https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:44,114 - 获取 https://taoiptv.com/lives/44025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:44,774 - 获取 https://taoiptv.com/lives/43025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:45,425 - 获取 https://taoiptv.com/lives/42025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:46,089 - 获取 https://taoiptv.com/lives/41025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:46,766 - 获取 https://taoiptv.com/lives/31025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:47,432 - 获取 https://taoiptv.com/lives/11025.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:48,095 - 获取 https://taoiptv.com/lives/51015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:48,750 - 获取 https://taoiptv.com/lives/45015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:49,423 - 获取 https://taoiptv.com/lives/44015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:50,110 - 获取 https://taoiptv.com/lives/43015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:50,791 - 获取 https://taoiptv.com/lives/42015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:51,450 - 获取 https://taoiptv.com/lives/41015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:52,143 - 获取 https://taoiptv.com/lives/34015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:52,832 - 获取 https://taoiptv.com/lives/22015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:53,512 - 获取 https://taoiptv.com/lives/31015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:54,177 - 获取 https://taoiptv.com/lives/11015.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:54,851 - 获取 https://taoiptv.com/lives/45023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:55,538 - 获取 https://taoiptv.com/lives/44023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:56,193 - 获取 https://taoiptv.com/lives/43023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:56,866 - 获取 https://taoiptv.com/lives/42023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:57,518 - 获取 https://taoiptv.com/lives/41023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:58,174 - 获取 https://taoiptv.com/lives/37023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:58,845 - 获取 https://taoiptv.com/lives/36023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:01:59,522 - 获取 https://taoiptv.com/lives/35023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:00,201 - 获取 https://taoiptv.com/lives/34023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:00,862 - 获取 https://taoiptv.com/lives/33023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:01,533 - 获取 https://taoiptv.com/lives/32023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:02,184 - 获取 https://taoiptv.com/lives/31023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:02,835 - 获取 https://taoiptv.com/lives/22023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:03,520 - 获取 https://taoiptv.com/lives/21023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:04,179 - 获取 https://taoiptv.com/lives/15023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:04,869 - 获取 https://taoiptv.com/lives/14023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:05,556 - 获取 https://taoiptv.com/lives/13023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:06,218 - 获取 https://taoiptv.com/lives/12023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:06,882 - 获取 https://taoiptv.com/lives/11023.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:07,557 - 获取 https://taoiptv.com/lives/65013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:08,235 - 获取 https://taoiptv.com/lives/62013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:08,912 - 获取 https://taoiptv.com/lives/61013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:09,578 - 获取 https://taoiptv.com/lives/52013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:10,243 - 获取 https://taoiptv.com/lives/51013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:10,902 - 获取 https://taoiptv.com/lives/45013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:11,574 - 获取 https://taoiptv.com/lives/44013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:12,249 - 获取 https://taoiptv.com/lives/43013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:12,926 - 获取 https://taoiptv.com/lives/42013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:13,596 - 获取 https://taoiptv.com/lives/41013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:14,258 - 获取 https://taoiptv.com/lives/37013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:14,922 - 获取 https://taoiptv.com/lives/34013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:15,581 - 获取 https://taoiptv.com/lives/33013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:16,237 - 获取 https://taoiptv.com/lives/32013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:16,892 - 获取 https://taoiptv.com/lives/31013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:17,553 - 获取 https://taoiptv.com/lives/23013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:18,227 - 获取 https://taoiptv.com/lives/22013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:18,879 - 获取 https://taoiptv.com/lives/21013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:19,551 - 获取 https://taoiptv.com/lives/14013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:20,207 - 获取 https://taoiptv.com/lives/13013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:20,859 - 获取 https://taoiptv.com/lives/11013.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:21,527 - 获取 https://taoiptv.com/lives/64024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:22,188 - 获取 https://taoiptv.com/lives/63024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:22,857 - 获取 https://taoiptv.com/lives/51024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:23,520 - 获取 https://taoiptv.com/lives/50024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:24,200 - 获取 https://taoiptv.com/lives/46024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:24,870 - 获取 https://taoiptv.com/lives/44024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:25,516 - 获取 https://taoiptv.com/lives/42024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:26,178 - 获取 https://taoiptv.com/lives/41024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:26,826 - 获取 https://taoiptv.com/lives/37024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:27,482 - 获取 https://taoiptv.com/lives/35024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:28,160 - 获取 https://taoiptv.com/lives/31024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:28,824 - 获取 https://taoiptv.com/lives/23024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:29,491 - 获取 https://taoiptv.com/lives/22024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:30,156 - 获取 https://taoiptv.com/lives/21024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:30,824 - 获取 https://taoiptv.com/lives/15024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:31,484 - 获取 https://taoiptv.com/lives/14024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:32,147 - 获取 https://taoiptv.com/lives/13024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:32,824 - 获取 https://taoiptv.com/lives/12024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:33,505 - 获取 https://taoiptv.com/lives/11024.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:34,162 - 获取 https://taoiptv.com/lives/62014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:34,854 - 获取 https://taoiptv.com/lives/61014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:35,509 - 获取 https://taoiptv.com/lives/51014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:36,171 - 获取 https://taoiptv.com/lives/50014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:36,828 - 获取 https://taoiptv.com/lives/46014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:37,488 - 获取 https://taoiptv.com/lives/45014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:38,160 - 获取 https://taoiptv.com/lives/44014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:38,854 - 获取 https://taoiptv.com/lives/43014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:39,506 - 获取 https://taoiptv.com/lives/42014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:40,170 - 获取 https://taoiptv.com/lives/41014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:40,854 - 获取 https://taoiptv.com/lives/37014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:41,540 - 获取 https://taoiptv.com/lives/36014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:42,231 - 获取 https://taoiptv.com/lives/34014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:42,898 - 获取 https://taoiptv.com/lives/33014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:43,565 - 获取 https://taoiptv.com/lives/31014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:44,218 - 获取 https://taoiptv.com/lives/22014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:44,904 - 获取 https://taoiptv.com/lives/21014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:45,579 - 获取 https://taoiptv.com/lives/15014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:46,241 - 获取 https://taoiptv.com/lives/14014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:46,899 - 获取 https://taoiptv.com/lives/13014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:47,563 - 获取 https://taoiptv.com/lives/12014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:48,228 - 获取 https://taoiptv.com/lives/11014.txt?token=8c78df7c7c0f4844... → 0 条（清洗后）
+2026-04-22 15:02:50,269 - 待检测 5119 条，跳过 45214 条（URL黑名单）
+2026-04-22 15:02:50,269 - 格式清洗统计: no_format=1836, empty_name=1, domain_blacklist=19768, vod_filtered=165510
+2026-04-22 15:05:53,041 - 黑名单已更新: 新增 60 条
+2026-04-22 15:05:53,075 - 测速结果 → whitelist_respotime.txt (5119 条)
+2026-04-22 15:05:53,078 - 自动白名单 → whitelist_auto.txt (4893 条)
+2026-04-22 15:05:53,080 - ===== 检测完成 =====
+ 总计: 5119 条
+ ✅ 流: 169
+ ✅ 列表: 57
+ ⚠️ 未知: 4663
+ ❌ 超时: 226
+ 🚫 域名黑名单: 0
+ 耗时: 304s
