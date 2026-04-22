@@ -1,7 +1,21 @@
-2026-04-22 13:06:23,002 - ===== 开始更新Token =====
-2026-04-22 13:06:23,003 - ✅ 测试写入成功！文件可正常修改
-2026-04-22 13:06:23,003 - 📂 当前工作目录：/home/runner/work/IPTV-LIVE/IPTV-LIVE
-2026-04-22 13:06:23,003 - 📂 目标文件：assets/my_urls.txt
-2026-04-22 13:06:23,003 - 📂 文件存在：True
-2026-04-22 13:06:23,112 - ❌ 获取Token失败：HTTP Error 403: Forbidden
-2026-04-22 13:06:23,112 - ===== 原程序执行完成 =====
+2026-04-22 13:31:56,152 - taoiptv Token 刷新模块异常（不影响主流程）: No module named 'utils_taoiptv_token'
+2026-04-22 13:31:56,152 - 域名黑名单: 仅使用硬编码绝对坏域名 11 个
+2026-04-22 13:31:56,408 - 加载 URL 精确黑名单: 213809 条
+2026-04-22 13:31:56,409 - ===== 程序开始: 20260422 13:31:56 =====
+2026-04-22 13:31:56,413 - 手动白名单: 168 个频道
+2026-04-22 13:31:56,413 - 读取文件失败 /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/assets/urls.txt: [Errno 2] No such file or directory: '/home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/assets/urls.txt'
+2026-04-22 13:31:56,413 - 未找到或未能读取 urls.txt 内容
+2026-04-22 13:31:56,413 - 读取文件失败 /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/assets/my_urls.txt: [Errno 2] No such file or directory: '/home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist/assets/my_urls.txt'
+2026-04-22 13:31:56,414 - 未找到或未能读取 my_urls.txt 内容
+2026-04-22 13:31:56,425 - 待检测 168 条，跳过 0 条（URL黑名单）
+2026-04-22 13:31:56,425 - 格式清洗统计: no_format=5
+2026-04-22 13:32:50,847 - 测速结果 → whitelist_respotime.txt (168 条)
+2026-04-22 13:32:50,847 - 自动白名单 → whitelist_auto.txt (0 条)
+2026-04-22 13:32:50,847 - ===== 检测完成 =====
+ 总计: 168 条
+ ✅ 流: 0
+ ✅ 列表: 0
+ ⚠️ 未知: 0
+ ❌ 超时: 168
+ 🚫 域名黑名单: 0
+ 耗时: 54s
