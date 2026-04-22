@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
-from urllib.parse import urlparse, quote, unquote, urljoin
+from urllib.parse import urlparse, quote, unquote, urljoin, parse_qs, urlencode
 import socket
 import ssl
 import re
@@ -26,7 +26,6 @@ def get_file_paths():
         "whitelist_respotime": os.path.join(current_dir, 'whitelist_respotime.txt'),
         "log": os.path.join(current_dir, 'log.txt'),
     }
-
 FILE_PATHS = get_file_paths()
 
 # ===================== 日志 =====================
@@ -57,9 +56,101 @@ class Config:
     HLS_SAMPLE_SEGMENTS = 2
     HLS_SEGMENT_TIMEOUT = 2.5
 
+# ===================== TaoIPTV Token 自动获取配置 =====================
+TAOIPTV_HOME = "https://www.taoiptv.com"
+TAOIPTV_TOKEN_PATTERN = re.compile(r'[a-fA-F0-9]{16}')  # 匹配16位Token
+TAOIPTV_URL_DOMAIN = "taoiptv.com"
+
+# ===================== 全局SSL上下文（复用原有证书忽略逻辑） =====================
+def _ssl_ctx():
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    return ctx
+
+# ===================== TaoIPTV Token 自动获取与更新函数 =====================
+def get_taoiptv_token() -> Optional[str]:
+    """自动获取TaoIPTV最新16位有效Token"""
+    try:
+        logger.info("===== 开始获取 TaoIPTV 最新 Token =====")
+        req = urllib.request.Request(
+            TAOIPTV_HOME,
+            headers={
+                "User-Agent": Config.USER_AGENT,
+                "Connection": "close",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+            },
+            method="GET"
+        )
+        opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=_ssl_ctx()))
+        with opener.open(req, timeout=Config.TIMEOUT_FETCH) as resp:
+            status_code = resp.getcode()
+            if status_code not in (200, 301, 302):
+                logger.error(f"TaoIPTV主页访问失败，状态码: {status_code}")
+                return None
+            html_content = resp.read().decode('utf-8', errors='replace')
+            token_matches = TAOIPTV_TOKEN_PATTERN.findall(html_content)
+            if not token_matches:
+                logger.error("TaoIPTV主页未匹配到有效16位Token")
+                return None
+            valid_token = token_matches[0]
+            logger.info(f"成功获取TaoIPTV最新Token: {valid_token}")
+            return valid_token
+    except Exception as e:
+        logger.error(f"获取TaoIPTV Token异常: {str(e)}")
+        return None
+
+def update_my_urls_token(new_token: str) -> bool:
+    """批量更新my_urls.txt中所有TaoIPTV链接的Token参数，保存到仓库文件"""
+    if not new_token or len(new_token) != 16:
+        logger.error("无效Token，跳过my_urls.txt更新")
+        return False
+    try:
+        file_path = FILE_PATHS["my_urls"]
+        logger.info(f"开始更新my_urls.txt中的Token，文件路径: {file_path}")
+        if not os.path.exists(file_path):
+            logger.warning("my_urls.txt文件不存在，跳过Token更新")
+            return False
+        # 读取文件全内容，兼容原有空格/换行/制表符分隔格式
+        with open(file_path, 'r', encoding='utf-8') as f:
+            raw_content = f.read()
+        url_list = re.split(r'[\s\t\n]+', raw_content)
+        updated_urls = []
+        update_count = 0
+        for url in url_list:
+            url = url.strip()
+            if not url:
+                continue
+            # 仅处理TaoIPTV域名的链接
+            parsed_url = urlparse(url)
+            host = parsed_url.hostname or ""
+            if TAOIPTV_URL_DOMAIN not in host:
+                updated_urls.append(url)
+                continue
+            # 解析并替换Token参数
+            query_params = parse_qs(parsed_url.query)
+            if "token" not in query_params:
+                updated_urls.append(url)
+                continue
+            query_params["token"] = [new_token]
+            new_query = urlencode(query_params, doseq=True)
+            new_url = parsed_url._replace(query=new_query).geturl()
+            updated_urls.append(new_url)
+            update_count += 1
+        # 写回文件，保持原有空格分隔格式，不改变原有文件结构
+        new_content = ' '.join(updated_urls)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        logger.info(f"my_urls.txt更新完成，共替换{update_count}个链接的Token")
+        return True
+    except Exception as e:
+        logger.error(f"更新my_urls.txt Token异常: {str(e)}")
+        return False
+
 # ===================== 域名黑名单 =====================
 DOMAIN_BLACKLIST: Set[str] = {
-    "iptv.catvod.com"，
+    "iptv.catvod.com",
     "dd.ddzb.fun",
     "goodiptv.club",
     "jiaojirentv.top",
@@ -68,10 +159,9 @@ DOMAIN_BLACKLIST: Set[str] = {
     "php.jdshipin.com",
     "t.freetv.fun",
     "stream1.freetv.fun",
-	"hlsztemgsplive.miguvideo",
+    "hlsztemgsplive.miguvideo",
     "stream2.freetv.fun",
 }
-
 logger.info(f"域名黑名单: 仅使用硬编码绝对坏域名 {len(DOMAIN_BLACKLIST)} 个")
 
 def url_matches_domain_blacklist(url: str) -> bool:
@@ -264,7 +354,6 @@ class StreamChecker:
                     if line.startswith('更新时间') or line.startswith('blacklist'):
                         has_header = True
                         break
-
             all_content: List[str] = []
             if not has_header:
                 bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
@@ -272,9 +361,8 @@ class StreamChecker:
                     "更新时间,#genre#",
                     f"{bj_time.strftime('%Y%m%d %H:%M')},url",
                     "",
-                    "blacklist,#genre#"，
+                    "blacklist,#genre#",
                 ])
-
             existing_urls: Set[str] = set()
             for line in existing_lines:
                 if line and not line.startswith('更新时间') and not line.startswith('blacklist') and line.strip():
@@ -282,12 +370,10 @@ class StreamChecker:
                     if url and '://' in url and url not in existing_urls:
                         existing_urls.add(url)
                         all_content.append(line)
-
             for url in self.new_failed_urls:
                 if url not in existing_urls:
                     existing_urls.add(url)
                     all_content.append(url)
-
             os.makedirs(os.path.dirname(FILE_PATHS["blacklist_auto"]), exist_ok=True)
             with open(FILE_PATHS["blacklist_auto"], 'w', encoding='utf-8') as f:
                 f.write('\n'.join(all_content))
@@ -310,10 +396,7 @@ class StreamChecker:
             return []
 
     def _ssl_ctx(self):
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        return ctx
+        return _ssl_ctx()
 
     def check_http(self, url: str, timeout: float):
         start = time.perf_counter()
@@ -330,25 +413,19 @@ class StreamChecker:
                 success = (200 <= code < 400) or code in (301, 302)
                 if not success:
                     return (False, elapsed, str(code), None)
-
                 if is_html_ct(ct) or _looks_like_html(data):
                     return (False, elapsed, f"{code}/html", "timeout")
-
                 if is_stream_like_ct(ct) and not ct.lower().startswith("text/"):
                     if _looks_like_media(data) and len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM:
                         return (True, elapsed, str(code), "stream")
                     return (True, elapsed, str(code), "unknown")
-
                 if ct.lower().startswith("text/") or ct.lower().startswith("application/xml"):
                     if b"#EXTM3U" in data or b"#EXTINF" in data or b"#EXT-X-" in data:
                         return (True, elapsed, str(code), "playlist")
                     return (True, elapsed, str(code), "unknown")
-
                 if _looks_like_media(data):
                     return (True, elapsed, str(code), "stream" if len(data) >= Config.MIN_FIRST_CHUNK_FOR_STREAM else "unknown")
-
                 return (True, elapsed, str(code), "unknown")
-
         except urllib.error.HTTPError as e:
             elapsed = round((time.perf_counter() - start) * 1000, 2)
             code = getattr(e, "code", None) or 0
@@ -428,10 +505,8 @@ class StreamChecker:
         try:
             u = quote(unquote(url), safe=':/?&=#')
             t = Config.TIMEOUT_WHITELIST if is_whitelist else Config.TIMEOUT_CHECK
-
             if url_matches_domain_blacklist(u):
                 return (False, 0, "domain_blacklist", "blacklist")
-
             if u.startswith(('http://', 'https://')):
                 succ, elapsed, code_or_reason, kind = self.check_http(u, t)
                 if succ and kind == "playlist":
@@ -446,11 +521,9 @@ class StreamChecker:
                                     return (True, elapsed, code_or_reason, "unknown")
                     except Exception: pass
                 return (succ, elapsed, code_or_reason, kind)
-
             elif u.startswith(('rtmp://', 'rtsp://')):
                 ok, ms = self.check_rtmp_rtsp(u, t)
                 return (ok, ms, None if ok else "rtmp/rtsp_fail", "stream" if ok else "timeout")
-
             else:
                 parsed = urlparse(u)
                 if not parsed.hostname: return (False, 0, "no_host", None)
@@ -459,7 +532,6 @@ class StreamChecker:
                 s.connect((parsed.hostname, parsed.port or 80))
                 s.close()
                 return (True, round((time.perf_counter() - start) * 1000, 2), "tcp_ok", None)
-
         except Exception as e:
             return (False, 0, str(e), "timeout")
 
@@ -529,28 +601,23 @@ class StreamChecker:
         pre_fail: List[str] = []
         skip = 0
         seen_urls: Set[str] = set()
-
         for line in lines:
             result, reason = clean_source_line(line)
             if not result:
                 self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
                 continue
-
             name, url = result
             if url in seen_urls: continue
             seen_urls.add(url)
-
             if url in self.blacklist_urls and url not in self.whitelist_urls:
                 pre_fail.append(f"{name},{url}")
                 skip += 1
             else:
                 to_check.append((url, f"{name},{url}"))
-
         logger.info(f"待检测 {len(to_check)} 条，跳过 {skip} 条（URL黑名单）")
         stats_parts = [f"{k}={v}" for k, v in self.clean_stats.items() if v > 0]
         if stats_parts:
             logger.info(f"格式清洗统计: {', '.join(stats_parts)}")
-
         return to_check, pre_fail
 
     def _ensure_single_line(self, text: str) -> str:
@@ -586,7 +653,6 @@ class StreamChecker:
     def run(self):
         logger.info(f"===== 程序开始: {self.start_time.strftime('%Y%m%d %H:%M:%S')} =====")
         self.load_whitelist()
-
         lines: List[str] = []
         
         # 读取并拉取标准 urls.txt (注意开启 split_by_space 兼容空格分隔)
@@ -608,9 +674,7 @@ class StreamChecker:
         lines.extend(self.whitelist_lines)
         for url in self.manual_urls:
             lines.append(url)
-
         to_check, pre_fail = self.prepare_lines(lines)
-
         results: List[Tuple[str, float, str, str]] = []
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as executor:
             future_to_url = {
@@ -627,18 +691,14 @@ class StreamChecker:
                 except Exception as e:
                     logger.error(f"检测异常 {url}: {e}")
                     self.new_failed_urls.add(url)
-
         self._save_blacklist()
-
         def sort_key(item):
             _, elapsed, _, kind = item
             order = {"stream": 0, "playlist": 1, "unknown": 2}.get(kind, 3)
             return (order, elapsed)
-
         results_sorted = sorted(results, key=sort_key)
         self.save_respotime(results_sorted)
         self.save_whitelist_auto(results_sorted)
-
         total = len(results)
         stream_n = sum(1 for _, _, _, k in results if k == "stream")
         playlist_n = sum(1 for _, _, _, k in results if k == "playlist")
@@ -646,7 +706,6 @@ class StreamChecker:
         timeout_n = sum(1 for _, _, _, k in results if k == "timeout")
         blacklist_n = sum(1 for _, _, _, k in results if k == "blacklist")
         elapsed_s = (datetime.now() - self.start_time).seconds
-
         logger.info(
             f"===== 检测完成 =====\n"
             f"  总计: {total} 条\n"
@@ -658,9 +717,15 @@ class StreamChecker:
             f"  耗时: {elapsed_s}s"
         )
 
-
 def main():
     try:
+        # ========== 前置执行：TaoIPTV Token自动获取与更新 ==========
+        new_token = get_taoiptv_token()
+        if new_token:
+            update_my_urls_token(new_token)
+        else:
+            logger.warning("TaoIPTV Token获取失败，将使用原有my_urls.txt内容继续执行后续流程")
+        # ========== 原有核心流程完全保留 ==========
         manual_urls: List[str] = []
         if not sys.stdin.isatty():
             for chunk in sys.stdin:
