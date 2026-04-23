@@ -159,7 +159,16 @@ def git_commit_push():
         logger.info("✅ 已成功同步修改到GitHub仓库！")
         return True
     except subprocess.CalledProcessError as e:
-        logger.warning(f"Git推送失败: {e.stderr.decode('utf-8', errors='ignore')}")
+        # 增加环境信息，方便排查 Actions 推送失败
+        env_hint = ""
+        try:
+            runner = os.getenv("GITHUB_ACTIONS", "false")
+            repo2 = os.getenv("GITHUB_REPOSITORY", "")
+            ref = os.getenv("GITHUB_REF", "")
+            env_hint = f" [GITHUB_ACTIONS={runner}, GITHUB_REPOSITORY={repo2}, GITHUB_REF={ref}]"
+        except Exception:
+            pass
+        logger.warning(f"Git推送失败:{env_hint}\n{e.stderr.decode('utf-8', errors='ignore') if e.stderr else ''}")
         return False
     except Exception as e:
         logger.warning(f"Git操作异常: {str(e)}")
@@ -421,23 +430,28 @@ class StreamChecker:
                 ctx = ssl._create_unverified_context()
                 req = urllib.request.Request(url, headers={"User-Agent": Config.USER_AGENT})
                 with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=15) as r:
-                    c = r.read().decode('utf-8', 'replace')
+                    # 显式用 utf-8 解码，避免 ascii 编码错误
+                    c = r.read().decode('utf-8', errors='replace')
                     if "#EXTM3U" in c[:200]:
                         name = ""
                         for l in c.splitlines():
+                            l = l.strip()
+                            if not l:
+                                continue
                             if l.startswith("#EXTINF"):
                                 name = l.split(',')[-1] if ',' in l else ""
                             elif l.startswith(('http','rtmp')) and name:
-                                res, _ = clean_source_line(f"{name.strip()},{l.strip()}")
+                                res, _ = clean_source_line(f"{name},{l}")
                                 if res:
                                     all_lines.append(f"{res[0]},{res[1]}")
                                 name = ""
                     else:
-                        # 兼容纯URL行（无逗号）：对纯URL补伪组名，保证能通过clean_source_line
+                        # 非 M3U 分支：兼容“纯 URL 行（无逗号）”的订阅
                         for l in c.splitlines():
                             l = l.strip()
                             if not l or l.startswith('#'):
                                 continue
+                            # 纯 URL 行补伪组名，保证能通过 clean_source_line
                             if '://' in l and ',' not in l:
                                 res, _ = clean_source_line(f"直播源,{l}")
                                 if res:
@@ -447,7 +461,8 @@ class StreamChecker:
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
             except Exception as e:
-                logger.error(f"拉取远程源失败 {url[:60]}: {e}")
+                # 把原始异常原样打印（包含编码/HTTP 等详情），方便排查
+                logger.error(f"拉取远程源失败 {url}: {e}")
         return all_lines
 
     def load_whitelist(self):
