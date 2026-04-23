@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
-from urllib.parse import urlparse, quote, unquote, urljoin
+from urllib.parse import urlparse, quote, unquote
 import socket
 import ssl
 import re
@@ -12,8 +12,8 @@ import logging
 import sys
 import subprocess
 
-# ==============智普清言==========================
-# 路径配置
+# ==============================================
+# 路径配置   智普清言
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -95,6 +95,7 @@ def get_taoiptv_token() -> Optional[str]:
 
 
 def update_my_urls_all(token: str) -> bool:
+    """用同一个Token更新所有链接，写入更新时间备注（自动删除旧备注）"""
     if not token or len(token) != 16:
         logger.error("❌ Token无效，跳过更新")
         return False
@@ -105,15 +106,25 @@ def update_my_urls_all(token: str) -> bool:
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
+
         count = len(re.findall(r"token=[a-f0-9]{16}", content, re.I))
         if count == 0:
             logger.info("✅ 文件中无需更新的Token")
             return False
+
+        # 一次性全局替换所有 Token
         content = re.sub(r"token=[a-f0-9]{16}", f"token={token}", content, flags=re.I)
-        # 在文件最顶部写入更新时间备注（read_file split_by_space 会自动跳过 # 行）
+
+        # 【问题2修复】删除旧备注行，避免多次运行后出现多行备注
+        content = re.sub(r"^#\s*更新时间:.*$", "", content, flags=re.MULTILINE)
+        # 清理删除备注后可能产生的连续空行，最多保留一个空行
+        content = re.sub(r"\n{2,}", "\n\n", content).strip() + "\n"
+
+        # 写入新的更新时间备注（放在文件最顶部）
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         header = f"# 更新时间: {bj.strftime('%Y-%m-%d %H:%M:%S')} | Token: {token}\n"
         content = header + content
+
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
             f.flush()
@@ -143,11 +154,11 @@ def git_commit_push():
         subprocess.run(["git", "add", "assets/my_urls.txt"], check=True, capture_output=True)
         subprocess.run(["git", "commit", "-m", "Auto update TaoIPTV token"],
                        check=True, capture_output=True)
-        token = os.getenv("GITHUB_TOKEN")
+        gh_token = os.getenv("GITHUB_TOKEN")
         repo = os.getenv("GITHUB_REPOSITORY")
-        if token and repo:
-            url = f"https://x-access-token:{token}@github.com/{repo}.git"
-            subprocess.run(["git", "push", url, "HEAD"], check=True, capture_output=True)
+        if gh_token and repo:
+            push_url = f"https://x-access-token:{gh_token}@github.com/{repo}.git"
+            subprocess.run(["git", "push", push_url, "HEAD"], check=True, capture_output=True)
         else:
             subprocess.run(["git", "push"], check=True, capture_output=True)
         logger.info("✅ 已同步到GitHub仓库！")
@@ -248,13 +259,18 @@ def is_stream_ct(ct):
 def is_html_ct(ct):
     return "text/html" in ct.lower() if ct else False
 def _read_chunk(resp, n=4096):
-    try: return resp.read(n)
-    except Exception: return b""
+    try:
+        return resp.read(n)
+    except Exception:
+        return b""
 def _looks_media(d):
-    if not d: return False
-    return d[:3]==b"FLV" or (len(d)>=8 and d[4:8]==b"ftyp") or d[:3]==b"ID3" or (len(d)>=188 and d[0]==0x47)
+    if not d:
+        return False
+    return (d[:3] == b"FLV" or (len(d) >= 8 and d[4:8] == b"ftyp")
+            or d[:3] == b"ID3" or (len(d) >= 188 and d[0] == 0x47))
 def _looks_html(d):
-    if not d: return False
+    if not d:
+        return False
     d = d.lstrip(b"\xef\xbb\xbf").lstrip()
     return d[:5].lower().startswith((b"<!doc", b"<html"))
 
@@ -274,7 +290,6 @@ class StreamChecker:
             CLEAN_DOMAIN_BL: 0, CLEAN_VOD: 0,
         }
 
-    # ---- blacklist ----
     def _load_blacklist(self):
         bl = set()
         try:
@@ -302,17 +317,24 @@ class StreamChecker:
                     existing = [l.rstrip("\n") for l in f]
                 for l in existing[:5]:
                     if l.startswith("更新时间"):
-                        has_h = True; break
+                        has_h = True
+                        break
             parts = []
             if not has_h:
                 bj = datetime.now(timezone.utc) + timedelta(hours=8)
-                parts += ["更新时间,#genre#", f"{bj.strftime('%Y%m%d %H:%M')},url", "", "blacklist,#genre#"]
+                parts += [
+                    "更新时间,#genre#",
+                    f"{bj.strftime('%Y%m%d %H:%M')},url",
+                    "",
+                    "blacklist,#genre#",
+                ]
             seen = set()
             for l in existing:
                 if l and not l.startswith(("更新时间", "#")):
                     u = l.split(",")[-1].strip()
                     if u:
-                        seen.add(u); parts.append(l)
+                        seen.add(u)
+                        parts.append(l)
             for u in self.new_failed_urls:
                 if u not in seen:
                     parts.append(u)
@@ -322,35 +344,40 @@ class StreamChecker:
         except Exception as e:
             logger.error(f"保存黑名单失败: {e}")
 
-    # ---- file I/O ----
     def read_file(self, path, split_by_space=False):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 c = f.read()
             if split_by_space:
-                return [l.strip() for l in re.split(r"[\s\t\n]+", c) if l.strip().startswith("http")]
+                # startswith('http') 自动跳过 # 开头的备注行
+                return [l.strip() for l in re.split(r"[\s\t\n]+", c)
+                        if l.strip().startswith("http")]
             return [l.strip() for l in c.splitlines() if l.strip()]
         except Exception as e:
             logger.warning(f"读取失败 {path}: {e}")
             return []
 
-    # ---- check ----
     def check_http(self, url, timeout):
         s = time.perf_counter()
         try:
             ctx = ssl._create_unverified_context()
             req = urllib.request.Request(url, headers={"User-Agent": Config.USER_AGENT})
-            with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=timeout) as r:
-                code, ct = r.getcode(), r.headers.get("Content-Type", "")
+            with urllib.request.build_opener(
+                urllib.request.HTTPSHandler(context=ctx)
+            ).open(req, timeout=timeout) as r:
+                code = r.getcode()
+                ct = r.headers.get("Content-Type", "")
                 data = _read_chunk(r)
                 ms = round((time.perf_counter() - s) * 1000, 2)
                 ok = 200 <= code < 400 or code in (301, 302)
-                if not ok:             return False, ms, str(code), None
+                if not ok:
+                    return False, ms, str(code), None
                 if is_html_ct(ct) or _looks_html(data):
-                                        return False, ms, f"{code}/html", "timeout"
+                    return False, ms, f"{code}/html", "timeout"
                 if is_stream_ct(ct) and _looks_media(data):
-                                        return True, ms, str(code), "stream"
-                if b"#EXTM3U" in data: return True, ms, str(code), "playlist"
+                    return True, ms, str(code), "stream"
+                if b"#EXTM3U" in data:
+                    return True, ms, str(code), "playlist"
                 return True, ms, str(code), "unknown"
         except Exception as e:
             ms = round((time.perf_counter() - s) * 1000, 2)
@@ -364,11 +391,11 @@ class StreamChecker:
             return self.check_http(url, t)
         return True, 0, "ok", "stream"
 
-    # ---- fetch ----
     def fetch_remote(self, urls):
+        """【问题1修复】每个入口单独打印源数量；非M3U分支兼容纯URL行"""
         all_lines = []
         for raw_url in urls:
-            # 对中文路径做安全编码，避免 'ascii' codec 错误
+            # 中文路径安全编码，避免 'ascii' codec 错误
             try:
                 safe_url = quote(unquote(raw_url), safe=":/?&=#%")
             except Exception:
@@ -376,10 +403,15 @@ class StreamChecker:
             try:
                 ctx = ssl._create_unverified_context()
                 req = urllib.request.Request(safe_url, headers={"User-Agent": Config.USER_AGENT})
-                with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=15) as r:
+                with urllib.request.build_opener(
+                    urllib.request.HTTPSHandler(context=ctx)
+                ).open(req, timeout=15) as r:
                     c = r.read().decode("utf-8", errors="replace")
+
                 before = len(all_lines)
+
                 if "#EXTM3U" in c[:200]:
+                    # M3U 分支
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
@@ -393,30 +425,34 @@ class StreamChecker:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             name = ""
                 else:
-                    # 兼容纯 URL 行（无逗号）+ 标准逗号格式
+                    # 非 M3U 分支：逐行处理
                     for l in c.splitlines():
                         l = l.strip()
                         if not l or l.startswith("#"):
                             continue
+                        # 纯 URL 行（无逗号）：补伪组名后传入清洗
                         if "://" in l and "," not in l:
                             res, _ = clean_source_line(f"直播源,{l}")
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             continue
+                        # 标准逗号格式
                         res, _ = clean_source_line(l)
                         if res:
                             all_lines.append(f"{res[0]},{res[1]}")
+
                 got = len(all_lines) - before
                 if got > 0:
                     logger.info(f"  ✓ {raw_url[:90]} → {got} 个源")
                 else:
                     preview = c[:120].replace("\n", " ")
-                    logger.warning(f"  ✗ {raw_url[:90]} → 0 个源 | 内容预览: {preview}")
+                    logger.warning(f"  ✗ {raw_url[:90]} → 0 个源 | 预览: {preview}")
+
             except Exception as e:
                 logger.error(f"  ✗ {raw_url[:90]} → 请求异常: {e}")
+
         return all_lines
 
-    # ---- whitelist ----
     def load_whitelist(self):
         for line in self.read_file(FILE_PATHS["whitelist_manual"]):
             if line.startswith("#"):
@@ -444,7 +480,6 @@ class StreamChecker:
         logger.info(f"待检测 {len(to_check)} 条")
         return to_check, []
 
-    # ---- run ----
     def run(self):
         logger.info("===== 开始流媒体检测 =====")
         self.load_whitelist()
@@ -476,7 +511,10 @@ class StreamChecker:
 
         results = []
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as pool:
-            fmap = {pool.submit(self.check_url, u, u in self.whitelist_urls): u for u, _ in to_check}
+            fmap = {
+                pool.submit(self.check_url, u, u in self.whitelist_urls): u
+                for u, _ in to_check
+            }
             for fut in as_completed(fmap):
                 url = fmap[fut]
                 try:
@@ -489,7 +527,9 @@ class StreamChecker:
                     self.new_failed_urls.add(url)
         self._save_blacklist()
 
-        results.sort(key=lambda x: ({"stream":0,"playlist":1,"unknown":2}.get(x[3],3), x[1]))
+        results.sort(key=lambda x: (
+            {"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]
+        ))
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         with open(FILE_PATHS["whitelist_respotime"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
@@ -500,6 +540,7 @@ class StreamChecker:
             for url, _, _, kind in results:
                 if kind not in ("timeout", "blacklist"):
                     f.write(f"自动,{url}\n")
+
         total = len(results)
         stream = sum(1 for *_, k in results if k == "stream")
         playlist = sum(1 for *_, k in results if k == "playlist")
