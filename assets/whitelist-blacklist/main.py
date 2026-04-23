@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置   智普清言
+# 路径配置 智普清言
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -95,7 +95,7 @@ def get_taoiptv_token() -> Optional[str]:
 
 
 def update_my_urls_all(token: str) -> bool:
-    """用同一个Token更新所有链接，写入更新时间备注（自动删除旧备注）"""
+    """更新Token + 删旧备注 + 写新备注（不修改URL格式）"""
     if not token or len(token) != 16:
         logger.error("❌ Token无效，跳过更新")
         return False
@@ -112,15 +112,14 @@ def update_my_urls_all(token: str) -> bool:
             logger.info("✅ 文件中无需更新的Token")
             return False
 
-        # 一次性全局替换所有 Token
+        # 替换 Token
         content = re.sub(r"token=[a-f0-9]{16}", f"token={token}", content, flags=re.I)
 
-        # 【问题2修复】删除旧备注行，避免多次运行后出现多行备注
+        # 删除旧备注行
         content = re.sub(r"^#\s*更新时间:.*$", "", content, flags=re.MULTILINE)
-        # 清理删除备注后可能产生的连续空行，最多保留一个空行
         content = re.sub(r"\n{2,}", "\n\n", content).strip() + "\n"
 
-        # 写入新的更新时间备注（放在文件最顶部）
+        # 写入新备注
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         header = f"# 更新时间: {bj.strftime('%Y-%m-%d %H:%M:%S')} | Token: {token}\n"
         content = header + content
@@ -349,9 +348,20 @@ class StreamChecker:
             with open(path, "r", encoding="utf-8") as f:
                 c = f.read()
             if split_by_space:
-                # startswith('http') 自动跳过 # 开头的备注行
-                return [l.strip() for l in re.split(r"[\s\t\n]+", c)
-                        if l.strip().startswith("http")]
+                result = []
+                for l in re.split(r"[\s\t\n]+", c):
+                    l = l.strip()
+                    if not l or l.startswith("#"):
+                        continue
+                    # 纯URL行：直接取
+                    if l.startswith("http"):
+                        result.append(l)
+                    # 兼容 "组名,URL" 格式（防止之前被改坏的文件）
+                    elif "," in l and "://" in l:
+                        url = l.split(",")[-1].strip().split("$")[0].split("#")[0].strip()
+                        if url.startswith("http"):
+                            result.append(url)
+                return result
             return [l.strip() for l in c.splitlines() if l.strip()]
         except Exception as e:
             logger.warning(f"读取失败 {path}: {e}")
@@ -392,10 +402,8 @@ class StreamChecker:
         return True, 0, "ok", "stream"
 
     def fetch_remote(self, urls):
-        """【问题1修复】每个入口单独打印源数量；非M3U分支兼容纯URL行"""
         all_lines = []
         for raw_url in urls:
-            # 中文路径安全编码，避免 'ascii' codec 错误
             try:
                 safe_url = quote(unquote(raw_url), safe=":/?&=#%")
             except Exception:
@@ -411,7 +419,6 @@ class StreamChecker:
                 before = len(all_lines)
 
                 if "#EXTM3U" in c[:200]:
-                    # M3U 分支
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
@@ -425,12 +432,11 @@ class StreamChecker:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             name = ""
                 else:
-                    # 非 M3U 分支：逐行处理
                     for l in c.splitlines():
                         l = l.strip()
                         if not l or l.startswith("#"):
                             continue
-                        # 纯 URL 行（无逗号）：补伪组名后传入清洗
+                        # 纯URL行（无逗号）：补伪组名
                         if "://" in l and "," not in l:
                             res, _ = clean_source_line(f"直播源,{l}")
                             if res:
@@ -485,7 +491,6 @@ class StreamChecker:
         self.load_whitelist()
         lines = []
 
-        # urls.txt
         urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
             logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
@@ -495,7 +500,6 @@ class StreamChecker:
         else:
             logger.warning("未找到 urls.txt")
 
-        # my_urls.txt
         my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
         if my_urls:
             logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
@@ -545,11 +549,11 @@ class StreamChecker:
         stream = sum(1 for *_, k in results if k == "stream")
         playlist = sum(1 for *_, k in results if k == "playlist")
         unknown = sum(1 for *_, k in results if k == "unknown")
-        timeout = sum(1 for *_, k in results if k == "timeout")
+        timeout_n = sum(1 for *_, k in results if k == "timeout")
         elapsed = (datetime.now() - self.start_time).seconds
         logger.info(
             f"===== 检测完成 | 总计:{total} | 流:{stream} | 列表:{playlist} | "
-            f"未知:{unknown} | 超时:{timeout} | 耗时:{elapsed}s ====="
+            f"未知:{unknown} | 超时:{timeout_n} | 耗时:{elapsed}s ====="
         )
 
 # ==============================================
