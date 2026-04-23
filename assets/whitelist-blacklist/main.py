@@ -107,13 +107,17 @@ def update_my_urls_all(token: str) -> bool:
         logger.error(f"❌ my_urls.txt文件不存在: {file_path}")
         return False
     try:
+        # 读取文件
         with open(file_path, 'r', encoding='utf-8') as f:
             original_content = f.read()
+        # 统计需要替换的链接数量
         old_token_count = len(re.findall(r'token=[a-f0-9]{16}', original_content, re.I))
         if old_token_count == 0:
             logger.info("✅ 文件中没有需要更新的Token，无需修改")
             return False
+        # 一次性全局替换所有Token
         new_content = re.sub(r'token=[a-f0-9]{16}', f'token={token}', original_content, flags=re.I)
+        # 强制写入文件
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
             f.flush()
@@ -131,15 +135,20 @@ def git_commit_push():
     """修改后自动提交到GitHub，网页上立刻看到变化"""
     try:
         logger.info("正在同步修改到GitHub仓库...")
+        # 切换到项目根目录
         os.chdir(PROJECT_ROOT)
+        # Git基础配置
         subprocess.run(["git", "config", "--global", "user.name", "IPTV-Auto-Bot"], check=True, capture_output=True)
         subprocess.run(["git", "config", "--global", "user.email", "bot@noreply.github.com"], check=True, capture_output=True)
+        # 检查是否有变更
         status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True).stdout.strip()
         if not status:
             logger.info("✅ 无文件变更，无需提交")
             return True
+        # 添加、提交、推送
         subprocess.run(["git", "add", "assets/my_urls.txt"], check=True, capture_output=True)
         subprocess.run(["git", "commit", "-m", "Auto update TaoIPTV token"], check=True, capture_output=True)
+        # 适配GitHub Actions的Token推送
         github_token = os.getenv("GITHUB_TOKEN")
         repo = os.getenv("GITHUB_REPOSITORY")
         if github_token and repo:
@@ -424,8 +433,17 @@ class StreamChecker:
                                     all_lines.append(f"{res[0]},{res[1]}")
                                 name = ""
                     else:
+                        # 兼容纯URL行（无逗号）：对纯URL补伪组名，保证能通过clean_source_line
                         for l in c.splitlines():
-                            res, _ = clean_source_line(l.strip())
+                            l = l.strip()
+                            if not l or l.startswith('#'):
+                                continue
+                            if '://' in l and ',' not in l:
+                                res, _ = clean_source_line(f"直播源,{l}")
+                                if res:
+                                    all_lines.append(f"{res[0]},{res[1]}")
+                                continue
+                            res, _ = clean_source_line(l)
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
             except Exception as e:
