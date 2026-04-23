@@ -16,14 +16,11 @@ import subprocess
 # 智普清言
 # 【核心修复】绝对路径100%正确，杜绝嵌套错误
 # ==============================================
-# 脚本位置：assets/whitelist-blacklist/main.py
-# 正确路径：项目根目录/assets/my_urls.txt
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
-SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)      # assets/whitelist-blacklist
-ASSETS_DIR = os.path.dirname(SCRIPT_DIR)            # 正确的assets目录（上一级）
-PROJECT_ROOT = os.path.dirname(ASSETS_DIR)          # 项目根目录
+SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
+ASSETS_DIR = os.path.dirname(SCRIPT_DIR)
+PROJECT_ROOT = os.path.dirname(ASSETS_DIR)
 
-# 固定文件路径（绝对不会错）
 FILE_PATHS = {
     "my_urls": os.path.join(ASSETS_DIR, "my_urls.txt"),
     "urls": os.path.join(ASSETS_DIR, "urls.txt"),
@@ -35,7 +32,7 @@ FILE_PATHS = {
 }
 
 # ==============================================
-# 日志配置（全量打印路径，方便排查）
+# 日志配置
 # ==============================================
 logging.basicConfig(
     level=logging.INFO,
@@ -47,7 +44,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 启动时强制打印路径，日志里一眼看对错
 logger.info("="*60)
 logger.info(f"项目根目录: {PROJECT_ROOT}")
 logger.info(f"脚本所在目录: {SCRIPT_DIR}")
@@ -67,10 +63,9 @@ class Config:
     MAX_WORKERS = 30
 
 # ==============================================
-# 【优化】只获取一次Token，批量更新所有链接
+# 只获取一次Token，批量更新所有链接
 # ==============================================
 def get_taoiptv_token() -> Optional[str]:
-    """只访问一次官网，获取有效Token"""
     try:
         logger.info("正在获取TaoIPTV最新Token...")
         ctx = ssl._create_unverified_context()
@@ -85,7 +80,6 @@ def get_taoiptv_token() -> Optional[str]:
                 logger.error(f"访问官网失败，状态码: {resp.getcode()}")
                 return None
             html = resp.read().decode('utf-8', errors='ignore')
-            # 精准匹配16位Token
             token_match = re.search(r'[a-f0-9]{16}', html, re.I)
             if token_match:
                 token = token_match.group(0)
@@ -98,7 +92,6 @@ def get_taoiptv_token() -> Optional[str]:
         return None
 
 def update_my_urls_all(token: str) -> bool:
-    """用同一个Token，一次性更新文件里所有链接"""
     if not token or len(token) != 16:
         logger.error("❌ Token无效，跳过更新")
         return False
@@ -107,48 +100,42 @@ def update_my_urls_all(token: str) -> bool:
         logger.error(f"❌ my_urls.txt文件不存在: {file_path}")
         return False
     try:
-        # 读取文件
         with open(file_path, 'r', encoding='utf-8') as f:
             original_content = f.read()
-        # 统计需要替换的链接数量
         old_token_count = len(re.findall(r'token=[a-f0-9]{16}', original_content, re.I))
         if old_token_count == 0:
             logger.info("✅ 文件中没有需要更新的Token，无需修改")
             return False
-        # 一次性全局替换所有Token
         new_content = re.sub(r'token=[a-f0-9]{16}', f'token={token}', original_content, flags=re.I)
-        # 强制写入文件
+        # 在文件头部写入更新时间备注（read_file 的 split_by_space 模式会自动跳过 # 开头的行）
+        bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
+        time_header = f"# 更新时间: {bj_time.strftime('%Y-%m-%d %H:%M:%S')} | Token: {token}\n"
+        new_content = time_header + new_content
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
             f.flush()
             os.fsync(f.fileno())
-        logger.info(f"✅ my_urls.txt更新成功！共替换 {old_token_count} 个链接的Token")
+        logger.info(f"✅ my_urls.txt更新成功！共替换 {old_token_count} 个链接的Token（{bj_time.strftime('%Y-%m-%d %H:%M:%S')}）")
         return True
     except Exception as e:
         logger.error(f"❌ 更新my_urls.txt失败: {str(e)}", exc_info=True)
         return False
 
 # ==============================================
-# 【核心修复】自动Git提交推送（同步到GitHub仓库）
+# 自动Git提交推送
 # ==============================================
 def git_commit_push():
-    """修改后自动提交到GitHub，网页上立刻看到变化"""
     try:
         logger.info("正在同步修改到GitHub仓库...")
-        # 切换到项目根目录
         os.chdir(PROJECT_ROOT)
-        # Git基础配置
         subprocess.run(["git", "config", "--global", "user.name", "IPTV-Auto-Bot"], check=True, capture_output=True)
         subprocess.run(["git", "config", "--global", "user.email", "bot@noreply.github.com"], check=True, capture_output=True)
-        # 检查是否有变更
         status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True).stdout.strip()
         if not status:
             logger.info("✅ 无文件变更，无需提交")
             return True
-        # 添加、提交、推送
         subprocess.run(["git", "add", "assets/my_urls.txt"], check=True, capture_output=True)
         subprocess.run(["git", "commit", "-m", "Auto update TaoIPTV token"], check=True, capture_output=True)
-        # 适配GitHub Actions的Token推送
         github_token = os.getenv("GITHUB_TOKEN")
         repo = os.getenv("GITHUB_REPOSITORY")
         if github_token and repo:
@@ -159,7 +146,6 @@ def git_commit_push():
         logger.info("✅ 已成功同步修改到GitHub仓库！")
         return True
     except subprocess.CalledProcessError as e:
-        # 增加环境信息，方便排查 Actions 推送失败
         env_hint = ""
         try:
             runner = os.getenv("GITHUB_ACTIONS", "false")
@@ -175,7 +161,7 @@ def git_commit_push():
         return False
 
 # ==============================================
-# 以下为原项目完整功能（无任何修改，保证兼容）
+# 以下为原项目完整功能
 # ==============================================
 DOMAIN_BLACKLIST: Set[str] = {
     "iptv.catvod.com",
@@ -385,6 +371,7 @@ class StreamChecker:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             if split_by_space:
+                # startswith('http') 会自动跳过 # 开头的注释行
                 return [l.strip() for l in re.split(r'[\s\t\n]+', content) if l.strip().startswith('http')]
             return [l.strip() for l in content.splitlines() if l.strip()]
         except Exception as e:
@@ -430,8 +417,8 @@ class StreamChecker:
                 ctx = ssl._create_unverified_context()
                 req = urllib.request.Request(url, headers={"User-Agent": Config.USER_AGENT})
                 with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=15) as r:
-                    # 显式用 utf-8 解码，避免 ascii 编码错误
                     c = r.read().decode('utf-8', errors='replace')
+                    count_before = len(all_lines)
                     if "#EXTM3U" in c[:200]:
                         name = ""
                         for l in c.splitlines():
@@ -446,12 +433,10 @@ class StreamChecker:
                                     all_lines.append(f"{res[0]},{res[1]}")
                                 name = ""
                     else:
-                        # 非 M3U 分支：兼容“纯 URL 行（无逗号）”的订阅
                         for l in c.splitlines():
                             l = l.strip()
                             if not l or l.startswith('#'):
                                 continue
-                            # 纯 URL 行补伪组名，保证能通过 clean_source_line
                             if '://' in l and ',' not in l:
                                 res, _ = clean_source_line(f"直播源,{l}")
                                 if res:
@@ -460,9 +445,16 @@ class StreamChecker:
                             res, _ = clean_source_line(l)
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
+                    count_after = len(all_lines)
+                    got = count_after - count_before
+                    if got > 0:
+                        logger.info(f"  → {url[:80]} : {got} 个源")
+                    else:
+                        # 获取 0 个源时，打印返回内容前 100 字，方便排查原因
+                        preview = c[:100].replace('\n', ' ')
+                        logger.warning(f"  → {url[:80]} : 0 个源 | 返回预览: {preview}")
             except Exception as e:
-                # 把原始异常原样打印（包含编码/HTTP 等详情），方便排查
-                logger.error(f"拉取远程源失败 {url}: {e}")
+                logger.error(f"  → {url[:80]} : 请求异常 - {e}")
         return all_lines
 
     def load_whitelist(self):
@@ -498,7 +490,6 @@ class StreamChecker:
         self.load_whitelist()
         lines = []
 
-        # 拉取 urls.txt
         urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
             logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
@@ -508,7 +499,6 @@ class StreamChecker:
         else:
             logger.warning("未找到或未能读取 urls.txt 内容")
 
-        # 拉取 my_urls.txt
         my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
         if my_urls:
             logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
@@ -552,21 +542,17 @@ class StreamChecker:
         logger.info(f"===== 检测完成 | 总计:{total} | 有效流:{stream_n} | 耗时:{(datetime.now()-self.start_time).seconds}s =====")
 
 # ==============================================
-# 主程序执行（先改文件，再跑流程）
+# 主程序执行
 # ==============================================
 def main():
     try:
         logger.info("===== 开始执行Token自动更新 =====")
-        # 1. 只获取一次Token
         token = get_taoiptv_token()
-        # 2. 一次性更新所有链接
         update_success = False
         if token:
             update_success = update_my_urls_all(token)
-        # 3. 同步到GitHub仓库
         if update_success:
             git_commit_push()
-        # 4. 执行原项目的黑白名单检测
         checker = StreamChecker()
         checker.run()
         logger.info("===== 全部流程执行完成 =====")
