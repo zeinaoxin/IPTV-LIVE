@@ -12,7 +12,7 @@ import logging
 import sys
 import subprocess
 
-# ==============================================    豆包
+# ==============================================
 # 【核心修复】绝对路径100%正确，杜绝嵌套错误
 # ==============================================
 # 脚本位置：assets/whitelist-blacklist/main.py
@@ -53,6 +53,7 @@ logger.info(f"脚本所在目录: {SCRIPT_DIR}")
 logger.info(f"assets目录: {ASSETS_DIR}")
 logger.info(f"my_urls.txt路径: {FILE_PATHS['my_urls']}")
 logger.info(f"my_urls.txt是否存在: {os.path.exists(FILE_PATHS['my_urls'])}")
+logger.info(f"urls.txt是否存在: {os.path.exists(FILE_PATHS['urls'])}")
 logger.info("="*60)
 
 # ==============================================
@@ -301,6 +302,12 @@ class StreamChecker:
             CLEAN_NO_FORMAT:0, CLEAN_EMPTY_NAME:0, CLEAN_BAD_URL:0,
             CLEAN_DOMAIN_BL:0, CLEAN_VOD:0
         }
+        # ===================== 新增：分文件统计变量 =====================
+        self.source_map: Dict[str, str] = {}  # 记录每个url的来源：urls/my_urls
+        self.urls_total = 0  # urls.txt拉取的总有效源数
+        self.my_urls_total = 0  # my_urls.txt拉取的总有效源数
+        self.urls_success = 0  # urls.txt检测成功的源数
+        self.my_urls_success = 0  # my_urls.txt检测成功的源数
 
     def _check_ipv6(self):
         try:
@@ -450,22 +457,43 @@ class StreamChecker:
     def run(self):
         logger.info("===== 开始流媒体检测 =====")
         self.load_whitelist()
-        lines = []
-        
-        urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
-        if urls:
-            logger.info(f"拉取urls.txt中的{len(urls)}个节点")
-            lines.extend(self.fetch_remote(urls))
-        
-        my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
-        if my_urls:
-            logger.info(f"拉取my_urls.txt中的{len(my_urls)}个节点")
-            lines.extend(self.fetch_remote(my_urls))
-        
-        lines.extend(self.whitelist_lines)
-        lines.extend(self.manual_urls)
+
+        # ===================== 优化：分文件拉取+来源标记 =====================
+        # 处理urls.txt
+        urls_remote_list = self.read_file(FILE_PATHS["urls"], split_by_space=True)
+        urls_lines = []
+        if urls_remote_list:
+            logger.info(f"开始拉取 urls.txt 中的 {len(urls_remote_list)} 个远程节点")
+            urls_lines = self.fetch_remote(urls_remote_list)
+            self.urls_total = len(urls_lines)
+            logger.info(f"urls.txt 拉取完成，共获取 {self.urls_total} 个有效源")
+            # 标记来源
+            for line in urls_lines:
+                res = clean_source_line(line)
+                if res:
+                    _, url = res
+                    self.source_map[url] = "urls"
+
+        # 处理my_urls.txt
+        my_urls_remote_list = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
+        my_urls_lines = []
+        if my_urls_remote_list:
+            logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls_remote_list)} 个远程节点")
+            my_urls_lines = self.fetch_remote(my_urls_remote_list)
+            self.my_urls_total = len(my_urls_lines)
+            logger.info(f"my_urls.txt 拉取完成，共获取 {self.my_urls_total} 个有效源")
+            # 标记来源
+            for line in my_urls_lines:
+                res = clean_source_line(line)
+                if res:
+                    _, url = res
+                    self.source_map[url] = "my_urls"
+
+        # 合并所有源（保留原有逻辑）
+        lines = urls_lines + my_urls_lines + self.whitelist_lines + self.manual_urls
         to_check, _ = self.prepare_lines(lines)
 
+        # 并发检测
         results = []
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as executor:
             future_map = {executor.submit(self.check_url, u, u in self.whitelist_urls): u for u, _ in to_check}
@@ -481,8 +509,19 @@ class StreamChecker:
                     self.new_failed_urls.add(url)
 
         self._save_blacklist()
+        # 排序结果
         results_sorted = sorted(results, key=lambda x: ({"stream":0,"playlist":1,"unknown":2}.get(x[3],3), x[1]))
-        
+
+        # ===================== 新增：分文件统计成功数 =====================
+        for url, _, _, kind in results_sorted:
+            source = self.source_map.get(url, "")
+            if kind not in ("timeout", "blacklist"):
+                if source == "urls":
+                    self.urls_success += 1
+                elif source == "my_urls":
+                    self.my_urls_success += 1
+
+        # 保存测速结果和白名单（保留原有逻辑）
         with open(FILE_PATHS["whitelist_respotime"], 'w', encoding='utf-8') as f:
             bj_time = datetime.now(timezone.utc)+timedelta(hours=8)
             f.write(f"更新时间,#genre#\n{bj_time.strftime('%Y%m%d %H:%M')}\n\n")
@@ -496,9 +535,33 @@ class StreamChecker:
                 if kind not in ("timeout", "blacklist"):
                     f.write(f"自动,{url}\n")
         
+        # 原有总统计
         total = len(results)
         stream_n = sum(1 for _,_,_,k in results if k=="stream")
-        logger.info(f"===== 检测完成 | 总计:{total} | 有效流:{stream_n} | 耗时:{(datetime.now()-self.start_time).seconds}s =====")
+        playlist_n = sum(1 for _,_,_,k in results if k=="playlist")
+        unknown_n = sum(1 for _,_,_,k in results if k=="unknown")
+        timeout_n = sum(1 for _,_,_,k in results if k=="timeout")
+        blacklist_n = sum(1 for _,_,_,k in results if k=="blacklist")
+        elapsed_s = (datetime.now()-self.start_time).seconds
+
+        # ===================== 新增：分文件统计日志打印 =====================
+        logger.info("="*60)
+        logger.info(f"===== 分文件源统计结果 =====")
+        logger.info(f"urls.txt: 总拉取源数 {self.urls_total} 个，检测有效成功 {self.urls_success} 个")
+        logger.info(f"my_urls.txt: 总拉取源数 {self.my_urls_total} 个，检测有效成功 {self.my_urls_success} 个")
+        logger.info("="*60)
+
+        # 原有总统计日志
+        logger.info(
+            f"===== 检测完成 =====\n"
+            f"  总计: {total} 条\n"
+            f"  ✅ 流: {stream_n}\n"
+            f"  ✅ 列表: {playlist_n}\n"
+            f"  ⚠️ 未知: {unknown_n}\n"
+            f"  ❌ 超时: {timeout_n}\n"
+            f"  🚫 域名黑名单: {blacklist_n}\n"
+            f"  耗时: {elapsed_s}s"
+        )
 
 # ==============================================
 # 主程序执行（先改文件，再跑流程）
