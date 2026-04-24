@@ -214,7 +214,7 @@ def is_vod_or_image_url(url: str) -> bool:
         return False
 
 # ==============================================
-# 行格式清洗
+# 行格式清洗（用于“组名,URL”格式的逐行处理）
 # ==============================================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
@@ -393,7 +393,9 @@ class StreamChecker:
         return True, 0, "ok", "stream"
 
     # =============================================================
-    # 关键修改：M3U 分支放宽 URL 行识别条件，兼容相对路径
+    # 【关键修复】fetch_remote
+    # - M3U：支持任意非 # 开头的 URL 行（含相对路径）；优先用 group-title
+    # - 非 M3U：正则提取 + 逗号/空格 拆解“单行多 URL”；对少量结果打印诊断
     # =============================================================
     def fetch_remote(self, urls):
         all_lines = []
@@ -412,73 +414,59 @@ class StreamChecker:
 
                 before = len(all_lines)
 
+                # ---------- 分支：M3U ----------
                 if "#EXTM3U" in c[:200]:
-                    # ---- M3U 分支 ----
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
                         if not l:
                             continue
-
-                        # 提取组名：优先从 #EXTINF 的 group-title 取，兼容中英文逗号
+                        # 组名提取：优先 group-title
                         if l.startswith("#EXTINF"):
-                            # 尝试提取 group-title（兼容中文逗号）
                             m_group = re.search(r'group-title\s*=\s*["\']?([^"\',]+)', l)
                             if m_group:
                                 name = m_group.group(1).strip()
                             else:
-                                # 退回到“逗号后最后一部分”
                                 name = l.split(",")[-1].strip() if "," in l else ""
                         elif not l.startswith("#"):
-                            # ---- 关键修改：不再要求 startswith(http/rtmp) ----
-                            # 只要不是 # 开头，就当作 URL 行处理
+                            # 只要不是 # 开头，就当作 URL 行
                             url_candidate = l.strip().split("#")[0].strip().split("$")[0].strip()
                             if not url_candidate:
                                 name = ""
                                 continue
-
-                            # 如果是相对路径，用本入口 URL 补全成绝对路径
+                            # 相对路径补全
                             if not re.match(r'https?://', url_candidate, re.I):
                                 url_candidate = urljoin(raw_url, url_candidate)
-
-                            # 过滤黑名单/点播图片
+                            # 黑名单/点播/图片过滤
                             if url_matches_domain_blacklist(url_candidate):
                                 name = ""
                                 continue
                             if is_vod_or_image_url(url_candidate):
                                 name = ""
                                 continue
-
-                            # 用 group-title 作组名（更规范）
                             group = name if name else "订阅源"
                             res, _ = clean_source_line(f"{group},{url_candidate}")
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             else:
-                                # 若清洗失败，也尽量保留（兜底）
                                 all_lines.append(f"{group},{url_candidate}")
-
-                            # 重置当前组名（与原逻辑一致：EXTINF 与下一行配对）
                             name = ""
                 else:
-                    # ---- 非 M3U 分支（保持不变：正则暴力提取所有 URL） ----
+                    # ---------- 分支：非 M3U ----------
+                    # 策略1：正则提取所有 http(s) URL
                     raw_urls_found = RE_ALL_URLS.findall(c)
-
                     for u in raw_urls_found:
                         u = u.strip()
                         if not u:
                             continue
-                        # 去掉 URL 末尾可能的标点残留
                         u = u.rstrip(".,;:!?)")
-                        # 过滤点播/图片/黑名单
                         if is_vod_or_image_url(u):
                             continue
                         if url_matches_domain_blacklist(u):
                             continue
-                        # 补默认组名
                         all_lines.append(f"订阅源,{u}")
 
-                    # 兜底：如果正则没提取到任何 URL，尝试逐行清洗
+                    # 策略2：如果正则没提取到任何 URL，尝试逐行清洗（兼容“组名,URL”格式）
                     if len(all_lines) == before:
                         for l in c.splitlines():
                             l = l.strip()
@@ -488,11 +476,33 @@ class StreamChecker:
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
 
+                    # 策略3：对“单行多 URL（逗号分隔）”做一次拆解兜底
+                    # 如果一整行里出现多个 http，按逗号拆开再逐条入队
+                    if len(all_lines) == before:
+                        for l in c.splitlines():
+                            l = l.strip()
+                            if not l or l.startswith("#"):
+                                continue
+                            if l.count("http") <= 1:
+                                continue
+                            # 优先用逗号拆
+                            parts = l.split(",")
+                            for part in parts:
+                                part = part.strip()
+                                if re.match(r'https?://', part, re.I):
+                                    part = part.rstrip(".,;:!?)")
+                                    if is_vod_or_image_url(part):
+                                        continue
+                                    if url_matches_domain_blacklist(part):
+                                        continue
+                                    all_lines.append(f"订阅源,{part}")
+
                 got = len(all_lines) - before
+
+                # 为 taoiptv 入口增加“少量结果”的诊断，便于后续排查
                 if got > 1:
                     logger.info(f"  ✓ {raw_url[:90]} → {got} 个源")
                 elif got == 1:
-                    # 只提取到 1 个源：打印原始内容前 500 字符作为诊断
                     diag = c[:500].replace("\n", "\\n").replace("\r", "")
                     logger.warning(f"  ⚠ {raw_url[:90]} → 仅 {got} 个源 | 内容诊断: {diag}")
                 else:
