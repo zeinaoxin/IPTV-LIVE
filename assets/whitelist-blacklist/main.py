@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置
+# 路径配置 豆包
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
