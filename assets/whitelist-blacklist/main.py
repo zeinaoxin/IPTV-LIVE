@@ -1,5 +1,4 @@
 import urllib.request
-import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
@@ -14,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置 元宝
+# 路径配置
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -215,7 +214,7 @@ def is_vod_or_image_url(url: str) -> bool:
         return False
 
 # ==============================================
-# 行格式清洗（用于"组名,URL"格式的逐行处理）
+# 行格式清洗（用于“组名,URL”格式的逐行处理）
 # ==============================================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
@@ -393,29 +392,25 @@ class StreamChecker:
             return self.check_http(url, t)
         return True, 0, "ok", "stream"
 
-    def _extract_urls_from_json(self, json_data, base_url=None):
-        """从JSON数据中递归提取所有URL"""
-        urls = set()
-        
-        def extract_from_value(value):
-            if isinstance(value, str):
-                # 检查是否是URL
-                if value.startswith(("http://", "https://", "rtmp://", "rtmps://")):
-                    # 清理URL，移除可能的后缀符号
-                    url = value.rstrip(".,;:!?)")
-                    # 过滤掉图片和点播
-                    if not is_vod_or_image_url(url) and not url_matches_domain_blacklist(url):
-                        urls.add(url)
-            elif isinstance(value, dict):
-                for v in value.values():
-                    extract_from_value(v)
-            elif isinstance(value, list):
-                for item in value:
-                    extract_from_value(item)
-        
-        extract_from_value(json_data)
-        return list(urls)
+    # =============================================================
+    # 【优化】多编码内容解码
+    # =============================================================
+    def _decode_content(self, raw_bytes):
+        """依次尝试 utf-8, gbk, gb2312 解码，均失败则用 utf-8 忽略错误"""
+        for enc in ('utf-8', 'gbk', 'gb2312'):
+            try:
+                return raw_bytes.decode(enc)
+            except (UnicodeDecodeError, LookupError):
+                continue
+        return raw_bytes.decode('utf-8', errors='replace')
 
+    # =============================================================
+    # 【核心优化】fetch_remote
+    # - 多编码兼容
+    # - M3U 识别更准确（去除 BOM）
+    # - 非 M3U 文本解析策略改进，覆盖更多格式
+    # - 完善的诊断日志
+    # =============================================================
     def fetch_remote(self, urls):
         all_lines = []
         for raw_url in urls:
@@ -423,73 +418,45 @@ class StreamChecker:
                 safe_url = quote(unquote(raw_url), safe=":/?&=#%")
             except Exception:
                 safe_url = raw_url
+
             try:
                 ctx = ssl._create_unverified_context()
                 req = urllib.request.Request(safe_url, headers={"User-Agent": Config.USER_AGENT})
                 with urllib.request.build_opener(
                     urllib.request.HTTPSHandler(context=ctx)
-                ).open(req, timeout=15) as r:
-                    raw_content = r.read()
-                    c = raw_content.decode("utf-8", errors="replace")
+                ).open(req, timeout=Config.TIMEOUT_FETCH) as r:
+                    raw_bytes = r.read()
+                    c = self._decode_content(raw_bytes)
 
                 before = len(all_lines)
-
-                # ---------- 分支1：检查是否是JSON（taoiptv.com的特殊处理） ----------
-                is_taoiptv = "taoiptv.com" in raw_url
-                if is_taoiptv:
-                    try:
-                        # 尝试解析为JSON
-                        json_data = json.loads(c)
-                        # 从JSON中提取URL
-                        extracted_urls = self._extract_urls_from_json(json_data, raw_url)
-                        
-                        for url in extracted_urls:
-                            # 对每个URL应用黑名单和点播过滤
-                            if url_matches_domain_blacklist(url):
-                                continue
-                            if is_vod_or_image_url(url):
-                                continue
-                            all_lines.append(f"TaoIPTV,{url}")
-                        
-                        got = len(all_lines) - before
-                        if got > 0:
-                            logger.info(f"  ✓ {raw_url[:90]} → JSON解析成功，提取到 {got} 个源")
-                        else:
-                            # 如果JSON解析没有提取到URL，尝试回退到其他解析方法
-                            logger.warning(f"  ⚠ {raw_url[:90]} → JSON解析但未提取到URL，尝试其他方法")
-                            is_taoiptv = False  # 标记为False，让后续逻辑处理
-                    except json.JSONDecodeError:
-                        # 如果不是有效的JSON，继续使用原有逻辑
-                        logger.debug(f"  ℹ {raw_url[:90]} → 不是有效的JSON，使用原有解析方法")
-                        is_taoiptv = False
-                    except Exception as e:
-                        logger.warning(f"  ⚠ {raw_url[:90]} → JSON解析异常: {e}，使用原有解析方法")
-                        is_taoiptv = False
-                
-                # ---------- 分支2：M3U格式 ----------
-                if not is_taoiptv and "#EXTM3U" in c[:200]:
+                # ---------- 分支：M3U ----------
+                # 去除 BOM 并检查是否以 #EXTM3U 开头
+                if c.lstrip('\ufeff').lstrip().startswith('#EXTM3U'):
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
                         if not l:
                             continue
-                        # 组名提取：优先 group-title
                         if l.startswith("#EXTINF"):
+                            # 提取组名：优先 group-title，其次 tvg-name，最后逗号分隔
                             m_group = re.search(r'group-title\s*=\s*["\']?([^"\',]+)', l)
                             if m_group:
                                 name = m_group.group(1).strip()
                             else:
-                                name = l.split(",")[-1].strip() if "," in l else ""
+                                m_tvg = re.search(r'tvg-name\s*=\s*["\']?([^"\',]+)', l)
+                                if m_tvg:
+                                    name = m_tvg.group(1).strip()
+                                else:
+                                    name = l.split(",")[-1].strip() if "," in l else ""
                         elif not l.startswith("#"):
-                            # 只要不是 # 开头，就当作 URL 行
-                            url_candidate = l.strip().split("#")[0].strip().split("$")[0].strip()
+                            url_candidate = l.split("#")[0].split("$")[0].strip()
                             if not url_candidate:
                                 name = ""
                                 continue
                             # 相对路径补全
                             if not re.match(r'https?://', url_candidate, re.I):
                                 url_candidate = urljoin(raw_url, url_candidate)
-                            # 黑名单/点播/图片过滤
+                            # 过滤黑名单/点播/图片
                             if url_matches_domain_blacklist(url_candidate):
                                 name = ""
                                 continue
@@ -497,73 +464,66 @@ class StreamChecker:
                                 name = ""
                                 continue
                             group = name if name else "订阅源"
+                            # 利用 clean_source_line 校验并提取标准格式
                             res, _ = clean_source_line(f"{group},{url_candidate}")
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             else:
                                 all_lines.append(f"{group},{url_candidate}")
                             name = ""
-                
-                # ---------- 分支3：非M3U格式（常规文本） ----------
-                elif not is_taoiptv:
-                    # 策略1：正则提取所有 http(s) URL
-                    raw_urls_found = RE_ALL_URLS.findall(c)
-                    for u in raw_urls_found:
-                        u = u.strip()
-                        if not u:
+                else:
+                    # ---------- 分支：非 M3U ----------
+                    # 策略1：逐行尝试标准格式清洗（频道名,URL）
+                    lines = c.splitlines()
+                    extracted = False
+                    for l in lines:
+                        l = l.strip()
+                        if not l or l.startswith("#"):
                             continue
-                        u = u.rstrip(".,;:!?)")
-                        if is_vod_or_image_url(u):
-                            continue
-                        if url_matches_domain_blacklist(u):
-                            continue
-                        all_lines.append(f"订阅源,{u}")
+                        res, _ = clean_source_line(l)
+                        if res:
+                            all_lines.append(f"{res[0]},{res[1]}")
+                            extracted = True
 
-                    # 策略2：如果正则没提取到任何 URL，尝试逐行清洗（兼容"组名,URL"格式）
-                    if len(all_lines) == before:
-                        for l in c.splitlines():
-                            l = l.strip()
-                            if not l or l.startswith("#"):
+                    # 策略2：如果策略1未提取到任何内容，直接用正则提取所有http(s) URL
+                    if not extracted:
+                        raw_urls_found = RE_ALL_URLS.findall(c)
+                        for u in raw_urls_found:
+                            u = u.strip().rstrip(".,;:!?)")
+                            if not u:
                                 continue
-                            res, _ = clean_source_line(l)
-                            if res:
-                                all_lines.append(f"{res[0]},{res[1]}")
+                            if is_vod_or_image_url(u) or url_matches_domain_blacklist(u):
+                                continue
+                            all_lines.append(f"订阅源,{u}")
 
-                    # 策略3：对"单行多 URL（逗号分隔）"做一次拆解兜底
-                    # 如果一整行里出现多个 http，按逗号拆开再逐条入队
-                    if len(all_lines) == before:
-                        for l in c.splitlines():
+                    # 策略3：兜底处理多URL合并行（如一行多个URL用逗号或空格分隔）
+                    if not extracted and len(all_lines) == before:
+                        for l in lines:
                             l = l.strip()
                             if not l or l.startswith("#"):
                                 continue
                             if l.count("http") <= 1:
                                 continue
-                            # 优先用逗号拆
+                            # 优先按逗号拆分
                             parts = l.split(",")
                             for part in parts:
                                 part = part.strip()
-                                if re.match(r'https?://', part, re.I):
-                                    part = part.rstrip(".,;:!?)")
-                                    if is_vod_or_image_url(part):
-                                        continue
-                                    if url_matches_domain_blacklist(part):
-                                        continue
-                                    all_lines.append(f"订阅源,{part}")
+                                if not part.startswith("http"):
+                                    continue
+                                part = part.rstrip(".,;:!?)")
+                                if is_vod_or_image_url(part) or url_matches_domain_blacklist(part):
+                                    continue
+                                all_lines.append(f"订阅源,{part}")
 
                 got = len(all_lines) - before
-
-                # 为 taoiptv 入口增加"少量结果"的诊断，便于后续排查
-                if got > 1:
-                    logger.info(f"  ✓ {raw_url[:90]} → {got} 个源")
-                elif got == 1:
-                    diag = c[:500].replace("\n", "\\n").replace("\r", "")
-                    logger.warning(f"  ⚠ {raw_url[:90]} → 仅 {got} 个源 | 内容诊断: {diag}")
+                preview = c[:300].replace("\n", "\\n")
+                if got > 0:
+                    logger.info(f"✓ {raw_url[:90]} → {got} 个源 (总长度 {len(c)} 字符)")
                 else:
-                    preview = c[:200].replace("\n", "\\n")
-                    logger.warning(f"  ✗ {raw_url[:90]} → 0 个源 | 内容: {preview}")
+                    logger.warning(f"✗ {raw_url[:90]} → 0 个源 | 内容预览: {preview}")
 
             except Exception as e:
-                logger.error(f"  ✗ {raw_url[:90]} → 异常: {e}")
+                logger.error(f"✗ {raw_url[:90]} → 异常: {e}")
 
         return all_lines
 
