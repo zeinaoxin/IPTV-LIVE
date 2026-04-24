@@ -1,212 +1,220 @@
-2026-04-24 10:43:00,729 - ============================================================
-2026-04-24 10:43:00,729 - 项目根目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE
-2026-04-24 10:43:00,729 - 脚本目录:   /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist
-2026-04-24 10:43:00,729 - assets目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets
-2026-04-24 10:43:00,729 - my_urls.txt: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls.txt (存在)
-2026-04-24 10:43:00,729 - ============================================================
-2026-04-24 10:43:00,729 - ===== 开始执行Token自动更新 =====
-2026-04-24 10:43:00,730 - 正在获取TaoIPTV最新Token...
-2026-04-24 10:43:02,218 - ✅ 成功获取Token: 8c78df7c7c0f4844
-2026-04-24 10:43:02,219 - ✅ my_urls.txt更新成功！替换 98 个Token（2026-04-24 18:43:02）
-2026-04-24 10:43:02,219 - 正在同步到GitHub仓库...
-2026-04-24 10:43:03,582 - ✅ 已同步到GitHub仓库！
-2026-04-24 10:43:03,759 - 加载URL黑名单: 216723 条
-2026-04-24 10:43:03,759 - ===== 开始流媒体检测 =====
-2026-04-24 10:43:03,762 - 手动白名单: 168 个频道
-2026-04-24 10:43:03,763 - 开始拉取 urls.txt 中的 91 个节点
-2026-04-24 10:43:03,913 -   ✓ https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt → 1019 个源
-2026-04-24 10:43:04,037 -   ✓ https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt → 443 个源
-2026-04-24 10:43:04,173 -   ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs/heads/master/live.m3u → 32 个源
-2026-04-24 10:43:04,367 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u → 1128 个源
-2026-04-24 10:43:04,544 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u → 799 个源
-2026-04-24 10:43:04,705 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%92%AA%E5%92%95%E7%9B% → 165 个源
-2026-04-24 10:43:04,882 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%B0%8F%E8%82%A5%E7%BE% → 196 个源
-2026-04-24 10:43:05,063 -   ✓ https://raw.githubusercontent.com/skddyj/iptv/refs/heads/main/IPTV.m3u → 82 个源
-2026-04-24 10:43:05,285 -   ✓ https://raw.githubusercontent.com/cyalias/mytvs-github/refs/heads/main/mytv.txt → 706 个源
-2026-04-24 10:43:05,473 -   ✓ https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/main/ipv4.txt → 181 个源
-2026-04-24 10:43:05,663 -   ✓ https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8 → 1892 个源
-2026-04-24 10:43:05,774 -   ✓ https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u → 125 个源
-2026-04-24 10:43:05,957 -   ✓ https://raw.githubusercontent.com/onlylove2023/iptv/refs/heads/main/IPTV.m3u → 61 个源
-2026-04-24 10:43:06,080 -   ✗ https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/main/hycg.txt → 异常: HTTP Error 404: Not Found
-2026-04-24 10:43:06,216 -   ✓ https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u → 82 个源
-2026-04-24 10:43:06,409 -   ✓ https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs/heads/master/output/weishi.m3 → 70 个源
-2026-04-24 10:43:06,838 -   ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/bbxx.txt → 15033 个源
-2026-04-24 10:43:07,180 -   ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/others_output.tx → 12156 个源
-2026-04-24 10:43:07,327 -   ✓ https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs/heads/main/cnTV_AutoUpdate.m3 → 66 个源
-2026-04-24 10:43:07,812 -   ✓ https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_live/refs/heads/main/live_ipv4.tx → 10474 个源
-2026-04-24 10:43:07,918 -   ✗ https://raw.githubusercontent.com/8080713/iptv-api666/refs/heads/main/output/result.m3u → 异常: HTTP Error 404: Not Found
-2026-04-24 10:43:08,071 -   ✓ https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/heads/master/output/user_result. → 385 个源
-2026-04-24 10:43:08,218 -   ✓ https://raw.githubusercontent.com/wwb521/live/refs/heads/main/tv.txt → 57 个源
-2026-04-24 10:43:08,389 -   ✓ https://raw.githubusercontent.com/zhi35/iptv/refs/heads/master/iptv.m3u → 508 个源
-2026-04-24 10:43:08,565 -   ✓ https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/heads/master/output/cctv.m3u → 54 个源
-2026-04-24 10:43:08,770 -   ✓ https://raw.githubusercontent.com/0610840119/iptv-api/refs/heads/master/output/xp_result.m → 667 个源
-2026-04-24 10:43:08,890 -   ✓ https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/master/TV-IPV4.m3u → 58 个源
-2026-04-24 10:43:09,123 -   ✓ https://raw.githubusercontent.com/MemoryCollection/IPTV/refs/heads/main/hotel.txt → 50 个源
-2026-04-24 10:43:09,148 -   ✓ https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u → 80 个源
-2026-04-24 10:43:09,383 -   ✓ https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/main/iptv_list.txt → 5698 个源
-2026-04-24 10:43:09,530 -   ✓ https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3u → 342 个源
-2026-04-24 10:43:09,652 -   ✓ https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt → 202 个源
-2026-04-24 10:43:09,758 -   ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt → 31 个源
-2026-04-24 10:43:09,910 -   ✓ https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.txt → 1028 个源
-2026-04-24 10:43:10,071 -   ✓ https://raw.githubusercontent.com/junge3333/juds6/main/yszb1.txt → 785 个源
-2026-04-24 10:43:10,204 -   ✓ https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.txt → 92 个源
-2026-04-24 10:43:10,332 -   ✓ https://raw.githubusercontent.com/maitel2020/iptv-self-use/main/iptv.txt → 71 个源
-2026-04-24 10:43:10,492 -   ✓ https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/main/live.txt → 314 个源
-2026-04-24 10:43:10,659 -   ✓ https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/live.txt → 531 个源
-2026-04-24 10:43:10,816 -   ✓ https://raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt → 933 个源
-2026-04-24 10:43:11,006 -   ✓ https://raw.githubusercontent.com/alienlu/iptv/refs/heads/master/iptv.txt → 332 个源
-2026-04-24 10:43:11,144 -   ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/台湾香港澳门2023.m3 → 151 个源
-2026-04-24 10:43:11,303 -   ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国内电视台2023.m3u → 286 个源
-2026-04-24 10:43:11,463 -   ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewT → 43 个源
-2026-04-24 10:43:11,617 -   ✓ https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt → 366 个源
-2026-04-24 10:43:11,962 -   ✓ https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt → 11973 个源
-2026-04-24 10:43:12,075 -   ✓ https://iptv.catvod.com/tv.m3u → 2 个源
-2026-04-24 10:43:27,254 -   ✓ https://xn--6orr3pi6g9uu.top/zb/zb.txt → 333 个源
-2026-04-24 10:43:28,036 -   ✓ https://tv.iill.top/m3u/Gather → 1303 个源
-2026-04-24 10:43:28,078 -   ✓ https://m.iill.top/Live.m3u → 486 个源
-2026-04-24 10:43:28,170 -   ✓ https://tv.iill.top/m3u/Sport → 36 个源
-2026-04-24 10:43:32,567 -   ✓ https://live.freetv.top/huyayqk.m3u → 2 个源
-2026-04-24 10:43:37,066 -   ✓ https://live.freetv.top/douyuyqk.m3u → 2 个源
-2026-04-24 10:43:37,362 -   ✓ https://live.zhoujie218.top/tv/iptv4.txt → 1028 个源
-2026-04-24 10:43:37,458 -   ✓ https://t.freetv.fun/m3u/playlist.txt → 33 个源
-2026-04-24 10:43:37,647 -   ✓ https://t.freetv.fun/m3u/taiwan.txt → 4 个源
-2026-04-24 10:43:37,840 -   ✓ https://t.freetv.fun/m3u/hong_kong.txt → 4 个源
-2026-04-24 10:43:45,265 -   ✓ https://t.freetv.fun/m3u/macao.txt → 4 个源
-2026-04-24 10:43:45,453 -   ✓ https://t.freetv.fun/m3u/japan.txt → 4 个源
-2026-04-24 10:43:45,646 -   ✓ https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u → 351 个源
-2026-04-24 10:43:45,799 -   ✓ https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u → 46 个源
-2026-04-24 10:43:45,956 -   ✓ https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u → 13 个源
-2026-04-24 10:43:46,110 -   ✓ https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u → 34 个源
-2026-04-24 10:43:46,268 -   ✓ https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u → 115 个源
-2026-04-24 10:43:46,424 -   ✓ https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u → 6 个源
-2026-04-24 10:43:46,575 -   ✓ https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u → 4 个源
-2026-04-24 10:43:46,727 -   ✓ https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u → 44 个源
-2026-04-24 10:43:46,877 -   ✓ https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u → 6 个源
-2026-04-24 10:43:47,026 -   ✓ https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u → 39 个源
-2026-04-24 10:43:47,189 -   ✓ https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u → 2 个源
-2026-04-24 10:43:47,342 -   ✓ https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u → 2 个源
-2026-04-24 10:43:47,524 -   ✓ https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u → 78 个源
-2026-04-24 10:43:47,676 -   ✓ https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u → 4 个源
-2026-04-24 10:43:47,827 -   ⚠ https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u → 仅 1 个源 | 内容诊断: #EXTM3U\n#EXTINF:-1 tvg-name="漫画解说" tvg-id="漫画解说" tvg-logo="https://tb.zbds.top/logo/漫画解说.png" group-title="解说频道", 漫画解说\nhttps://www.goodiptv.club/douyu/5907076\nupdateTime: 2026-04-24 17:53:24
-2026-04-24 10:43:49,063 -   ✓ https://tv.850930.xyz/kdsb.txt → 5167 个源
-2026-04-24 10:43:49,245 -   ✓ https://tv.850930.xyz/pix.m3u → 59 个源
-2026-04-24 10:43:49,323 -   ✓ https://live.zbds.org/tv/iptv4.txt → 1028 个源
-2026-04-24 10:43:49,591 -   ✓ https://iptv.zsdc.eu.org/home/iptv.m3u8 → 154 个源
-2026-04-24 10:43:50,258 -   ✓ https://freetv.fun/test_channels_original_new.txt → 4 个源
-2026-04-24 10:43:51,628 -   ✓ https://jihulab.com/-/snippets/5265/raw/main/.txt → 19 个源
-2026-04-24 10:43:51,744 -   ✓ https://iptv-org.github.io/iptv/languages/zho.m3u → 207 个源
-2026-04-24 10:43:51,811 -   ✓ https://iptv-org.github.io/iptv/countries/us.m3u → 1352 个源
-2026-04-24 10:43:51,940 -   ✓ https://iptv-org.github.io/iptv/countries/tw.m3u → 23 个源
-2026-04-24 10:43:53,351 -   ✓ https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-afc9-7b323e3e16c0/d4fe44c5-107c → 1830 个源
-2026-04-24 10:43:54,528 -   ✓ https://fm1077.serv00.net/SmartTV.m3u → 562 个源
-2026-04-24 10:43:54,649 -   ✓ https://m3u.ibert.me/txt/fmml_ipv6.txt → 82 个源
-2026-04-24 10:43:54,766 -   ✓ https://m3u.ibert.me/txt/ycl_iptv.txt → 90 个源
-2026-04-24 10:43:54,884 -   ✓ https://m3u.ibert.me/txt/y_g.txt → 125 个源
-2026-04-24 10:43:55,174 -   ✓ https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt → 483 个源
-2026-04-24 10:43:59,504 -   ✓ https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F%A3/IPV6.txt → 185 个源
-2026-04-24 10:44:00,337 -   ✓ http://tot.totalh.net/tttt.txt → 760 个源
-2026-04-24 10:44:00,338 - urls.txt 完成：91 个节点 → 85863 个源
-2026-04-24 10:44:00,338 - 开始拉取 my_urls.txt 中的 98 个节点
-2026-04-24 10:44:01,340 -   ✓ https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:02,001 -   ✓ https://taoiptv.com/lives/44025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:02,662 -   ✓ https://taoiptv.com/lives/43025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:03,329 -   ✓ https://taoiptv.com/lives/42025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:04,007 -   ✓ https://taoiptv.com/lives/41025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:04,674 -   ✓ https://taoiptv.com/lives/31025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:05,356 -   ✓ https://taoiptv.com/lives/11025.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:06,032 -   ✓ https://taoiptv.com/lives/51015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:06,735 -   ✓ https://taoiptv.com/lives/45015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:07,404 -   ✓ https://taoiptv.com/lives/44015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:08,061 -   ✓ https://taoiptv.com/lives/43015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:08,713 -   ✓ https://taoiptv.com/lives/42015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:09,396 -   ✓ https://taoiptv.com/lives/41015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:10,059 -   ✓ https://taoiptv.com/lives/34015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:10,731 -   ✓ https://taoiptv.com/lives/22015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:11,393 -   ✓ https://taoiptv.com/lives/31015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:12,080 -   ✓ https://taoiptv.com/lives/11015.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:12,751 -   ✓ https://taoiptv.com/lives/45023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:13,410 -   ✓ https://taoiptv.com/lives/44023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:14,080 -   ✓ https://taoiptv.com/lives/43023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:14,736 -   ✓ https://taoiptv.com/lives/42023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:15,413 -   ✓ https://taoiptv.com/lives/41023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:16,075 -   ✓ https://taoiptv.com/lives/37023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:16,726 -   ✓ https://taoiptv.com/lives/36023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:17,387 -   ✓ https://taoiptv.com/lives/35023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:18,069 -   ✓ https://taoiptv.com/lives/34023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:18,743 -   ✓ https://taoiptv.com/lives/33023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:19,410 -   ✓ https://taoiptv.com/lives/32023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:20,080 -   ✓ https://taoiptv.com/lives/31023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:20,738 -   ✓ https://taoiptv.com/lives/22023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:21,410 -   ✓ https://taoiptv.com/lives/21023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:22,067 -   ✓ https://taoiptv.com/lives/15023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:22,725 -   ✓ https://taoiptv.com/lives/14023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:23,378 -   ✓ https://taoiptv.com/lives/13023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:24,035 -   ✓ https://taoiptv.com/lives/12023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:24,710 -   ✓ https://taoiptv.com/lives/11023.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:25,364 -   ✓ https://taoiptv.com/lives/65013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:26,021 -   ✓ https://taoiptv.com/lives/62013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:26,695 -   ✓ https://taoiptv.com/lives/61013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:27,363 -   ✓ https://taoiptv.com/lives/52013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:28,030 -   ✓ https://taoiptv.com/lives/51013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:28,702 -   ✓ https://taoiptv.com/lives/45013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:29,359 -   ✓ https://taoiptv.com/lives/44013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:30,027 -   ✓ https://taoiptv.com/lives/43013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:30,707 -   ✓ https://taoiptv.com/lives/42013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:31,378 -   ✓ https://taoiptv.com/lives/41013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:32,046 -   ✓ https://taoiptv.com/lives/37013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:32,703 -   ✓ https://taoiptv.com/lives/34013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:33,370 -   ✓ https://taoiptv.com/lives/33013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:34,034 -   ✓ https://taoiptv.com/lives/32013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:34,714 -   ✓ https://taoiptv.com/lives/31013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:35,378 -   ✓ https://taoiptv.com/lives/23013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:36,030 -   ✓ https://taoiptv.com/lives/22013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:36,695 -   ✓ https://taoiptv.com/lives/21013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:37,345 -   ✓ https://taoiptv.com/lives/14013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:38,023 -   ✓ https://taoiptv.com/lives/13013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:38,696 -   ✓ https://taoiptv.com/lives/11013.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:39,346 -   ✓ https://taoiptv.com/lives/64024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:40,021 -   ✓ https://taoiptv.com/lives/63024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:40,690 -   ✓ https://taoiptv.com/lives/51024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:41,348 -   ✓ https://taoiptv.com/lives/50024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:42,007 -   ✓ https://taoiptv.com/lives/46024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:42,698 -   ✓ https://taoiptv.com/lives/44024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:43,345 -   ✓ https://taoiptv.com/lives/42024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:44,004 -   ✓ https://taoiptv.com/lives/41024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:44,661 -   ✓ https://taoiptv.com/lives/37024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:45,361 -   ✓ https://taoiptv.com/lives/35024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:46,016 -   ✓ https://taoiptv.com/lives/31024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:46,677 -   ✓ https://taoiptv.com/lives/23024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:47,341 -   ✓ https://taoiptv.com/lives/22024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:48,005 -   ✓ https://taoiptv.com/lives/21024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:48,676 -   ✓ https://taoiptv.com/lives/15024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:49,984 -   ✓ https://taoiptv.com/lives/14024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:50,639 -   ✓ https://taoiptv.com/lives/13024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:51,294 -   ✓ https://taoiptv.com/lives/12024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:51,948 -   ✓ https://taoiptv.com/lives/11024.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:52,598 -   ✓ https://taoiptv.com/lives/62014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:53,255 -   ✓ https://taoiptv.com/lives/61014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:53,933 -   ✓ https://taoiptv.com/lives/51014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:54,592 -   ✓ https://taoiptv.com/lives/50014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:55,262 -   ✓ https://taoiptv.com/lives/46014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:55,929 -   ✓ https://taoiptv.com/lives/45014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:56,591 -   ✓ https://taoiptv.com/lives/44014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:57,244 -   ✓ https://taoiptv.com/lives/43014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:57,905 -   ✓ https://taoiptv.com/lives/42014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:58,565 -   ✓ https://taoiptv.com/lives/41014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:59,227 -   ✓ https://taoiptv.com/lives/37014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:44:59,894 -   ✓ https://taoiptv.com/lives/36014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:00,556 -   ✓ https://taoiptv.com/lives/34014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:01,215 -   ✓ https://taoiptv.com/lives/33014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:01,873 -   ✓ https://taoiptv.com/lives/31014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:02,538 -   ✓ https://taoiptv.com/lives/22014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:03,207 -   ✓ https://taoiptv.com/lives/21014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:03,857 -   ✓ https://taoiptv.com/lives/15014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:04,516 -   ✓ https://taoiptv.com/lives/14014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:05,174 -   ✓ https://taoiptv.com/lives/13014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:05,842 -   ✓ https://taoiptv.com/lives/12014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:06,492 -   ✓ https://taoiptv.com/lives/11014.txt?token=8c78df7c7c0f4844 → 3 个源
-2026-04-24 10:45:06,493 - my_urls.txt 完成：98 个节点 → 294 个源
-2026-04-24 10:45:07,780 - 待检测 4541 条
-2026-04-24 10:46:54,558 - 黑名单更新，新增85条
-2026-04-24 10:46:54,588 - ===== 检测完成 | 总计:4541 | 流:146 | 列表:4153 | 未知:112 | 超时:130 | 耗时:231s =====
-2026-04-24 10:46:54,594 - ===== 全部流程执行完成 =====
+2026-04-24 11:01:54,191 - ============================================================
+2026-04-24 11:01:54,191 - 项目根目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE
+2026-04-24 11:01:54,191 - 脚本目录:   /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist
+2026-04-24 11:01:54,191 - assets目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets
+2026-04-24 11:01:54,191 - my_urls.txt: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls.txt (存在)
+2026-04-24 11:01:54,191 - ============================================================
+2026-04-24 11:01:54,192 - ===== 开始执行Token自动更新 =====
+2026-04-24 11:01:54,192 - 正在获取TaoIPTV最新Token...
+2026-04-24 11:01:55,873 - ✅ 成功获取Token: 8c78df7c7c0f4844
+2026-04-24 11:01:55,875 - ✅ my_urls.txt更新成功！替换 98 个Token（2026-04-24 19:01:55）
+2026-04-24 11:01:55,875 - 正在同步到GitHub仓库...
+2026-04-24 11:01:56,353 - Git推送失败: [ACTIONS=true REPO=zeinaoxin/IPTV-LIVE] To https://github.com/zeinaoxin/IPTV-LIVE
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/zeinaoxin/IPTV-LIVE'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+2026-04-24 11:01:56,574 - 加载URL黑名单: 216808 条
+2026-04-24 11:01:56,574 - ===== 开始流媒体检测 =====
+2026-04-24 11:01:56,578 - 手动白名单: 168 个频道
+2026-04-24 11:01:56,578 - 开始拉取 urls.txt 中的 91 个节点
+2026-04-24 11:01:56,656 - ✓ https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt → 1024 个源 (总长度 148011 字符)
+2026-04-24 11:01:56,725 - ✓ https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt → 444 个源 (总长度 96349 字符)
+2026-04-24 11:01:56,754 - ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs/heads/master/live.m3u → 32 个源 (总长度 5448 字符)
+2026-04-24 11:01:56,881 - ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u → 1128 个源 (总长度 230662 字符)
+2026-04-24 11:01:56,997 - ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u → 799 个源 (总长度 175869 字符)
+2026-04-24 11:01:57,059 - ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%92%AA%E5%92%95%E7%9B% → 166 个源 (总长度 9939 字符)
+2026-04-24 11:01:57,115 - ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%B0%8F%E8%82%A5%E7%BE% → 196 个源 (总长度 37195 字符)
+2026-04-24 11:01:57,148 - ✓ https://raw.githubusercontent.com/skddyj/iptv/refs/heads/main/IPTV.m3u → 82 个源 (总长度 22781 字符)
+2026-04-24 11:01:57,229 - ✓ https://raw.githubusercontent.com/cyalias/mytvs-github/refs/heads/main/mytv.txt → 706 个源 (总长度 109803 字符)
+2026-04-24 11:01:57,291 - ✓ https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/main/ipv4.txt → 183 个源 (总长度 39422 字符)
+2026-04-24 11:01:57,424 - ✓ https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8 → 1892 个源 (总长度 512415 字符)
+2026-04-24 11:01:57,486 - ✓ https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u → 125 个源 (总长度 22503 字符)
+2026-04-24 11:01:57,536 - ✓ https://raw.githubusercontent.com/onlylove2023/iptv/refs/heads/main/IPTV.m3u → 61 个源 (总长度 18469 字符)
+2026-04-24 11:01:57,574 - ✗ https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/main/hycg.txt → 异常: HTTP Error 404: Not Found
+2026-04-24 11:01:57,607 - ✓ https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u → 82 个源 (总长度 22781 字符)
+2026-04-24 11:01:57,662 - ✓ https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs/heads/master/output/weishi.m3 → 70 个源 (总长度 23039 字符)
+2026-04-24 11:01:58,164 - ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/bbxx.txt → 15491 个源 (总长度 1436718 字符)
+2026-04-24 11:01:58,533 - ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/others_output.tx → 12414 个源 (总长度 1121429 字符)
+2026-04-24 11:01:58,563 - ✓ https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs/heads/main/cnTV_AutoUpdate.m3 → 66 个源 (总长度 13816 字符)
+2026-04-24 11:01:58,929 - ✓ https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_live/refs/heads/main/live_ipv4.tx → 10692 个源 (总长度 1106281 字符)
+2026-04-24 11:01:58,958 - ✗ https://raw.githubusercontent.com/8080713/iptv-api666/refs/heads/main/output/result.m3u → 异常: HTTP Error 404: Not Found
+2026-04-24 11:01:59,004 - ✓ https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/heads/master/output/user_result. → 385 个源 (总长度 56930 字符)
+2026-04-24 11:01:59,048 - ✓ https://raw.githubusercontent.com/wwb521/live/refs/heads/main/tv.txt → 57 个源 (总长度 9477 字符)
+2026-04-24 11:01:59,121 - ✓ https://raw.githubusercontent.com/zhi35/iptv/refs/heads/master/iptv.m3u → 508 个源 (总长度 98800 字符)
+2026-04-24 11:01:59,170 - ✓ https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/heads/master/output/cctv.m3u → 54 个源 (总长度 23538 字符)
+2026-04-24 11:01:59,294 - ✓ https://raw.githubusercontent.com/0610840119/iptv-api/refs/heads/master/output/xp_result.m → 667 个源 (总长度 137656 字符)
+2026-04-24 11:01:59,339 - ✓ https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/master/TV-IPV4.m3u → 58 个源 (总长度 7631 字符)
+2026-04-24 11:01:59,387 - ✓ https://raw.githubusercontent.com/MemoryCollection/IPTV/refs/heads/main/hotel.txt → 50 个源 (总长度 5094 字符)
+2026-04-24 11:01:59,437 - ✓ https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u → 80 个源 (总长度 21174 字符)
+2026-04-24 11:01:59,627 - ✓ https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/main/iptv_list.txt → 5698 个源 (总长度 324424 字符)
+2026-04-24 11:01:59,713 - ✓ https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3u → 342 个源 (总长度 107364 字符)
+2026-04-24 11:01:59,766 - ✓ https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt → 202 个源 (总长度 14858 字符)
+2026-04-24 11:01:59,807 - ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt → 31 个源 (总长度 2565 字符)
+2026-04-24 11:01:59,859 - ✓ https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.txt → 1028 个源 (总长度 90659 字符)
+2026-04-24 11:01:59,945 - ✓ https://raw.githubusercontent.com/junge3333/juds6/main/yszb1.txt → 1447 个源 (总长度 93536 字符)
+2026-04-24 11:02:00,005 - ✓ https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.txt → 92 个源 (总长度 8084 字符)
+2026-04-24 11:02:00,066 - ✓ https://raw.githubusercontent.com/maitel2020/iptv-self-use/main/iptv.txt → 71 个源 (总长度 53716 字符)
+2026-04-24 11:02:00,132 - ✓ https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/main/live.txt → 314 个源 (总长度 38463 字符)
+2026-04-24 11:02:00,204 - ✓ https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/live.txt → 662 个源 (总长度 58683 字符)
+2026-04-24 11:02:00,313 - ✓ https://raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt → 933 个源 (总长度 116491 字符)
+2026-04-24 11:02:00,375 - ✓ https://raw.githubusercontent.com/alienlu/iptv/refs/heads/master/iptv.txt → 332 个源 (总长度 18282 字符)
+2026-04-24 11:02:00,429 - ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/台湾香港澳门2023.m3 → 151 个源 (总长度 14842 字符)
+2026-04-24 11:02:00,484 - ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国内电视台2023.m3u → 286 个源 (总长度 25474 字符)
+2026-04-24 11:02:00,539 - ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewT → 43 个源 (总长度 3718 字符)
+2026-04-24 11:02:00,586 - ✓ https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt → 366 个源 (总长度 97142 字符)
+2026-04-24 11:02:00,994 - ✓ https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt → 12183 个源 (总长度 1306825 字符)
+2026-04-24 11:02:01,384 - ✓ https://iptv.catvod.com/tv.m3u → 2 个源 (总长度 5932 字符)
+2026-04-24 11:02:16,058 - ✓ https://xn--6orr3pi6g9uu.top/zb/zb.txt → 331 个源 (总长度 8491017 字符)
+2026-04-24 11:02:16,615 - ✓ https://tv.iill.top/m3u/Gather → 1303 个源 (总长度 210266 字符)
+2026-04-24 11:02:18,194 - ✓ https://m.iill.top/Live.m3u → 8 个源 (总长度 8097 字符)
+2026-04-24 11:02:18,219 - ✓ https://tv.iill.top/m3u/Sport → 36 个源 (总长度 8116 字符)
+2026-04-24 11:02:22,418 - ✓ https://live.freetv.top/huyayqk.m3u → 2 个源 (总长度 229174 字符)
+2026-04-24 11:02:27,120 - ✓ https://live.freetv.top/douyuyqk.m3u → 2 个源 (总长度 170445 字符)
+2026-04-24 11:02:28,587 - ✓ https://live.zhoujie218.top/tv/iptv4.txt → 1028 个源 (总长度 90659 字符)
+2026-04-24 11:02:28,697 - ✓ https://t.freetv.fun/m3u/playlist.txt → 28 个源 (总长度 243798 字符)
+2026-04-24 11:02:28,732 - ✓ https://t.freetv.fun/m3u/taiwan.txt → 17 个源 (总长度 18999 字符)
+2026-04-24 11:02:28,763 - ✓ https://t.freetv.fun/m3u/hong_kong.txt → 6 个源 (总长度 10515 字符)
+2026-04-24 11:02:28,799 - ✓ https://t.freetv.fun/m3u/macao.txt → 4 个源 (总长度 1588 字符)
+2026-04-24 11:02:28,830 - ✓ https://t.freetv.fun/m3u/japan.txt → 4 个源 (总长度 2948 字符)
+2026-04-24 11:02:29,268 - ✓ https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u → 351 个源 (总长度 64579 字符)
+2026-04-24 11:02:29,503 - ✓ https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u → 46 个源 (总长度 9191 字符)
+2026-04-24 11:02:29,725 - ✓ https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u → 13 个源 (总长度 1975 字符)
+2026-04-24 11:02:29,962 - ✓ https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u → 34 个源 (总长度 5717 字符)
+2026-04-24 11:02:30,218 - ✓ https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u → 115 个源 (总长度 26418 字符)
+2026-04-24 11:02:30,441 - ✓ https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u → 6 个源 (总长度 919 字符)
+2026-04-24 11:02:30,659 - ✓ https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u → 4 个源 (总长度 595 字符)
+2026-04-24 11:02:30,882 - ✓ https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u → 44 个源 (总长度 6840 字符)
+2026-04-24 11:02:31,103 - ✓ https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u → 6 个源 (总长度 1343 字符)
+2026-04-24 11:02:31,339 - ✓ https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u → 39 个源 (总长度 6613 字符)
+2026-04-24 11:02:31,560 - ✓ https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u → 2 个源 (总长度 210 字符)
+2026-04-24 11:02:31,779 - ✓ https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u → 2 个源 (总长度 207 字符)
+2026-04-24 11:02:32,004 - ✓ https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u → 78 个源 (总长度 13735 字符)
+2026-04-24 11:02:32,220 - ✓ https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u → 4 个源 (总长度 546 字符)
+2026-04-24 11:02:32,443 - ✓ https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u → 1 个源 (总长度 190 字符)
+2026-04-24 11:02:33,374 - ✓ https://tv.850930.xyz/kdsb.txt → 5197 个源 (总长度 314201 字符)
+2026-04-24 11:02:33,516 - ✓ https://tv.850930.xyz/pix.m3u → 59 个源 (总长度 10909 字符)
+2026-04-24 11:02:33,630 - ✓ https://live.zbds.org/tv/iptv4.txt → 1028 个源 (总长度 90659 字符)
+2026-04-24 11:02:33,880 - ✓ https://iptv.zsdc.eu.org/home/iptv.m3u8 → 154 个源 (总长度 43195 字符)
+2026-04-24 11:02:34,347 - ✓ https://freetv.fun/test_channels_original_new.txt → 28 个源 (总长度 262103 字符)
+2026-04-24 11:02:35,219 - ✓ https://jihulab.com/-/snippets/5265/raw/main/.txt → 19 个源 (总长度 25055 字符)
+2026-04-24 11:02:35,261 - ✓ https://iptv-org.github.io/iptv/languages/zho.m3u → 207 个源 (总长度 41216 字符)
+2026-04-24 11:02:35,375 - ✓ https://iptv-org.github.io/iptv/countries/us.m3u → 1352 个源 (总长度 307060 字符)
+2026-04-24 11:02:35,397 - ✓ https://iptv-org.github.io/iptv/countries/tw.m3u → 23 个源 (总长度 4242 字符)
+2026-04-24 11:02:37,757 - ✓ https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-afc9-7b323e3e16c0/d4fe44c5-107c → 1872 个源 (总长度 135544 字符)
+2026-04-24 11:02:38,573 - ✓ https://fm1077.serv00.net/SmartTV.m3u → 562 个源 (总长度 53282 字符)
+2026-04-24 11:02:38,617 - ✓ https://m3u.ibert.me/txt/fmml_ipv6.txt → 82 个源 (总长度 14565 字符)
+2026-04-24 11:02:38,643 - ✓ https://m3u.ibert.me/txt/ycl_iptv.txt → 90 个源 (总长度 2744 字符)
+2026-04-24 11:02:38,670 - ✓ https://m3u.ibert.me/txt/y_g.txt → 125 个源 (总长度 10848 字符)
+2026-04-24 11:02:38,921 - ✓ https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt → 483 个源 (总长度 31753 字符)
+2026-04-24 11:02:43,881 - ✓ https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F%A3/IPV6.txt → 184 个源 (总长度 23360 字符)
+2026-04-24 11:02:44,568 - ✓ http://tot.totalh.net/tttt.txt → 759 个源 (总长度 58193 字符)
+2026-04-24 11:02:44,568 - urls.txt 完成：91 个节点 → 87433 个源
+2026-04-24 11:02:44,569 - 开始拉取 my_urls.txt 中的 98 个节点
+2026-04-24 11:02:45,737 - ✓ https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:46,465 - ✓ https://taoiptv.com/lives/44025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:47,181 - ✓ https://taoiptv.com/lives/43025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:47,907 - ✓ https://taoiptv.com/lives/42025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:48,635 - ✓ https://taoiptv.com/lives/41025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:49,372 - ✓ https://taoiptv.com/lives/31025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:50,117 - ✓ https://taoiptv.com/lives/11025.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:50,839 - ✓ https://taoiptv.com/lives/51015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:51,558 - ✓ https://taoiptv.com/lives/45015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:52,274 - ✓ https://taoiptv.com/lives/44015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:53,006 - ✓ https://taoiptv.com/lives/43015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:53,728 - ✓ https://taoiptv.com/lives/42015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:54,454 - ✓ https://taoiptv.com/lives/41015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:55,172 - ✓ https://taoiptv.com/lives/34015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:55,894 - ✓ https://taoiptv.com/lives/22015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:56,605 - ✓ https://taoiptv.com/lives/31015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:57,371 - ✓ https://taoiptv.com/lives/11015.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:58,093 - ✓ https://taoiptv.com/lives/45023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:58,803 - ✓ https://taoiptv.com/lives/44023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:02:59,516 - ✓ https://taoiptv.com/lives/43023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:00,245 - ✓ https://taoiptv.com/lives/42023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:00,962 - ✓ https://taoiptv.com/lives/41023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:01,673 - ✓ https://taoiptv.com/lives/37023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:02,385 - ✓ https://taoiptv.com/lives/36023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:03,112 - ✓ https://taoiptv.com/lives/35023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:03,826 - ✓ https://taoiptv.com/lives/34023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:04,543 - ✓ https://taoiptv.com/lives/33023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:05,280 - ✓ https://taoiptv.com/lives/32023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:05,989 - ✓ https://taoiptv.com/lives/31023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:06,714 - ✓ https://taoiptv.com/lives/22023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:07,419 - ✓ https://taoiptv.com/lives/21023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:08,140 - ✓ https://taoiptv.com/lives/15023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:08,863 - ✓ https://taoiptv.com/lives/14023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:09,571 - ✓ https://taoiptv.com/lives/13023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:10,280 - ✓ https://taoiptv.com/lives/12023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:11,009 - ✓ https://taoiptv.com/lives/11023.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:11,733 - ✓ https://taoiptv.com/lives/65013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:12,454 - ✓ https://taoiptv.com/lives/62013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:13,171 - ✓ https://taoiptv.com/lives/61013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:13,889 - ✓ https://taoiptv.com/lives/52013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:14,597 - ✓ https://taoiptv.com/lives/51013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:15,338 - ✓ https://taoiptv.com/lives/45013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:16,048 - ✓ https://taoiptv.com/lives/44013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:16,766 - ✓ https://taoiptv.com/lives/43013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:17,472 - ✓ https://taoiptv.com/lives/42013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:18,176 - ✓ https://taoiptv.com/lives/41013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:18,892 - ✓ https://taoiptv.com/lives/37013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:19,622 - ✓ https://taoiptv.com/lives/34013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:20,359 - ✓ https://taoiptv.com/lives/33013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:21,076 - ✓ https://taoiptv.com/lives/32013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:21,787 - ✓ https://taoiptv.com/lives/31013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:22,503 - ✓ https://taoiptv.com/lives/23013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:23,230 - ✓ https://taoiptv.com/lives/22013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:23,958 - ✓ https://taoiptv.com/lives/21013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:24,687 - ✓ https://taoiptv.com/lives/14013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:25,419 - ✓ https://taoiptv.com/lives/13013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:26,138 - ✓ https://taoiptv.com/lives/11013.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:26,859 - ✓ https://taoiptv.com/lives/64024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:27,568 - ✓ https://taoiptv.com/lives/63024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:28,287 - ✓ https://taoiptv.com/lives/51024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:29,022 - ✓ https://taoiptv.com/lives/50024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:29,732 - ✓ https://taoiptv.com/lives/46024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:30,461 - ✓ https://taoiptv.com/lives/44024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:31,192 - ✓ https://taoiptv.com/lives/42024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:31,908 - ✓ https://taoiptv.com/lives/41024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:32,638 - ✓ https://taoiptv.com/lives/37024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:33,344 - ✓ https://taoiptv.com/lives/35024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:34,078 - ✓ https://taoiptv.com/lives/31024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:34,800 - ✓ https://taoiptv.com/lives/23024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:35,510 - ✓ https://taoiptv.com/lives/22024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:36,237 - ✓ https://taoiptv.com/lives/21024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:36,972 - ✓ https://taoiptv.com/lives/15024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:37,697 - ✓ https://taoiptv.com/lives/14024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:38,421 - ✓ https://taoiptv.com/lives/13024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:39,147 - ✓ https://taoiptv.com/lives/12024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:39,889 - ✓ https://taoiptv.com/lives/11024.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:40,617 - ✓ https://taoiptv.com/lives/62014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:41,321 - ✓ https://taoiptv.com/lives/61014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:42,033 - ✓ https://taoiptv.com/lives/51014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:42,745 - ✓ https://taoiptv.com/lives/50014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:43,479 - ✓ https://taoiptv.com/lives/46014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:44,190 - ✓ https://taoiptv.com/lives/45014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:44,904 - ✓ https://taoiptv.com/lives/44014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:45,623 - ✓ https://taoiptv.com/lives/43014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:46,327 - ✓ https://taoiptv.com/lives/42014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:47,051 - ✓ https://taoiptv.com/lives/41014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:47,774 - ✓ https://taoiptv.com/lives/37014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:48,516 - ✓ https://taoiptv.com/lives/36014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:49,244 - ✓ https://taoiptv.com/lives/34014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:49,957 - ✓ https://taoiptv.com/lives/33014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:50,670 - ✓ https://taoiptv.com/lives/31014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:51,379 - ✓ https://taoiptv.com/lives/22014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:52,099 - ✓ https://taoiptv.com/lives/21014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:52,815 - ✓ https://taoiptv.com/lives/15014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:53,547 - ✓ https://taoiptv.com/lives/14014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:54,278 - ✓ https://taoiptv.com/lives/13014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:54,993 - ✓ https://taoiptv.com/lives/12014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:55,711 - ✓ https://taoiptv.com/lives/11014.txt?token=8c78df7c7c0f4844 → 3 个源 (总长度 728 字符)
+2026-04-24 11:03:55,712 - my_urls.txt 完成：98 个节点 → 294 个源
+2026-04-24 11:03:57,440 - 待检测 4312 条
+2026-04-24 11:05:42,936 - 黑名单更新，新增22条
+2026-04-24 11:05:42,968 - ===== 检测完成 | 总计:4312 | 流:85 | 列表:4079 | 未知:81 | 超时:67 | 耗时:226s =====
+2026-04-24 11:05:42,975 - ===== 全部流程执行完成 =====
