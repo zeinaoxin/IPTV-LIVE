@@ -1,4 +1,5 @@
 import urllib.request
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
@@ -13,7 +14,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置
+# 路径配置 元宝
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -214,7 +215,7 @@ def is_vod_or_image_url(url: str) -> bool:
         return False
 
 # ==============================================
-# 行格式清洗（用于“组名,URL”格式的逐行处理）
+# 行格式清洗（用于"组名,URL"格式的逐行处理）
 # ==============================================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
@@ -392,11 +393,29 @@ class StreamChecker:
             return self.check_http(url, t)
         return True, 0, "ok", "stream"
 
-    # =============================================================
-    # 【关键修复】fetch_remote
-    # - M3U：支持任意非 # 开头的 URL 行（含相对路径）；优先用 group-title
-    # - 非 M3U：正则提取 + 逗号/空格 拆解“单行多 URL”；对少量结果打印诊断
-    # =============================================================
+    def _extract_urls_from_json(self, json_data, base_url=None):
+        """从JSON数据中递归提取所有URL"""
+        urls = set()
+        
+        def extract_from_value(value):
+            if isinstance(value, str):
+                # 检查是否是URL
+                if value.startswith(("http://", "https://", "rtmp://", "rtmps://")):
+                    # 清理URL，移除可能的后缀符号
+                    url = value.rstrip(".,;:!?)")
+                    # 过滤掉图片和点播
+                    if not is_vod_or_image_url(url) and not url_matches_domain_blacklist(url):
+                        urls.add(url)
+            elif isinstance(value, dict):
+                for v in value.values():
+                    extract_from_value(v)
+            elif isinstance(value, list):
+                for item in value:
+                    extract_from_value(item)
+        
+        extract_from_value(json_data)
+        return list(urls)
+
     def fetch_remote(self, urls):
         all_lines = []
         for raw_url in urls:
@@ -410,12 +429,45 @@ class StreamChecker:
                 with urllib.request.build_opener(
                     urllib.request.HTTPSHandler(context=ctx)
                 ).open(req, timeout=15) as r:
-                    c = r.read().decode("utf-8", errors="replace")
+                    raw_content = r.read()
+                    c = raw_content.decode("utf-8", errors="replace")
 
                 before = len(all_lines)
 
-                # ---------- 分支：M3U ----------
-                if "#EXTM3U" in c[:200]:
+                # ---------- 分支1：检查是否是JSON（taoiptv.com的特殊处理） ----------
+                is_taoiptv = "taoiptv.com" in raw_url
+                if is_taoiptv:
+                    try:
+                        # 尝试解析为JSON
+                        json_data = json.loads(c)
+                        # 从JSON中提取URL
+                        extracted_urls = self._extract_urls_from_json(json_data, raw_url)
+                        
+                        for url in extracted_urls:
+                            # 对每个URL应用黑名单和点播过滤
+                            if url_matches_domain_blacklist(url):
+                                continue
+                            if is_vod_or_image_url(url):
+                                continue
+                            all_lines.append(f"TaoIPTV,{url}")
+                        
+                        got = len(all_lines) - before
+                        if got > 0:
+                            logger.info(f"  ✓ {raw_url[:90]} → JSON解析成功，提取到 {got} 个源")
+                        else:
+                            # 如果JSON解析没有提取到URL，尝试回退到其他解析方法
+                            logger.warning(f"  ⚠ {raw_url[:90]} → JSON解析但未提取到URL，尝试其他方法")
+                            is_taoiptv = False  # 标记为False，让后续逻辑处理
+                    except json.JSONDecodeError:
+                        # 如果不是有效的JSON，继续使用原有逻辑
+                        logger.debug(f"  ℹ {raw_url[:90]} → 不是有效的JSON，使用原有解析方法")
+                        is_taoiptv = False
+                    except Exception as e:
+                        logger.warning(f"  ⚠ {raw_url[:90]} → JSON解析异常: {e}，使用原有解析方法")
+                        is_taoiptv = False
+                
+                # ---------- 分支2：M3U格式 ----------
+                if not is_taoiptv and "#EXTM3U" in c[:200]:
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
@@ -451,8 +503,9 @@ class StreamChecker:
                             else:
                                 all_lines.append(f"{group},{url_candidate}")
                             name = ""
-                else:
-                    # ---------- 分支：非 M3U ----------
+                
+                # ---------- 分支3：非M3U格式（常规文本） ----------
+                elif not is_taoiptv:
                     # 策略1：正则提取所有 http(s) URL
                     raw_urls_found = RE_ALL_URLS.findall(c)
                     for u in raw_urls_found:
@@ -466,7 +519,7 @@ class StreamChecker:
                             continue
                         all_lines.append(f"订阅源,{u}")
 
-                    # 策略2：如果正则没提取到任何 URL，尝试逐行清洗（兼容“组名,URL”格式）
+                    # 策略2：如果正则没提取到任何 URL，尝试逐行清洗（兼容"组名,URL"格式）
                     if len(all_lines) == before:
                         for l in c.splitlines():
                             l = l.strip()
@@ -476,7 +529,7 @@ class StreamChecker:
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
 
-                    # 策略3：对“单行多 URL（逗号分隔）”做一次拆解兜底
+                    # 策略3：对"单行多 URL（逗号分隔）"做一次拆解兜底
                     # 如果一整行里出现多个 http，按逗号拆开再逐条入队
                     if len(all_lines) == before:
                         for l in c.splitlines():
@@ -499,7 +552,7 @@ class StreamChecker:
 
                 got = len(all_lines) - before
 
-                # 为 taoiptv 入口增加“少量结果”的诊断，便于后续排查
+                # 为 taoiptv 入口增加"少量结果"的诊断，便于后续排查
                 if got > 1:
                     logger.info(f"  ✓ {raw_url[:90]} → {got} 个源")
                 elif got == 1:
