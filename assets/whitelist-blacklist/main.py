@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
-from urllib.parse import urlparse, quote, unquote
+from urllib.parse import urlparse, quote, unquote, urljoin
 import socket
 import ssl
 import re
@@ -214,7 +214,7 @@ def is_vod_or_image_url(url: str) -> bool:
         return False
 
 # ==============================================
-# 行格式清洗（只用于本地文件的"组名,URL"格式）
+# 行格式清洗
 # ==============================================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
@@ -393,7 +393,7 @@ class StreamChecker:
         return True, 0, "ok", "stream"
 
     # =============================================================
-    # 【终极修复】不再猜测分隔符，直接用正则暴力提取所有 URL
+    # 关键修改：M3U 分支放宽 URL 行识别条件，兼容相对路径
     # =============================================================
     def fetch_remote(self, urls):
         all_lines = []
@@ -413,29 +413,55 @@ class StreamChecker:
                 before = len(all_lines)
 
                 if "#EXTM3U" in c[:200]:
-                    # ---- M3U 分支：从 #EXTINF 提取组名，下一行提取 URL ----
+                    # ---- M3U 分支 ----
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
                         if not l:
                             continue
+
+                        # 提取组名：优先从 #EXTINF 的 group-title 取，兼容中英文逗号
                         if l.startswith("#EXTINF"):
-                            # 取逗号后面最后一部分作为组名
-                            name = l.split(",")[-1].strip() if "," in l else ""
-                        elif l.startswith(("http", "rtmp")):
-                            if name:
-                                res, _ = clean_source_line(f"{name},{l}")
-                                if res:
-                                    all_lines.append(f"{res[0]},{res[1]}")
+                            # 尝试提取 group-title（兼容中文逗号）
+                            m_group = re.search(r'group-title\s*=\s*["\']?([^"\',]+)', l)
+                            if m_group:
+                                name = m_group.group(1).strip()
                             else:
-                                # 没有 EXTINF 组名，用默认名
-                                res, _ = clean_source_line(f"订阅源,{l}")
-                                if res:
-                                    all_lines.append(f"{res[0]},{res[1]}")
+                                # 退回到“逗号后最后一部分”
+                                name = l.split(",")[-1].strip() if "," in l else ""
+                        elif not l.startswith("#"):
+                            # ---- 关键修改：不再要求 startswith(http/rtmp) ----
+                            # 只要不是 # 开头，就当作 URL 行处理
+                            url_candidate = l.strip().split("#")[0].strip().split("$")[0].strip()
+                            if not url_candidate:
+                                name = ""
+                                continue
+
+                            # 如果是相对路径，用本入口 URL 补全成绝对路径
+                            if not re.match(r'https?://', url_candidate, re.I):
+                                url_candidate = urljoin(raw_url, url_candidate)
+
+                            # 过滤黑名单/点播图片
+                            if url_matches_domain_blacklist(url_candidate):
+                                name = ""
+                                continue
+                            if is_vod_or_image_url(url_candidate):
+                                name = ""
+                                continue
+
+                            # 用 group-title 作组名（更规范）
+                            group = name if name else "订阅源"
+                            res, _ = clean_source_line(f"{group},{url_candidate}")
+                            if res:
+                                all_lines.append(f"{res[0]},{res[1]}")
+                            else:
+                                # 若清洗失败，也尽量保留（兜底）
+                                all_lines.append(f"{group},{url_candidate}")
+
+                            # 重置当前组名（与原逻辑一致：EXTINF 与下一行配对）
                             name = ""
                 else:
-                    # ---- 非 M3U 分支：正则暴力提取所有 URL ----
-                    # 不管内容是一行一个、一行多个、全挤在一起、还是混着注释
+                    # ---- 非 M3U 分支（保持不变：正则暴力提取所有 URL） ----
                     raw_urls_found = RE_ALL_URLS.findall(c)
 
                     for u in raw_urls_found:
@@ -452,7 +478,7 @@ class StreamChecker:
                         # 补默认组名
                         all_lines.append(f"订阅源,{u}")
 
-                    # ---- 兜底：如果正则没提取到任何 URL，尝试逐行清洗 ----
+                    # 兜底：如果正则没提取到任何 URL，尝试逐行清洗
                     if len(all_lines) == before:
                         for l in c.splitlines():
                             l = l.strip()
