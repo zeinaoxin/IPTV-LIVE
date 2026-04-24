@@ -1,129 +1,216 @@
-2026-04-24 12:57:51,353 - ============================================================
-2026-04-24 12:57:51,353 - 项目根目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE
-2026-04-24 12:57:51,353 - 脚本目录:   /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist
-2026-04-24 12:57:51,353 - assets目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets
-2026-04-24 12:57:51,353 - my_urls.txt: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls.txt (存在)
-2026-04-24 12:57:51,353 - ============================================================
-2026-04-24 12:57:51,354 - ===== 开始执行Token自动更新 =====
-2026-04-24 12:57:51,354 - 正在获取TaoIPTV最新Token...
-2026-04-24 12:57:52,912 - ✅ 成功获取Token: 8c78df7c7c0f4844
-2026-04-24 12:57:52,912 - 开始处理第一个远程源...
-2026-04-24 12:57:52,912 - 找到第一个远程源: https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844...
-2026-04-24 12:57:53,146 - 加载URL黑名单: 217188 条
-2026-04-24 12:57:54,318 -   ⚠ https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:57:54,318 - ✅ 已将第一个远程源解析内容保存到: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/111.txt
-2026-04-24 12:57:54,318 -    共 3 条记录
-2026-04-24 12:57:54,332 - ✅ my_urls.txt更新成功！替换 98 个Token（2026-04-24 20:57:54）
-2026-04-24 12:57:54,332 - 正在同步到GitHub仓库...
-2026-04-24 12:57:56,105 - ✅ 已同步到GitHub仓库！
-2026-04-24 12:57:56,334 - 加载URL黑名单: 217188 条
-2026-04-24 12:57:56,334 - ===== 开始流媒体检测 =====
-2026-04-24 12:57:56,338 - 手动白名单: 168 个频道
-2026-04-24 12:57:56,338 - 开始拉取 urls.txt 中的 91 个节点
-2026-04-24 12:57:57,772 -   ✗ https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/main/hycg.txt → 异常: HTTP Error 404: Not Found
-2026-04-24 12:57:59,708 -   ✗ https://raw.githubusercontent.com/8080713/iptv-api666/refs/heads/main/output/result.m3u → 异常: HTTP Error 404: Not Found
-2026-04-24 12:58:50,377 - urls.txt 完成：91 个节点 → 85369 个源
-2026-04-24 12:58:50,378 - 开始拉取 my_urls.txt 中的 98 个节点
-2026-04-24 12:58:51,533 -   ⚠ https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:52,249 -   ⚠ https://taoiptv.com/lives/44025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:52,968 -   ⚠ https://taoiptv.com/lives/43025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:53,680 -   ⚠ https://taoiptv.com/lives/42025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:54,392 -   ⚠ https://taoiptv.com/lives/41025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:55,116 -   ⚠ https://taoiptv.com/lives/31025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:55,852 -   ⚠ https://taoiptv.com/lives/11025.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:56,571 -   ⚠ https://taoiptv.com/lives/51015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:57,307 -   ⚠ https://taoiptv.com/lives/45015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:58,025 -   ⚠ https://taoiptv.com/lives/44015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:58,734 -   ⚠ https://taoiptv.com/lives/43015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:58:59,447 -   ⚠ https://taoiptv.com/lives/42015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:00,156 -   ⚠ https://taoiptv.com/lives/41015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:00,876 -   ⚠ https://taoiptv.com/lives/34015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:01,583 -   ⚠ https://taoiptv.com/lives/22015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:02,301 -   ⚠ https://taoiptv.com/lives/31015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:03,014 -   ⚠ https://taoiptv.com/lives/11015.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:03,727 -   ⚠ https://taoiptv.com/lives/45023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:04,459 -   ⚠ https://taoiptv.com/lives/44023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:05,207 -   ⚠ https://taoiptv.com/lives/43023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:05,937 -   ⚠ https://taoiptv.com/lives/42023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:06,646 -   ⚠ https://taoiptv.com/lives/41023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:07,350 -   ⚠ https://taoiptv.com/lives/37023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:08,065 -   ⚠ https://taoiptv.com/lives/36023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:08,798 -   ⚠ https://taoiptv.com/lives/35023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:09,503 -   ⚠ https://taoiptv.com/lives/34023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:10,227 -   ⚠ https://taoiptv.com/lives/33023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:10,933 -   ⚠ https://taoiptv.com/lives/32023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:11,640 -   ⚠ https://taoiptv.com/lives/31023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:12,364 -   ⚠ https://taoiptv.com/lives/22023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:13,078 -   ⚠ https://taoiptv.com/lives/21023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:13,814 -   ⚠ https://taoiptv.com/lives/15023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:14,534 -   ⚠ https://taoiptv.com/lives/14023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:15,253 -   ⚠ https://taoiptv.com/lives/13023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:15,970 -   ⚠ https://taoiptv.com/lives/12023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:16,703 -   ⚠ https://taoiptv.com/lives/11023.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:17,439 -   ⚠ https://taoiptv.com/lives/65013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:18,166 -   ⚠ https://taoiptv.com/lives/62013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:18,886 -   ⚠ https://taoiptv.com/lives/61013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:19,601 -   ⚠ https://taoiptv.com/lives/52013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:20,329 -   ⚠ https://taoiptv.com/lives/51013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:21,059 -   ⚠ https://taoiptv.com/lives/45013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:21,783 -   ⚠ https://taoiptv.com/lives/44013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:22,507 -   ⚠ https://taoiptv.com/lives/43013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:23,220 -   ⚠ https://taoiptv.com/lives/42013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:23,930 -   ⚠ https://taoiptv.com/lives/41013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:24,638 -   ⚠ https://taoiptv.com/lives/37013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:25,367 -   ⚠ https://taoiptv.com/lives/34013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:26,082 -   ⚠ https://taoiptv.com/lives/33013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:26,814 -   ⚠ https://taoiptv.com/lives/32013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:27,545 -   ⚠ https://taoiptv.com/lives/31013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:28,254 -   ⚠ https://taoiptv.com/lives/23013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:28,964 -   ⚠ https://taoiptv.com/lives/22013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:29,691 -   ⚠ https://taoiptv.com/lives/21013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:30,420 -   ⚠ https://taoiptv.com/lives/14013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:31,130 -   ⚠ https://taoiptv.com/lives/13013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:31,840 -   ⚠ https://taoiptv.com/lives/11013.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:32,560 -   ⚠ https://taoiptv.com/lives/64024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:33,291 -   ⚠ https://taoiptv.com/lives/63024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:34,000 -   ⚠ https://taoiptv.com/lives/51024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:34,709 -   ⚠ https://taoiptv.com/lives/50024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:35,428 -   ⚠ https://taoiptv.com/lives/46024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:36,136 -   ⚠ https://taoiptv.com/lives/44024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:36,834 -   ⚠ https://taoiptv.com/lives/42024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:37,545 -   ⚠ https://taoiptv.com/lives/41024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:38,252 -   ⚠ https://taoiptv.com/lives/37024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:38,994 -   ⚠ https://taoiptv.com/lives/35024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:39,702 -   ⚠ https://taoiptv.com/lives/31024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:40,426 -   ⚠ https://taoiptv.com/lives/23024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:41,130 -   ⚠ https://taoiptv.com/lives/22024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:41,842 -   ⚠ https://taoiptv.com/lives/21024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:42,561 -   ⚠ https://taoiptv.com/lives/15024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:43,277 -   ⚠ https://taoiptv.com/lives/14024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:43,993 -   ⚠ https://taoiptv.com/lives/13024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:44,704 -   ⚠ https://taoiptv.com/lives/12024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:45,400 -   ⚠ https://taoiptv.com/lives/11024.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:46,122 -   ⚠ https://taoiptv.com/lives/62014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:46,839 -   ⚠ https://taoiptv.com/lives/61014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:47,546 -   ⚠ https://taoiptv.com/lives/51014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:48,264 -   ⚠ https://taoiptv.com/lives/50014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:48,966 -   ⚠ https://taoiptv.com/lives/46014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:49,681 -   ⚠ https://taoiptv.com/lives/45014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:50,416 -   ⚠ https://taoiptv.com/lives/44014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:51,119 -   ⚠ https://taoiptv.com/lives/43014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:51,822 -   ⚠ https://taoiptv.com/lives/42014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:52,539 -   ⚠ https://taoiptv.com/lives/41014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:53,250 -   ⚠ https://taoiptv.com/lives/37014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:53,958 -   ⚠ https://taoiptv.com/lives/36014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:54,659 -   ⚠ https://taoiptv.com/lives/34014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:55,364 -   ⚠ https://taoiptv.com/lives/33014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:56,089 -   ⚠ https://taoiptv.com/lives/31014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:56,792 -   ⚠ https://taoiptv.com/lives/22014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:57,501 -   ⚠ https://taoiptv.com/lives/21014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:58,220 -   ⚠ https://taoiptv.com/lives/15014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:58,920 -   ⚠ https://taoiptv.com/lives/14014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 12:59:59,636 -   ⚠ https://taoiptv.com/lives/13014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 13:00:00,339 -   ⚠ https://taoiptv.com/lives/12014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 13:00:01,054 -   ⚠ https://taoiptv.com/lives/11014.txt?token=8c78df7c7c0f4844 → 不是有效的JSON，使用原有解析方法
-2026-04-24 13:00:01,055 - my_urls.txt 完成：98 个节点 → 294 个源
-2026-04-24 13:00:02,834 - 待检测 4194 条
-2026-04-24 13:01:50,886 - 黑名单更新，新增14条
-2026-04-24 13:01:50,919 - ===== 检测完成 | 总计:4194 | 流:75 | 列表:3948 | 未知:112 | 超时:59 | 耗时:234s =====
-2026-04-24 13:01:50,925 - ===== 全部流程执行完成 =====
+2026-04-24 13:07:32,149 - ============================================================
+2026-04-24 13:07:32,149 - 项目根目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE
+2026-04-24 13:07:32,149 - 脚本目录:   /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist
+2026-04-24 13:07:32,149 - assets目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets
+2026-04-24 13:07:32,149 - my_urls.txt: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls.txt (存在)
+2026-04-24 13:07:32,149 - ============================================================
+2026-04-24 13:07:32,150 - ===== 开始执行Token自动更新 =====
+2026-04-24 13:07:32,150 - 正在获取TaoIPTV最新Token...
+2026-04-24 13:07:33,830 - ✅ 成功获取Token: 8c78df7c7c0f4844
+2026-04-24 13:07:33,831 - ✅ my_urls.txt更新成功！替换 98 个Token（2026-04-24 21:07:33）
+2026-04-24 13:07:33,832 - ✅ Token已成功更新并应用
+2026-04-24 13:07:33,832 - 开始处理第一个远程源...
+2026-04-24 13:07:33,832 - 正在测试远程源连接: https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844...
+2026-04-24 13:07:35,055 - ❌ Token无效，远程服务器拒绝连接
+2026-04-24 13:07:35,055 - 正在同步到GitHub仓库...
+2026-04-24 13:07:36,381 - ✅ 已同步到GitHub仓库！
+2026-04-24 13:07:36,609 - 加载URL黑名单: 217202 条
+2026-04-24 13:07:36,609 - ===== 开始流媒体检测 =====
+2026-04-24 13:07:36,614 - 手动白名单: 168 个频道
+2026-04-24 13:07:36,614 - 开始拉取 urls.txt 中的 91 个节点
+2026-04-24 13:07:36,742 -   ✓ https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt → 1019 个源
+2026-04-24 13:07:36,851 -   ✓ https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt → 443 个源
+2026-04-24 13:07:36,921 -   ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs/heads/master/live.m3u → 32 个源
+2026-04-24 13:07:37,041 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u → 1128 个源
+2026-04-24 13:07:37,172 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u → 799 个源
+2026-04-24 13:07:37,252 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%92%AA%E5%92%95%E7%9B% → 165 个源
+2026-04-24 13:07:37,345 -   ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%B0%8F%E8%82%A5%E7%BE% → 196 个源
+2026-04-24 13:07:37,439 -   ✓ https://raw.githubusercontent.com/skddyj/iptv/refs/heads/main/IPTV.m3u → 82 个源
+2026-04-24 13:07:37,569 -   ✓ https://raw.githubusercontent.com/cyalias/mytvs-github/refs/heads/main/mytv.txt → 706 个源
+2026-04-24 13:07:37,668 -   ✓ https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/main/ipv4.txt → 181 个源
+2026-04-24 13:07:37,852 -   ✓ https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8 → 1892 个源
+2026-04-24 13:07:37,899 -   ✓ https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u → 125 个源
+2026-04-24 13:07:38,044 -   ✓ https://raw.githubusercontent.com/onlylove2023/iptv/refs/heads/main/IPTV.m3u → 61 个源
+2026-04-24 13:07:38,098 -   ✗ https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/main/hycg.txt → 异常: HTTP Error 404: Not Found
+2026-04-24 13:07:38,223 -   ✓ https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u → 82 个源
+2026-04-24 13:07:38,299 -   ✓ https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs/heads/master/output/weishi.m3 → 70 个源
+2026-04-24 13:07:38,854 -   ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/bbxx.txt → 15033 个源
+2026-04-24 13:07:39,246 -   ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/others_output.tx → 12156 个源
+2026-04-24 13:07:39,327 -   ✓ https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs/heads/main/cnTV_AutoUpdate.m3 → 65 个源
+2026-04-24 13:07:39,797 -   ✓ https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_live/refs/heads/main/live_ipv4.tx → 10474 个源
+2026-04-24 13:07:39,849 -   ✗ https://raw.githubusercontent.com/8080713/iptv-api666/refs/heads/main/output/result.m3u → 异常: HTTP Error 404: Not Found
+2026-04-24 13:07:39,956 -   ✓ https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/heads/master/output/user_result. → 385 个源
+2026-04-24 13:07:40,033 -   ✓ https://raw.githubusercontent.com/wwb521/live/refs/heads/main/tv.txt → 57 个源
+2026-04-24 13:07:40,138 -   ✓ https://raw.githubusercontent.com/zhi35/iptv/refs/heads/master/iptv.m3u → 508 个源
+2026-04-24 13:07:40,221 -   ✓ https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/heads/master/output/cctv.m3u → 54 个源
+2026-04-24 13:07:40,367 -   ✓ https://raw.githubusercontent.com/0610840119/iptv-api/refs/heads/master/output/xp_result.m → 670 个源
+2026-04-24 13:07:40,432 -   ✓ https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/master/TV-IPV4.m3u → 58 个源
+2026-04-24 13:07:40,510 -   ✓ https://raw.githubusercontent.com/MemoryCollection/IPTV/refs/heads/main/hotel.txt → 50 个源
+2026-04-24 13:07:40,555 -   ✓ https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u → 80 个源
+2026-04-24 13:07:40,758 -   ✓ https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/main/iptv_list.txt → 5698 个源
+2026-04-24 13:07:40,876 -   ✓ https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3u → 342 个源
+2026-04-24 13:07:40,959 -   ✓ https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt → 202 个源
+2026-04-24 13:07:41,032 -   ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt → 31 个源
+2026-04-24 13:07:41,146 -   ✓ https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.txt → 1028 个源
+2026-04-24 13:07:41,250 -   ✓ https://raw.githubusercontent.com/junge3333/juds6/main/yszb1.txt → 785 个源
+2026-04-24 13:07:41,327 -   ✓ https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.txt → 92 个源
+2026-04-24 13:07:41,450 -   ✓ https://raw.githubusercontent.com/maitel2020/iptv-self-use/main/iptv.txt → 71 个源
+2026-04-24 13:07:41,533 -   ✓ https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/main/live.txt → 314 个源
+2026-04-24 13:07:41,656 -   ✓ https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/live.txt → 531 个源
+2026-04-24 13:07:41,800 -   ✓ https://raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt → 933 个源
+2026-04-24 13:07:41,891 -   ✓ https://raw.githubusercontent.com/alienlu/iptv/refs/heads/master/iptv.txt → 332 个源
+2026-04-24 13:07:41,978 -   ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/台湾香港澳门2023.m3 → 151 个源
+2026-04-24 13:07:42,068 -   ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国内电视台2023.m3u → 286 个源
+2026-04-24 13:07:42,167 -   ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewT → 43 个源
+2026-04-24 13:07:42,242 -   ✓ https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt → 373 个源
+2026-04-24 13:07:42,709 -   ✓ https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt → 11973 个源
+2026-04-24 13:07:43,222 -   ✓ https://iptv.catvod.com/tv.m3u → 2 个源
+2026-04-24 13:07:58,449 -   ✓ https://xn--6orr3pi6g9uu.top/zb/zb.txt → 333 个源
+2026-04-24 13:07:59,059 -   ✓ https://tv.iill.top/m3u/Gather → 1303 个源
+2026-04-24 13:08:00,715 -   ✓ https://m.iill.top/Live.m3u → 8 个源
+2026-04-24 13:08:00,765 -   ✓ https://tv.iill.top/m3u/Sport → 36 个源
+2026-04-24 13:08:05,123 -   ✓ https://live.freetv.top/huyayqk.m3u → 2 个源
+2026-04-24 13:08:09,628 -   ✓ https://live.freetv.top/douyuyqk.m3u → 2 个源
+2026-04-24 13:08:11,577 -   ✓ https://live.zhoujie218.top/tv/iptv4.txt → 1028 个源
+2026-04-24 13:08:12,087 -   ✓ https://t.freetv.fun/m3u/playlist.txt → 4 个源
+2026-04-24 13:08:12,266 -   ✓ https://t.freetv.fun/m3u/taiwan.txt → 4 个源
+2026-04-24 13:08:12,428 -   ✓ https://t.freetv.fun/m3u/hong_kong.txt → 4 个源
+2026-04-24 13:08:12,600 -   ✓ https://t.freetv.fun/m3u/macao.txt → 4 个源
+2026-04-24 13:08:12,764 -   ✓ https://t.freetv.fun/m3u/japan.txt → 4 个源
+2026-04-24 13:08:13,153 -   ✓ https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u → 351 个源
+2026-04-24 13:08:13,439 -   ✓ https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u → 46 个源
+2026-04-24 13:08:13,705 -   ✓ https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u → 13 个源
+2026-04-24 13:08:13,968 -   ✓ https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u → 34 个源
+2026-04-24 13:08:14,234 -   ✓ https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u → 115 个源
+2026-04-24 13:08:14,502 -   ✓ https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u → 6 个源
+2026-04-24 13:08:14,756 -   ✓ https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u → 4 个源
+2026-04-24 13:08:15,021 -   ✓ https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u → 44 个源
+2026-04-24 13:08:15,289 -   ✓ https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u → 6 个源
+2026-04-24 13:08:15,559 -   ✓ https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u → 39 个源
+2026-04-24 13:08:15,833 -   ✓ https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u → 2 个源
+2026-04-24 13:08:16,101 -   ✓ https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u → 2 个源
+2026-04-24 13:08:16,368 -   ✓ https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u → 78 个源
+2026-04-24 13:08:16,649 -   ✓ https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u → 4 个源
+2026-04-24 13:08:16,913 -   ⚠ https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u → 仅 1 个源 | 内容诊断: #EXTM3U\n#EXTINF:-1 tvg-name="漫画解说" tvg-id="漫画解说" tvg-logo="https://tb.zbds.top/logo/漫画解说.png" group-title="解说频道", 漫画解说\nhttps://www.goodiptv.club/douyu/5907076\nupdateTime: 2026-04-24 17:53:24
+2026-04-24 13:08:17,895 -   ✓ https://tv.850930.xyz/kdsb.txt → 5167 个源
+2026-04-24 13:08:18,054 -   ✓ https://tv.850930.xyz/pix.m3u → 59 个源
+2026-04-24 13:08:18,202 -   ✓ https://live.zbds.org/tv/iptv4.txt → 1028 个源
+2026-04-24 13:08:18,492 -   ✓ https://iptv.zsdc.eu.org/home/iptv.m3u8 → 154 个源
+2026-04-24 13:08:19,155 -   ✓ https://freetv.fun/test_channels_original_new.txt → 4 个源
+2026-04-24 13:08:20,139 -   ✓ https://jihulab.com/-/snippets/5265/raw/main/.txt → 19 个源
+2026-04-24 13:08:20,240 -   ✓ https://iptv-org.github.io/iptv/languages/zho.m3u → 207 个源
+2026-04-24 13:08:20,395 -   ✓ https://iptv-org.github.io/iptv/countries/us.m3u → 1352 个源
+2026-04-24 13:08:20,437 -   ✓ https://iptv-org.github.io/iptv/countries/tw.m3u → 23 个源
+2026-04-24 13:08:22,627 -   ✓ https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-afc9-7b323e3e16c0/d4fe44c5-107c → 1830 个源
+2026-04-24 13:08:23,487 -   ✓ https://fm1077.serv00.net/SmartTV.m3u → 562 个源
+2026-04-24 13:08:23,570 -   ✓ https://m3u.ibert.me/txt/fmml_ipv6.txt → 82 个源
+2026-04-24 13:08:23,616 -   ✓ https://m3u.ibert.me/txt/ycl_iptv.txt → 90 个源
+2026-04-24 13:08:23,676 -   ✓ https://m3u.ibert.me/txt/y_g.txt → 125 个源
+2026-04-24 13:08:23,972 -   ✓ https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt → 483 个源
+2026-04-24 13:08:30,309 -   ✓ https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F%A3/IPV6.txt → 185 个源
+2026-04-24 13:08:30,912 -   ✓ http://tot.totalh.net/tttt.txt → 760 个源
+2026-04-24 13:08:30,913 - urls.txt 完成：91 个节点 → 85365 个源
+2026-04-24 13:08:30,913 - 开始拉取 my_urls.txt 中的 98 个节点
+2026-04-24 13:08:32,105 -   ✗ https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:32,855 -   ✗ https://taoiptv.com/lives/44025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:33,601 -   ✗ https://taoiptv.com/lives/43025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:34,344 -   ✗ https://taoiptv.com/lives/42025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:35,075 -   ✗ https://taoiptv.com/lives/41025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:35,833 -   ✗ https://taoiptv.com/lives/31025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:36,576 -   ✗ https://taoiptv.com/lives/11025.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:37,339 -   ✗ https://taoiptv.com/lives/51015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:38,081 -   ✗ https://taoiptv.com/lives/45015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:38,818 -   ✗ https://taoiptv.com/lives/44015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:39,552 -   ✗ https://taoiptv.com/lives/43015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:40,305 -   ✗ https://taoiptv.com/lives/42015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:41,044 -   ✗ https://taoiptv.com/lives/41015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:41,795 -   ✗ https://taoiptv.com/lives/34015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:42,566 -   ✗ https://taoiptv.com/lives/22015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:43,313 -   ✗ https://taoiptv.com/lives/31015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:44,069 -   ✗ https://taoiptv.com/lives/11015.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:44,824 -   ✗ https://taoiptv.com/lives/45023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:45,570 -   ✗ https://taoiptv.com/lives/44023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:46,317 -   ✗ https://taoiptv.com/lives/43023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:47,074 -   ✗ https://taoiptv.com/lives/42023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:47,820 -   ✗ https://taoiptv.com/lives/41023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:48,577 -   ✗ https://taoiptv.com/lives/37023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:49,332 -   ✗ https://taoiptv.com/lives/36023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:50,085 -   ✗ https://taoiptv.com/lives/35023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:50,828 -   ✗ https://taoiptv.com/lives/34023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:51,570 -   ✗ https://taoiptv.com/lives/33023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:52,321 -   ✗ https://taoiptv.com/lives/32023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:53,071 -   ✗ https://taoiptv.com/lives/31023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:53,808 -   ✗ https://taoiptv.com/lives/22023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:54,571 -   ✗ https://taoiptv.com/lives/21023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:55,327 -   ✗ https://taoiptv.com/lives/15023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:56,068 -   ✗ https://taoiptv.com/lives/14023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:56,836 -   ✗ https://taoiptv.com/lives/13023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:57,586 -   ✗ https://taoiptv.com/lives/12023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:58,340 -   ✗ https://taoiptv.com/lives/11023.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:59,086 -   ✗ https://taoiptv.com/lives/65013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:08:59,846 -   ✗ https://taoiptv.com/lives/62013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:00,605 -   ✗ https://taoiptv.com/lives/61013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:01,352 -   ✗ https://taoiptv.com/lives/52013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:02,078 -   ✗ https://taoiptv.com/lives/51013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:02,823 -   ✗ https://taoiptv.com/lives/45013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:03,567 -   ✗ https://taoiptv.com/lives/44013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:04,320 -   ✗ https://taoiptv.com/lives/43013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:05,069 -   ✗ https://taoiptv.com/lives/42013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:05,828 -   ✗ https://taoiptv.com/lives/41013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:06,580 -   ✗ https://taoiptv.com/lives/37013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:07,334 -   ✗ https://taoiptv.com/lives/34013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:08,081 -   ✗ https://taoiptv.com/lives/33013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:08,835 -   ✗ https://taoiptv.com/lives/32013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:09,605 -   ✗ https://taoiptv.com/lives/31013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:10,354 -   ✗ https://taoiptv.com/lives/23013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:11,119 -   ✗ https://taoiptv.com/lives/22013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:11,883 -   ✗ https://taoiptv.com/lives/21013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:12,630 -   ✗ https://taoiptv.com/lives/14013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:13,369 -   ✗ https://taoiptv.com/lives/13013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:14,142 -   ✗ https://taoiptv.com/lives/11013.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:14,920 -   ✗ https://taoiptv.com/lives/64024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:15,665 -   ✗ https://taoiptv.com/lives/63024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:16,441 -   ✗ https://taoiptv.com/lives/51024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:17,204 -   ✗ https://taoiptv.com/lives/50024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:17,958 -   ✗ https://taoiptv.com/lives/46024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:18,695 -   ✗ https://taoiptv.com/lives/44024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:19,437 -   ✗ https://taoiptv.com/lives/42024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:20,182 -   ✗ https://taoiptv.com/lives/41024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:20,926 -   ✗ https://taoiptv.com/lives/37024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:21,651 -   ✗ https://taoiptv.com/lives/35024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:22,392 -   ✗ https://taoiptv.com/lives/31024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:23,130 -   ✗ https://taoiptv.com/lives/23024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:23,856 -   ✗ https://taoiptv.com/lives/22024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:24,595 -   ✗ https://taoiptv.com/lives/21024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:25,350 -   ✗ https://taoiptv.com/lives/15024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:26,077 -   ✗ https://taoiptv.com/lives/14024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:26,825 -   ✗ https://taoiptv.com/lives/13024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:27,569 -   ✗ https://taoiptv.com/lives/12024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:28,319 -   ✗ https://taoiptv.com/lives/11024.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:29,049 -   ✗ https://taoiptv.com/lives/62014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:29,786 -   ✗ https://taoiptv.com/lives/61014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:30,527 -   ✗ https://taoiptv.com/lives/51014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:31,287 -   ✗ https://taoiptv.com/lives/50014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:32,027 -   ✗ https://taoiptv.com/lives/46014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:32,765 -   ✗ https://taoiptv.com/lives/45014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:33,511 -   ✗ https://taoiptv.com/lives/44014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:34,252 -   ✗ https://taoiptv.com/lives/43014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:34,984 -   ✗ https://taoiptv.com/lives/42014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:35,718 -   ✗ https://taoiptv.com/lives/41014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:36,447 -   ✗ https://taoiptv.com/lives/37014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:37,207 -   ✗ https://taoiptv.com/lives/36014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:37,949 -   ✗ https://taoiptv.com/lives/34014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:38,678 -   ✗ https://taoiptv.com/lives/33014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:39,404 -   ✗ https://taoiptv.com/lives/31014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:40,148 -   ✗ https://taoiptv.com/lives/22014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:40,890 -   ✗ https://taoiptv.com/lives/21014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:41,635 -   ✗ https://taoiptv.com/lives/15014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:42,366 -   ✗ https://taoiptv.com/lives/14014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:43,092 -   ✗ https://taoiptv.com/lives/13014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:43,824 -   ✗ https://taoiptv.com/lives/12014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:44,565 -   ✗ https://taoiptv.com/lives/11014.txt?token=8c78df7c7c0f4844 → 认证失败，token已过期或无效
+2026-04-24 13:09:44,565 - my_urls.txt 完成：98 个节点 → 0 个源
+2026-04-24 13:09:46,302 - 待检测 4182 条
+2026-04-24 13:11:37,328 - 黑名单更新，新增17条
+2026-04-24 13:11:37,363 - ===== 检测完成 | 总计:4182 | 流:75 | 列表:3934 | 未知:111 | 超时:62 | 耗时:240s =====
+2026-04-24 13:11:37,369 - ===== 全部流程执行完成 =====
