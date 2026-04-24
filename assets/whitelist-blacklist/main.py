@@ -61,6 +61,11 @@ class Config:
     MAX_WORKERS = 30
 
 # ==============================================
+# 正则：从任意文本中提取所有 http(s) URL
+# ==============================================
+RE_ALL_URLS = re.compile(r'https?://[^\s,\'"<>}\])]+')
+
+# ==============================================
 # Token：获取一次，批量更新
 # ==============================================
 def get_taoiptv_token() -> Optional[str]:
@@ -112,15 +117,12 @@ def update_my_urls_all(token: str) -> bool:
             logger.info("✅ 文件中无需更新的Token")
             return False
 
-        # 1) 替换 Token
         content = re.sub(r"token=[a-f0-9]{16}", f"token={token}", content, flags=re.I)
 
-        # 2) 删除旧备注行（避免多次运行多行备注）
+        # 删除旧备注行
         content = re.sub(r"^#\s*更新时间:.*$", "", content, flags=re.MULTILINE)
-        # 压缩多余空行
         content = re.sub(r"\n{2,}", "\n\n", content).strip() + "\n"
 
-        # 3) 写入新备注（放在文件最顶部）
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         header = f"# 更新时间: {bj.strftime('%Y-%m-%d %H:%M:%S')} | Token: {token}\n"
         content = header + content
@@ -212,7 +214,7 @@ def is_vod_or_image_url(url: str) -> bool:
         return False
 
 # ==============================================
-# 行格式清洗
+# 行格式清洗（只用于本地文件的"组名,URL"格式）
 # ==============================================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
@@ -349,7 +351,6 @@ class StreamChecker:
             with open(path, "r", encoding="utf-8") as f:
                 c = f.read()
             if split_by_space:
-                # startswith('http') 自动跳过 # 开头的备注行
                 return [l.strip() for l in re.split(r"[\s\t\n]+", c)
                         if l.strip().startswith("http")]
             return [l.strip() for l in c.splitlines() if l.strip()]
@@ -391,9 +392,9 @@ class StreamChecker:
             return self.check_http(url, t)
         return True, 0, "ok", "stream"
 
-    # =============================================
-    # 【关键修复】正确解析“单行多URL（空格隔开）”或“单行一URL”的 TXT
-    # =============================================
+    # =============================================================
+    # 【终极修复】不再猜测分隔符，直接用正则暴力提取所有 URL
+    # =============================================================
     def fetch_remote(self, urls):
         all_lines = []
         for raw_url in urls:
@@ -411,50 +412,69 @@ class StreamChecker:
 
                 before = len(all_lines)
 
-                # M3U 分支
                 if "#EXTM3U" in c[:200]:
+                    # ---- M3U 分支：从 #EXTINF 提取组名，下一行提取 URL ----
                     name = ""
                     for l in c.splitlines():
                         l = l.strip()
                         if not l:
                             continue
                         if l.startswith("#EXTINF"):
-                            name = l.split(",")[-1] if "," in l else ""
-                        elif l.startswith(("http", "rtmp")) and name:
-                            res, _ = clean_source_line(f"{name},{l}")
-                            if res:
-                                all_lines.append(f"{res[0]},{res[1]}")
+                            # 取逗号后面最后一部分作为组名
+                            name = l.split(",")[-1].strip() if "," in l else ""
+                        elif l.startswith(("http", "rtmp")):
+                            if name:
+                                res, _ = clean_source_line(f"{name},{l}")
+                                if res:
+                                    all_lines.append(f"{res[0]},{res[1]}")
+                            else:
+                                # 没有 EXTINF 组名，用默认名
+                                res, _ = clean_source_line(f"订阅源,{l}")
+                                if res:
+                                    all_lines.append(f"{res[0]},{res[1]}")
                             name = ""
                 else:
-                    # 非 M3U 分支
-                    # 关键：把整份文本先按“空白序列”拆成多条，再逐条处理
-                    # 这样无论是“每行一个URL”还是“一行多个URL空格隔开”都能处理
-                    tokens = re.split(r"[\s\t\r\n]+", c)
-                    for tok in tokens:
-                        tok = tok.strip()
-                        if not tok or tok.startswith("#"):
+                    # ---- 非 M3U 分支：正则暴力提取所有 URL ----
+                    # 不管内容是一行一个、一行多个、全挤在一起、还是混着注释
+                    raw_urls_found = RE_ALL_URLS.findall(c)
+
+                    for u in raw_urls_found:
+                        u = u.strip()
+                        if not u:
                             continue
-                        # 只要包含 :// 就认为是 URL
-                        if "://" in tok:
-                            # 统一加默认组名（避免因为没逗号被 clean_source_line 丢弃）
-                            res, _ = clean_source_line(f"订阅源,{tok}")
+                        # 去掉 URL 末尾可能的标点残留
+                        u = u.rstrip(".,;:!?)")
+                        # 过滤点播/图片/黑名单
+                        if is_vod_or_image_url(u):
+                            continue
+                        if url_matches_domain_blacklist(u):
+                            continue
+                        # 补默认组名
+                        all_lines.append(f"订阅源,{u}")
+
+                    # ---- 兜底：如果正则没提取到任何 URL，尝试逐行清洗 ----
+                    if len(all_lines) == before:
+                        for l in c.splitlines():
+                            l = l.strip()
+                            if not l or l.startswith("#"):
+                                continue
+                            res, _ = clean_source_line(l)
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
-                            continue
-                        # 不以 http 开头，且不含 :// 的普通字段，尝试按逗号格式解析
-                        res, _ = clean_source_line(tok)
-                        if res:
-                            all_lines.append(f"{res[0]},{res[1]}")
 
                 got = len(all_lines) - before
-                if got > 0:
+                if got > 1:
                     logger.info(f"  ✓ {raw_url[:90]} → {got} 个源")
+                elif got == 1:
+                    # 只提取到 1 个源：打印原始内容前 500 字符作为诊断
+                    diag = c[:500].replace("\n", "\\n").replace("\r", "")
+                    logger.warning(f"  ⚠ {raw_url[:90]} → 仅 {got} 个源 | 内容诊断: {diag}")
                 else:
-                    preview = c[:120].replace("\n", " ")
-                    logger.warning(f"  ✗ {raw_url[:90]} → 0 个源 | 预览: {preview}")
+                    preview = c[:200].replace("\n", "\\n")
+                    logger.warning(f"  ✗ {raw_url[:90]} → 0 个源 | 内容: {preview}")
 
             except Exception as e:
-                logger.error(f"  ✗ {raw_url[:90]} → 请求异常: {e}")
+                logger.error(f"  ✗ {raw_url[:90]} → 异常: {e}")
 
         return all_lines
 
@@ -490,7 +510,6 @@ class StreamChecker:
         self.load_whitelist()
         lines = []
 
-        # urls.txt
         urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
             logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
@@ -500,7 +519,6 @@ class StreamChecker:
         else:
             logger.warning("未找到 urls.txt")
 
-        # my_urls.txt
         my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
         if my_urls:
             logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
