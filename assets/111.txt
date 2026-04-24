@@ -1,12 +1,10 @@
-# 保存时间: 2026-04-24 21:57:57
-# 来源: https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844
-
+# 保存时间: 2026-04-24 22:02:56
+# 来源URL: https://taoiptv.com/lives/51025.txt?token=8c78df7c7c0f4844
 <html>
 <head><title>Authentication Failed</title></head>
 <body>
 <br>
 <center><h4>认证token参数不正确或已过期，请访问发布站重新获取：<a href="https://taoiptv.com">https://taoiptv.com</a></h4></center>
 <hr><center>！！！温馨提示！！！</center>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"7e654930c36e462baf34ea63ae0d099f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
