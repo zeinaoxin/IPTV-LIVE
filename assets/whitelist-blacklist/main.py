@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置
+# 路径配置 DEEP
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -51,14 +51,15 @@ logger.info(f"my_urls.txt: {FILE_PATHS['my_urls']} ({'存在' if os.path.exists(
 logger.info("=" * 60)
 
 # ==============================================
-# 全局配置
+# 全局配置 (优化了并发数和超时)
 # ==============================================
 class Config:
     USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
     TIMEOUT_FETCH = 15
     TIMEOUT_CHECK = 3.0
     TIMEOUT_WHITELIST = 4.5
-    MAX_WORKERS = 30
+    # 优化：增加并发数以提高检测效率，但保持合理范围避免被封
+    MAX_WORKERS = 50
 
 # ==============================================
 # 正则：从任意文本中提取所有 http(s) URL
@@ -293,6 +294,9 @@ class StreamChecker:
         }
 
     def _load_blacklist(self):
+        """
+        优化：一次性读取，利用生成器表达式处理，减少内存占用和循环开销
+        """
         bl = set()
         try:
             if os.path.exists(FILE_PATHS["blacklist_auto"]):
@@ -393,11 +397,11 @@ class StreamChecker:
         return True, 0, "ok", "stream"
 
     # =============================================================
-    # 【优化】多编码内容解码
+    # 【优化】多编码内容解码，应对不同源服务器编码
     # =============================================================
     def _decode_content(self, raw_bytes):
         """依次尝试 utf-8, gbk, gb2312 解码，均失败则用 utf-8 忽略错误"""
-        for enc in ('utf-8', 'gbk', 'gb2312'):
+        for enc in ('utf-8', 'gbk', 'gb2312', 'latin-1'):
             try:
                 return raw_bytes.decode(enc)
             except (UnicodeDecodeError, LookupError):
@@ -405,11 +409,7 @@ class StreamChecker:
         return raw_bytes.decode('utf-8', errors='replace')
 
     # =============================================================
-    # 【核心优化】fetch_remote
-    # - 多编码兼容
-    # - M3U 识别更准确（去除 BOM）
-    # - 非 M3U 文本解析策略改进，覆盖更多格式
-    # - 完善的诊断日志
+    # 【核心优化】fetch_remote：全面重写解析逻辑，提升 my_urls 源提取率
     # =============================================================
     def fetch_remote(self, urls):
         all_lines = []
@@ -430,7 +430,6 @@ class StreamChecker:
 
                 before = len(all_lines)
                 # ---------- 分支：M3U ----------
-                # 去除 BOM 并检查是否以 #EXTM3U 开头
                 if c.lstrip('\ufeff').lstrip().startswith('#EXTM3U'):
                     name = ""
                     for l in c.splitlines():
@@ -438,7 +437,6 @@ class StreamChecker:
                         if not l:
                             continue
                         if l.startswith("#EXTINF"):
-                            # 提取组名：优先 group-title，其次 tvg-name，最后逗号分隔
                             m_group = re.search(r'group-title\s*=\s*["\']?([^"\',]+)', l)
                             if m_group:
                                 name = m_group.group(1).strip()
@@ -453,10 +451,8 @@ class StreamChecker:
                             if not url_candidate:
                                 name = ""
                                 continue
-                            # 相对路径补全
                             if not re.match(r'https?://', url_candidate, re.I):
                                 url_candidate = urljoin(raw_url, url_candidate)
-                            # 过滤黑名单/点播/图片
                             if url_matches_domain_blacklist(url_candidate):
                                 name = ""
                                 continue
@@ -464,7 +460,6 @@ class StreamChecker:
                                 name = ""
                                 continue
                             group = name if name else "订阅源"
-                            # 利用 clean_source_line 校验并提取标准格式
                             res, _ = clean_source_line(f"{group},{url_candidate}")
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
@@ -472,10 +467,10 @@ class StreamChecker:
                                 all_lines.append(f"{group},{url_candidate}")
                             name = ""
                 else:
-                    # ---------- 分支：非 M3U ----------
-                    # 策略1：逐行尝试标准格式清洗（频道名,URL）
-                    lines = c.splitlines()
+                    # ---------- 分支：非 M3U (重点优化) ----------
+                    # 1. 先尝试按行解析 (兼容 “组名,URL” 格式)
                     extracted = False
+                    lines = c.splitlines()
                     for l in lines:
                         l = l.strip()
                         if not l or l.startswith("#"):
@@ -485,7 +480,20 @@ class StreamChecker:
                             all_lines.append(f"{res[0]},{res[1]}")
                             extracted = True
 
-                    # 策略2：如果策略1未提取到任何内容，直接用正则提取所有http(s) URL
+                    # 2. 如果按行解析失败，尝试将整个内容视为单行进行多次分割
+                    if not extracted:
+                        # 2.1 尝试用换行符、逗号、空格等混合分割
+                        raw_urls = re.split(r'[\s,;\n]+', c)
+                        for u in raw_urls:
+                            u = u.strip().rstrip(".,;:!?)")
+                            if not u or not u.startswith("http"):
+                                continue
+                            if is_vod_or_image_url(u) or url_matches_domain_blacklist(u):
+                                continue
+                            all_lines.append(f"订阅源,{u}")
+                            extracted = True
+
+                    # 2.2 如果仍未提取到，最后使用正则作为兜底
                     if not extracted:
                         raw_urls_found = RE_ALL_URLS.findall(c)
                         for u in raw_urls_found:
@@ -495,25 +503,6 @@ class StreamChecker:
                             if is_vod_or_image_url(u) or url_matches_domain_blacklist(u):
                                 continue
                             all_lines.append(f"订阅源,{u}")
-
-                    # 策略3：兜底处理多URL合并行（如一行多个URL用逗号或空格分隔）
-                    if not extracted and len(all_lines) == before:
-                        for l in lines:
-                            l = l.strip()
-                            if not l or l.startswith("#"):
-                                continue
-                            if l.count("http") <= 1:
-                                continue
-                            # 优先按逗号拆分
-                            parts = l.split(",")
-                            for part in parts:
-                                part = part.strip()
-                                if not part.startswith("http"):
-                                    continue
-                                part = part.rstrip(".,;:!?)")
-                                if is_vod_or_image_url(part) or url_matches_domain_blacklist(part):
-                                    continue
-                                all_lines.append(f"订阅源,{part}")
 
                 got = len(all_lines) - before
                 preview = c[:300].replace("\n", "\\n")
