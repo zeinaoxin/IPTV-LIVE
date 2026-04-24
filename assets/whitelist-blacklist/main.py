@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置 智普清言
+# 路径配置
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -95,7 +95,7 @@ def get_taoiptv_token() -> Optional[str]:
 
 
 def update_my_urls_all(token: str) -> bool:
-    """更新Token + 删旧备注 + 写新备注（不修改URL格式）"""
+    """更新Token + 删除旧备注 + 写新备注"""
     if not token or len(token) != 16:
         logger.error("❌ Token无效，跳过更新")
         return False
@@ -112,14 +112,15 @@ def update_my_urls_all(token: str) -> bool:
             logger.info("✅ 文件中无需更新的Token")
             return False
 
-        # 替换 Token
+        # 1) 替换 Token
         content = re.sub(r"token=[a-f0-9]{16}", f"token={token}", content, flags=re.I)
 
-        # 删除旧备注行
+        # 2) 删除旧备注行（避免多次运行多行备注）
         content = re.sub(r"^#\s*更新时间:.*$", "", content, flags=re.MULTILINE)
+        # 压缩多余空行
         content = re.sub(r"\n{2,}", "\n\n", content).strip() + "\n"
 
-        # 写入新备注
+        # 3) 写入新备注（放在文件最顶部）
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         header = f"# 更新时间: {bj.strftime('%Y-%m-%d %H:%M:%S')} | Token: {token}\n"
         content = header + content
@@ -348,20 +349,9 @@ class StreamChecker:
             with open(path, "r", encoding="utf-8") as f:
                 c = f.read()
             if split_by_space:
-                result = []
-                for l in re.split(r"[\s\t\n]+", c):
-                    l = l.strip()
-                    if not l or l.startswith("#"):
-                        continue
-                    # 纯URL行：直接取
-                    if l.startswith("http"):
-                        result.append(l)
-                    # 兼容 "组名,URL" 格式（防止之前被改坏的文件）
-                    elif "," in l and "://" in l:
-                        url = l.split(",")[-1].strip().split("$")[0].split("#")[0].strip()
-                        if url.startswith("http"):
-                            result.append(url)
-                return result
+                # startswith('http') 自动跳过 # 开头的备注行
+                return [l.strip() for l in re.split(r"[\s\t\n]+", c)
+                        if l.strip().startswith("http")]
             return [l.strip() for l in c.splitlines() if l.strip()]
         except Exception as e:
             logger.warning(f"读取失败 {path}: {e}")
@@ -402,8 +392,10 @@ class StreamChecker:
         return True, 0, "ok", "stream"
 
     def fetch_remote(self, urls):
+        """【核心修复】正确解析纯URL列表（无逗号）的远程源"""
         all_lines = []
         for raw_url in urls:
+            # 对中文路径做安全编码，避免 'ascii' codec 错误
             try:
                 safe_url = quote(unquote(raw_url), safe=":/?&=#%")
             except Exception:
@@ -418,6 +410,7 @@ class StreamChecker:
 
                 before = len(all_lines)
 
+                # M3U 分支（以 #EXTM3U 开头）
                 if "#EXTM3U" in c[:200]:
                     name = ""
                     for l in c.splitlines():
@@ -432,17 +425,23 @@ class StreamChecker:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             name = ""
                 else:
+                    # 非 M3U 分支：逐行处理
+                    # 对“每行一个 URL，没有逗号”的列表自动兼容
+                    # 只要行内包含 :// 就认为是 URL 行
                     for l in c.splitlines():
                         l = l.strip()
                         if not l or l.startswith("#"):
                             continue
-                        # 纯URL行（无逗号）：补伪组名
+                        # 如果一行里没有逗号但有 ://，就自动在 URL 前面加一个逗号
+                        # 这样 clean_source_line 会把前一条的 name 延续给本行
+                        # 如果前面没有 name，就用默认组名
                         if "://" in l and "," not in l:
-                            res, _ = clean_source_line(f"直播源,{l}")
+                            # 用默认组名兜底，确保能通过 clean_source_line 的“有逗号”检查
+                            res, _ = clean_source_line(f"订阅源,{l}")
                             if res:
                                 all_lines.append(f"{res[0]},{res[1]}")
                             continue
-                        # 标准逗号格式
+                        # 常规逗号格式
                         res, _ = clean_source_line(l)
                         if res:
                             all_lines.append(f"{res[0]},{res[1]}")
@@ -491,6 +490,7 @@ class StreamChecker:
         self.load_whitelist()
         lines = []
 
+        # urls.txt
         urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
             logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
@@ -500,6 +500,7 @@ class StreamChecker:
         else:
             logger.warning("未找到 urls.txt")
 
+        # my_urls.txt
         my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
         if my_urls:
             logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
@@ -549,11 +550,11 @@ class StreamChecker:
         stream = sum(1 for *_, k in results if k == "stream")
         playlist = sum(1 for *_, k in results if k == "playlist")
         unknown = sum(1 for *_, k in results if k == "unknown")
-        timeout_n = sum(1 for *_, k in results if k == "timeout")
+        timeout = sum(1 for *_, k in results if k == "timeout")
         elapsed = (datetime.now() - self.start_time).seconds
         logger.info(
             f"===== 检测完成 | 总计:{total} | 流:{stream} | 列表:{playlist} | "
-            f"未知:{unknown} | 超时:{timeout_n} | 耗时:{elapsed}s ====="
+            f"未知:{unknown} | 超时:{timeout} | 耗时:{elapsed}s ====="
         )
 
 # ==============================================
