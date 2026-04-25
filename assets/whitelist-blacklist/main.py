@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置  智普清言
+# 路径配置  智普清言   手动提交my_urls.txt版本
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
