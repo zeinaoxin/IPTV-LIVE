@@ -14,7 +14,7 @@ import subprocess
 import json
 
 # ==============================================
-# 路径配置
+# 路径配置 智普清言
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -68,31 +68,190 @@ class Config:
 RE_ALL_URLS = re.compile(r'https?://[^\s,\'"<>}\])]+')
 
 # ==============================================
-# Token：通过浏览器模拟点击获取（成功率最高）
+# Token：通过Playwright模拟点击获取（成功率最高）
 # ==============================================
-def get_taoiptv_token_by_browser() -> Optional[str]:
+def get_taoiptv_token_by_playwright() -> Optional[str]:
     """
-    使用 agent-browser 模拟真实点击网页上的"获取Token"红色文字
+    使用 Playwright 模拟真实点击网页上的"获取Token"红色文字
     这是成功率最高的方式
     """
     try:
-        logger.info("正在通过浏览器模拟点击获取TaoIPTV最新Token...")
+        logger.info("正在通过Playwright模拟点击获取TaoIPTV最新Token...")
+        
+        # 检查playwright是否可用
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError:
+            logger.warning("Playwright未安装，尝试安装...")
+            try:
+                subprocess.run([sys.executable, "-m", "pip", "install", "playwright", "-q"], 
+                             check=True, capture_output=True, timeout=120)
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], 
+                             check=True, capture_output=True, timeout=300)
+                from playwright.sync_api import sync_playwright
+                logger.info("Playwright安装成功")
+            except Exception as e:
+                logger.warning(f"Playwright安装失败: {e}，使用备用方法...")
+                return get_taoiptv_token_by_agent_browser()
+        
+        with sync_playwright() as p:
+            # 启动浏览器（headless模式）
+            browser = p.chromium.launch(
+                headless=True,
+                args=[
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                    '--disable-web-security',
+                ]
+            )
+            context = browser.new_context(
+                user_agent=Config.USER_AGENT,
+                viewport={'width': 1920, 'height': 1080}
+            )
+            page = context.new_page()
+            
+            try:
+                # 访问网页
+                logger.info("  步骤1: 打开 https://taoiptv.com ...")
+                page.goto("https://taoiptv.com", wait_until="networkidle", timeout=30000)
+                
+                # 等待页面加载
+                time.sleep(2)
+                
+                # 查找并点击"获取Token"元素
+                logger.info("  步骤2: 查找'获取Token'元素...")
+                
+                # 尝试多种选择器
+                selectors = [
+                    "text=获取Token",
+                    "text=获取 Token",
+                    "text=Token",
+                    "a:has-text('Token')",
+                    "span:has-text('Token')",
+                    "div:has-text('Token')",
+                    "[onclick*='token']",
+                    "[onclick*='Token']",
+                    "#token",
+                    ".token",
+                ]
+                
+                clicked = False
+                for selector in selectors:
+                    try:
+                        element = page.locator(selector).first
+                        if element.is_visible(timeout=2000):
+                            logger.info(f"  找到元素: {selector}")
+                            element.click()
+                            clicked = True
+                            logger.info("  步骤3: 已点击'获取Token'元素")
+                            break
+                    except Exception:
+                        continue
+                
+                if not clicked:
+                    # 尝试通过JavaScript查找并点击
+                    logger.info("  尝试通过JavaScript查找...")
+                    try:
+                        # 获取页面所有文本包含Token的元素
+                        elements = page.locator("*:has-text('Token')").all()
+                        for elem in elements:
+                            try:
+                                text = elem.inner_text()
+                                if "获取Token" in text or "获取 Token" in text:
+                                    elem.click()
+                                    clicked = True
+                                    logger.info("  通过JavaScript点击成功")
+                                    break
+                            except Exception:
+                                continue
+                    except Exception as e:
+                        logger.warning(f"  JavaScript查找失败: {e}")
+                
+                if clicked:
+                    # 等待Token复制到剪贴板
+                    time.sleep(2)
+                    
+                    # 尝试从页面获取Token（可能显示在页面上）
+                    logger.info("  步骤4: 从页面获取Token...")
+                    
+                    # 方法1: 从剪贴板获取
+                    token = None
+                    try:
+                        token = page.evaluate("navigator.clipboard.readText()")
+                        if token and len(token) == 16 and re.match(r'^[a-f0-9]{16}$', token, re.I):
+                            logger.info(f"✅ 成功从剪贴板获取Token: {token}")
+                            return token
+                    except Exception:
+                        pass
+                    
+                    # 方法2: 从页面内容中查找Token
+                    content = page.content()
+                    
+                    # 查找页面上显示的Token（可能在某个元素中）
+                    # 排除Cloudflare beacon等干扰
+                    token_patterns = [
+                        r'Token[：:]\s*([a-f0-9]{16})',
+                        r'token[：:]\s*([a-f0-9]{16})',
+                        r'([a-f0-9]{16})',
+                    ]
+                    
+                    for pattern in token_patterns:
+                        matches = re.findall(pattern, content, re.I)
+                        for match in matches:
+                            # 排除已知的干扰Token（如Cloudflare beacon中的）
+                            if match != "8c78df7c7c0f4844":  # 排除已知的无效Token
+                                logger.info(f"✅ 成功从页面获取Token: {match}")
+                                return match
+                    
+                    # 方法3: 从localStorage或sessionStorage获取
+                    try:
+                        storage = page.evaluate("JSON.stringify({...localStorage, ...sessionStorage})")
+                        storage_dict = json.loads(storage)
+                        for key, value in storage_dict.items():
+                            if 'token' in key.lower() and len(str(value)) == 16:
+                                if re.match(r'^[a-f0-9]{16}$', str(value), re.I):
+                                    logger.info(f"✅ 成功从storage获取Token: {value}")
+                                    return value
+                    except Exception:
+                        pass
+                    
+                    logger.warning("  未能从页面获取有效Token")
+                else:
+                    logger.warning("  未找到'获取Token'元素")
+                
+            finally:
+                browser.close()
+        
+        # 如果Playwright失败，尝试备用方法
+        return get_taoiptv_token_by_agent_browser()
+        
+    except Exception as e:
+        logger.error(f"Playwright获取Token失败: {e}", exc_info=True)
+        return get_taoiptv_token_by_agent_browser()
+
+
+def get_taoiptv_token_by_agent_browser() -> Optional[str]:
+    """
+    使用 agent-browser CLI 模拟点击获取Token
+    """
+    try:
+        logger.info("正在通过agent-browser模拟点击获取TaoIPTV最新Token...")
         
         # 步骤1: 打开网页
         logger.info("  步骤1: 打开 https://taoiptv.com ...")
         result = subprocess.run(
-            ["agent-browser", "open", "https://taoiptv.com"],
+            ["agent-browser", "open", "https://taoiptv.com", "--timeout", "30000"],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=60
         )
-        if result.returncode != 0:
-            logger.warning(f"打开网页返回码: {result.returncode}")
         
         # 等待页面加载
         time.sleep(3)
         
-        # 步骤2: 获取页面快照，找到"获取Token"元素
+        # 步骤2: 获取页面快照
         logger.info("  步骤2: 获取页面元素快照...")
         result = subprocess.run(
             ["agent-browser", "snapshot", "-i", "--json"],
@@ -101,62 +260,47 @@ def get_taoiptv_token_by_browser() -> Optional[str]:
             timeout=30
         )
         
-        if result.returncode != 0:
-            logger.warning(f"获取快照返回码: {result.returncode}, 尝试备用方法...")
-            return get_taoiptv_token_by_browser_fallback()
-        
-        # 步骤3: 查找"获取Token"元素并点击
+        # 步骤3: 点击"获取Token"元素
         logger.info("  步骤3: 查找并点击'获取Token'元素...")
         
-        # 使用语义定位器点击包含"获取Token"或"Token"文字的元素
-        click_result = subprocess.run(
+        # 尝试多种方式点击
+        click_commands = [
             ["agent-browser", "find", "text", "获取Token", "click"],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
+            ["agent-browser", "find", "text", "Token", "click"],
+            ["agent-browser", "find", "text", "获取 Token", "click"],
+        ]
         
-        if click_result.returncode != 0:
-            # 尝试其他可能的文字
-            logger.info("  尝试查找'Token'文字...")
-            click_result = subprocess.run(
-                ["agent-browser", "find", "text", "Token", "click"],
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
+        clicked = False
+        for cmd in click_commands:
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+                if result.returncode == 0:
+                    clicked = True
+                    logger.info(f"  点击成功: {' '.join(cmd[2:4])}")
+                    break
+            except Exception:
+                continue
         
-        if click_result.returncode != 0:
-            logger.warning(f"点击元素返回码: {click_result.returncode}")
-            logger.info("  尝试备用方法...")
-            return get_taoiptv_token_by_browser_fallback()
+        if clicked:
+            time.sleep(2)
+            
+            # 步骤4: 从剪贴板获取Token
+            logger.info("  步骤4: 从剪贴板获取Token...")
+            token = get_clipboard_content()
+            
+            if token and len(token) == 16 and re.match(r'^[a-f0-9]{16}$', token, re.I):
+                logger.info(f"✅ 成功通过agent-browser获取Token: {token}")
+                return token
         
-        logger.info(f"  点击结果: {click_result.stdout.strip()}")
+        # 如果失败，尝试从页面获取
+        return get_taoiptv_token_from_page()
         
-        # 等待Token复制到剪贴板
-        time.sleep(2)
-        
-        # 步骤4: 从剪贴板获取Token
-        logger.info("  步骤4: 从剪贴板获取Token...")
-        token = get_clipboard_content()
-        
-        if token and len(token) == 16 and re.match(r'^[a-f0-9]{16}$', token, re.I):
-            logger.info(f"✅ 成功通过浏览器点击获取Token: {token}")
-            return token
-        
-        # 如果剪贴板获取失败，尝试从页面获取
-        logger.info("  剪贴板获取失败，尝试从页面获取...")
-        return get_taoiptv_token_by_browser_fallback()
-        
-    except subprocess.TimeoutExpired:
-        logger.error("❌ 浏览器操作超时")
-        return get_taoiptv_token_by_browser_fallback()
     except FileNotFoundError:
-        logger.warning("❌ agent-browser 未安装，使用备用方法...")
-        return get_taoiptv_token_by_browser_fallback()
+        logger.warning("agent-browser未安装，使用备用方法...")
+        return get_taoiptv_token_from_page()
     except Exception as e:
-        logger.error(f"❌ 浏览器获取Token失败: {e}", exc_info=True)
-        return get_taoiptv_token_by_browser_fallback()
+        logger.error(f"agent-browser获取Token失败: {e}")
+        return get_taoiptv_token_from_page()
     finally:
         # 关闭浏览器
         try:
@@ -165,9 +309,10 @@ def get_taoiptv_token_by_browser() -> Optional[str]:
             pass
 
 
-def get_taoiptv_token_by_browser_fallback() -> Optional[str]:
+def get_taoiptv_token_from_page() -> Optional[str]:
     """
     备用方法：直接从网页HTML中提取Token
+    注意：这个方法可能获取到无效Token，需要验证
     """
     try:
         logger.info("  使用备用方法从网页提取Token...")
@@ -177,7 +322,8 @@ def get_taoiptv_token_by_browser_fallback() -> Optional[str]:
             headers={
                 "User-Agent": Config.USER_AGENT,
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Referer": "https://taoiptv.com/",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Cache-Control": "no-cache",
             },
             method="GET",
         )
@@ -189,11 +335,29 @@ def get_taoiptv_token_by_browser_fallback() -> Optional[str]:
                 return None
             html = resp.read().decode("utf-8", errors="ignore")
         
-        # 匹配16位十六进制Token
-        m = re.search(r"[a-f0-9]{16}", html, re.I)
-        if m:
-            logger.info(f"✅ 成功从网页提取Token: {m.group(0)}")
-            return m.group(0)
+        # 排除已知的干扰Token
+        known_invalid_tokens = [
+            "8c78df7c7c0f4844",  # Cloudflare beacon token
+        ]
+        
+        # 查找所有16位十六进制Token
+        all_tokens = re.findall(r"[a-f0-9]{16}", html, re.I)
+        
+        # 过滤掉已知的无效Token
+        valid_tokens = [t for t in all_tokens if t.lower() not in [x.lower() for x in known_invalid_tokens]]
+        
+        if valid_tokens:
+            # 优先选择在特定上下文中的Token
+            for token in valid_tokens:
+                # 检查Token是否在token=参数附近
+                if f"token={token}" in html.lower():
+                    logger.info(f"✅ 找到URL参数中的Token: {token}")
+                    return token
+            
+            # 否则返回第一个有效Token
+            logger.info(f"✅ 从网页提取Token: {valid_tokens[0]}")
+            return valid_tokens[0]
+        
         logger.error("❌ 未在页面中匹配到有效Token")
         return None
     except Exception as e:
@@ -270,8 +434,8 @@ def get_clipboard_content() -> Optional[str]:
 # Token：获取一次，批量更新
 # ==============================================
 def get_taoiptv_token() -> Optional[str]:
-    """优先使用浏览器模拟点击获取Token"""
-    return get_taoiptv_token_by_browser()
+    """优先使用Playwright模拟点击获取Token"""
+    return get_taoiptv_token_by_playwright()
 
 
 def update_my_urls_all(token: str) -> bool:
@@ -316,7 +480,7 @@ def update_my_urls_all(token: str) -> bool:
 # ==============================================
 # 解析第一个远程源并保存到 assets/111.txt
 # ==============================================
-def fetch_and_save_first_source() -> bool:
+def fetch_and_save_first_source(token: str = None) -> bool:
     """
     解析 assets/my_urls.txt 文件里第一个远程源
     把网页的内容保存到 assets/111.txt 中
@@ -350,6 +514,10 @@ def fetch_and_save_first_source() -> bool:
             logger.error("❌ my_urls.txt 中没有找到有效的URL")
             return False
         
+        # 如果提供了新Token，更新URL中的Token
+        if token and "token=" in first_url:
+            first_url = re.sub(r"token=[a-f0-9]{16}", f"token={token}", first_url, flags=re.I)
+        
         logger.info(f"正在解析第一个远程源: {first_url}")
         
         # 获取远程源内容
@@ -363,6 +531,11 @@ def fetch_and_save_first_source() -> bool:
             urllib.request.HTTPSHandler(context=ctx)
         ).open(req, timeout=Config.TIMEOUT_FETCH) as resp:
             content = resp.read().decode("utf-8", errors="replace")
+        
+        # 检查是否获取成功（不是认证失败页面）
+        if "认证token参数不正确" in content or "Authentication Failed" in content:
+            logger.error("❌ Token无效，获取第一个远程源失败")
+            return False
         
         # 清空原内容并写入新内容
         output_path = FILE_PATHS["first_source"]
@@ -869,7 +1042,7 @@ def main():
     try:
         logger.info("===== 开始执行Token自动更新 =====")
         
-        # 步骤1: 获取Token
+        # 步骤1: 获取Token（优先Playwright模拟点击）
         token = get_taoiptv_token()
         
         # 步骤2: 更新my_urls.txt中的Token
@@ -877,7 +1050,8 @@ def main():
             update_my_urls_all(token)
         
         # 步骤3: 解析第一个远程源并保存到assets/111.txt
-        fetch_and_save_first_source()
+        # 传入token确保使用最新Token
+        fetch_and_save_first_source(token)
         
         # 步骤4: 同步到GitHub仓库
         git_commit_push()
