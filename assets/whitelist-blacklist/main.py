@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置  智普清言   手动提交my_urls.txt版本
+# 路径配置 智普清言 手动提交my_urls.txt版本
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -115,6 +115,7 @@ DOMAIN_BLACKLIST: Set[str] = {
     "alist.xicp.fun", "rihou.cc", "php.jdshipin.com",
     "t.freetv.fun", "stream1.freetv.fun", "hlsztemgsplive.miguvideo", "stream2.freetv.fun",
 }
+
 def url_matches_domain_blacklist(url: str) -> bool:
     try:
         host = (urlparse(url).hostname or "").lower()
@@ -128,6 +129,7 @@ def url_matches_domain_blacklist(url: str) -> bool:
 VOD_DOMAINS: Set[str] = {"kwimgs.com", "kuaishou.com", "ixigua.com", "douyin.com", "tiktokcdn.com", "bdstatic.com", "byteimg.com"}
 VOD_EXTS: Set[str] = {".mp4", ".mkv", ".avi", ".wmv", ".mov", ".rmvb"}
 IMG_EXTS: Set[str] = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg"}
+
 def is_vod_or_image_url(url: str) -> bool:
     try:
         host = (urlparse(url).hostname or "").lower()
@@ -178,19 +180,24 @@ def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
 # 媒体类型判定
 # ==============================================
 STREAM_CTS = ["video/mp2t", "video/mp4", "video/x-flv", "application/vnd.apple.mpegurl", "application/octet-stream", "application/x-mpegURL"]
+
 def is_stream_ct(ct):
     return any(p in ct.lower() for p in STREAM_CTS) if ct else False
+
 def is_html_ct(ct):
     return "text/html" in ct.lower() if ct else False
+
 def _read_chunk(resp, n=4096):
     try:
         return resp.read(n)
     except Exception:
         return b""
+
 def _looks_media(d):
     if not d:
         return False
     return (d[:3] == b"FLV" or (len(d) >= 8 and d[4:8] == b"ftyp") or d[:3] == b"ID3" or (len(d) >= 188 and d[0] == 0x47))
+
 def _looks_html(d):
     if not d:
         return False
@@ -208,7 +215,13 @@ class StreamChecker:
         self.whitelist_lines: List[str] = []
         self.new_failed_urls: Set[str] = set()
         self.manual_urls = manual_urls or []
-        self.clean_stats: Dict[str, int] = {CLEAN_NO_FORMAT: 0, CLEAN_EMPTY_NAME: 0, CLEAN_BAD_URL: 0, CLEAN_DOMAIN_BL: 0, CLEAN_VOD: 0}
+        self.clean_stats: Dict[str, int] = {
+            CLEAN_NO_FORMAT: 0,
+            CLEAN_EMPTY_NAME: 0,
+            CLEAN_BAD_URL: 0,
+            CLEAN_DOMAIN_BL: 0,
+            CLEAN_VOD: 0,
+        }
 
     def _load_blacklist(self):
         bl = set()
@@ -222,7 +235,7 @@ class StreamChecker:
                         url = line.split(",")[-1].split("$")[0].split("#")[0].strip()
                         if "://" in url:
                             bl.add(url)
-                logger.info(f"加载URL黑名单: {len(bl)} 条")
+            logger.info(f"加载URL黑名单: {len(bl)} 条")
         except Exception as e:
             logger.error(f"加载黑名单失败: {e}")
         return bl
@@ -249,7 +262,7 @@ class StreamChecker:
                     u = l.split(",")[-1].strip()
                     if u:
                         seen.add(u)
-                        parts.append(l)
+                    parts.append(l)
             for u in self.new_failed_urls:
                 if u not in seen:
                     parts.append(u)
@@ -407,25 +420,40 @@ class StreamChecker:
     def run(self):
         logger.info("===== 开始流媒体检测 =====")
         self.load_whitelist()
+
         lines = []
-        urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
-        if urls:
-            logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
-            fetched = self.fetch_remote(urls)
-            logger.info(f"urls.txt 完成：{len(urls)} 个节点 → {len(fetched)} 个源")
-            lines.extend(fetched)
+
+        # ---------- 读取并拉取 urls.txt ----------
+        path_urls = FILE_PATHS["urls"]
+        if not os.path.exists(path_urls):
+            logger.warning(f"未找到 {path_urls}")
         else:
-            logger.warning("未找到 urls.txt")
-        my_urls = self.read_file(FILE_PATHS["my_urls"], split_by_space=True)
-        if my_urls:
-            logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
-            fetched = self.fetch_remote(my_urls)
-            logger.info(f"my_urls.txt 完成：{len(my_urls)} 个节点 → {len(fetched)} 个源")
-            lines.extend(fetched)
+            urls = self.read_file(path_urls, split_by_space=True)
+            if not urls:
+                logger.warning(f"{path_urls} 存在但无有效行")
+            else:
+                logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
+                fetched = self.fetch_remote(urls)
+                logger.info(f"urls.txt 完成：{len(urls)} 个节点 → {len(fetched)} 个源")
+                lines.extend(fetched)
+
+        # ---------- 读取并拉取 my_urls.txt ----------
+        path_my_urls = FILE_PATHS["my_urls"]
+        if not os.path.exists(path_my_urls):
+            logger.warning(f"未找到 {path_my_urls}")
         else:
-            logger.warning("未找到 my_urls.txt")
+            my_urls = self.read_file(path_my_urls, split_by_space=True)
+            if not my_urls:
+                logger.warning(f"{path_my_urls} 存在但无有效行")
+            else:
+                logger.info(f"开始拉取 my_urls.txt 中的 {len(my_urls)} 个节点")
+                fetched = self.fetch_remote(my_urls)
+                logger.info(f"my_urls.txt 完成：{len(my_urls)} 个节点 → {len(fetched)} 个源")
+                lines.extend(fetched)
+
         lines.extend(self.whitelist_lines)
         lines.extend(self.manual_urls)
+
         to_check, _ = self.prepare_lines(lines)
         results = []
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as pool:
@@ -440,18 +468,22 @@ class StreamChecker:
                 except Exception as e:
                     logger.error(f"检测异常 {url}: {e}")
                     self.new_failed_urls.add(url)
+
         self._save_blacklist()
+
         results.sort(key=lambda x: ({"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]))
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         with open(FILE_PATHS["whitelist_respotime"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
             for url, ms, code, kind in results:
                 f.write(f"{ms},{url},{code},{kind}\n")
+
         with open(FILE_PATHS["whitelist_auto"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
             for url, _, _, kind in results:
                 if kind not in ("timeout", "blacklist"):
                     f.write(f"自动,{url}\n")
+
         total = len(results)
         stream = sum(1 for *_, k in results if k == "stream")
         playlist = sum(1 for *_, k in results if k == "playlist")
