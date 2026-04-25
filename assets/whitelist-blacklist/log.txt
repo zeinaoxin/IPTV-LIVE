@@ -12727,3 +12727,5 @@ urllib.error.HTTPError: HTTP Error 403: Forbidden
 2026-04-25 15:22:30,800 - INFO - 清洗统计: {'no_format': 15, 'empty_name': 0, 'bad_url': 0, 'domain_blacklist': 0, 'vod_filtered': 1}
 2026-04-25 15:22:30,801 - INFO - 远程源拉取统计: {'total_urls': 182, 'success': 85782, 'failed': 5, 'skipped': 0}
 2026-04-25 15:22:30,801 - INFO - 正在同步到GitHub仓库...
+2026-04-25 15:22:34,433 - INFO - ✅ 已同步到GitHub仓库！
+2026-04-25 15:22:34,433 - INFO - ===== 全部流程执行完成 =====
