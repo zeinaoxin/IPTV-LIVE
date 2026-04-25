@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置 智普清言 本地文件夹源 带测速
+# 路径配置
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -60,8 +60,11 @@ class Config:
     TIMEOUT_CHECK = 3.0
     TIMEOUT_WHITELIST = 4.5
     MAX_WORKERS = 30
-    # ---- 速度优选：仅保留测速最快的前 N 条有效源写入白名单 ----
     MAX_FASTEST = 20
+    # ---- 优化参数 ----
+    MIN_RESPONSE_TIME = 50  # 最小有效响应时间（ms），屏蔽0ms等无效源
+    MAX_RETRIES = 2        # 重试次数
+    RETRY_TIMEOUT = 2.0    # 重试超时时间
 
 # ==============================================
 # 正则：从任意文本中提取所有 http(s) URL
@@ -381,6 +384,11 @@ class StreamChecker:
                 ct = r.headers.get("Content-Type", "")
                 data = _read_chunk(r)
                 ms = round((time.perf_counter() - s) * 1000, 2)
+                
+                # ---- 优化：屏蔽0ms等无效响应 ----
+                if ms < Config.MIN_RESPONSE_TIME:
+                    return False, ms, f"{ms}ms_too_fast", "timeout"
+                
                 ok = 200 <= code < 400 or code in (301, 302)
                 if not ok:
                     return False, ms, str(code), None
@@ -581,8 +589,6 @@ class StreamChecker:
                     f"⚡ 速度优选: 有效源 {len(valid_results)} 条 → 保留最快 {kept} 条 | "
                     f"速度范围: {fastest_ms}ms ~ {slowest_ms}ms | 淘汰 {discarded} 条慢源"
                 )
-            else:
-                logger.info(f"⚡ 速度优选: 有效源 0 条，无可用源")
         else:
             logger.info(f"⚡ 速度优选: 有效源 {len(valid_results)} 条（≤{max_fast}），全部保留")
 
