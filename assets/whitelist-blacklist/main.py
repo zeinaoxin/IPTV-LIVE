@@ -3,13 +3,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
+import sys
 from urllib.parse import urlparse, quote, unquote, urljoin
 import socket
 import ssl
 import re
 from typing import List, Tuple, Set, Dict, Optional
 import logging
-import sys
 import subprocess
 
 # ==============================================
@@ -89,7 +89,7 @@ def git_commit_push():
                 FILE_PATHS["blacklist_auto"], 
                 FILE_PATHS["whitelist_auto"], 
                 FILE_PATHS["whitelist_respotime"], 
-                FILE_PATHS["log"]
+                FILE_PATHS["log"],
             ], 
             check=True, capture_output=True, text=True
         )
@@ -269,6 +269,8 @@ class StreamChecker:
             "skipped": 0
         }
         self.channel_results: Dict[str, List[Tuple[str, float, str, str]]] = {}  # 频道名 -> (url, ms, code, kind)
+        self.results: List[Tuple[str, float, str, str]] = []  # 全量测速结果
+        self.fastest_results: List[Tuple[str, float, str, str]] = []  # 优选结果
 
     # ---------- 本地源读取（assets/my_urls/*.txt） ----------
     def read_my_urls_dir(self, dirpath: str) -> List[str]:
@@ -613,7 +615,7 @@ class StreamChecker:
         to_check, _ = self.prepare_lines(lines)
         logger.info(f"准备完成: 耗时 {time.time() - start_prepare:.2f}s, 待检测 {len(to_check)} 条")
         
-        results = []
+        self.results = []
         start_check = time.time()
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as pool:
             fmap = {pool.submit(self.check_url, u, u in self.whitelist_urls): u for u, _ in to_check}
@@ -621,7 +623,7 @@ class StreamChecker:
                 url = fmap[fut]
                 try:
                     s, ms, code, kind = fut.result()
-                    results.append((url, ms, code, kind))
+                    self.results.append((url, ms, code, kind))
                     if not s and url not in self.whitelist_urls:
                         self.new_failed_urls.add(url)
                 except Exception as e:
@@ -633,7 +635,7 @@ class StreamChecker:
         
         # 按频道分组
         self.channel_results = {}
-        for url, ms, code, kind in results:
+        for url, ms, code, kind in self.results:
             if kind in ("timeout", "blacklist"):
                 continue
             
@@ -656,7 +658,7 @@ class StreamChecker:
     # ==============================
     def optimize_by_speed_per_channel(self):
         logger.info("===== 开始按频道速度优选 =====")
-        fastest_results = []
+        self.fastest_results = []
         total_channels = len(self.channel_results)
         total_optimized = 0
         
@@ -683,26 +685,26 @@ class StreamChecker:
             else:
                 logger.info(f"⚡ 频道 {channel_name} 速度优选: 有效源 {len(channel_results)} 条，全部保留")
             
-            fastest_results.extend(channel_fastest)
+            self.fastest_results.extend(channel_fastest)
             total_optimized += kept
         
         logger.info(f"===== 速度优选完成 | 总共优化 {total_channels} 个频道 | 保留 {total_optimized} 条源 =====")
         
         # 写入文件
-        self.write_files(results, fastest_results)
+        self.write_files()
 
     # ==============================
     # 写入文件
     # ==============================
-    def write_files(self, results, fastest_results):
+    def write_files(self):
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
         
         # whitelist_respotime.txt —— 保留全量测速记录（含超时/黑名单），方便排查
         start_write = time.time()
-        results.sort(key=lambda x: ({"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]))
+        self.results.sort(key=lambda x: ({"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]))
         with open(FILE_PATHS["whitelist_respotime"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
-            for url, ms, code, kind in results:
+            for url, ms, code, kind in self.results:
                 f.write(f"{ms},{url},{code},{kind}\n")
         logger.info(f"写入whitelist_respotime.txt完成: 耗时 {time.time() - start_write:.2f}s")
         
@@ -710,24 +712,24 @@ class StreamChecker:
         start_write_auto = time.time()
         with open(FILE_PATHS["whitelist_auto"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
-            for url, _, _, kind in fastest_results:
+            for url, _, _, kind in self.fastest_results:
                 f.write(f"自动,{url}\n")
         logger.info(f"写入whitelist_auto.txt完成: 耗时 {time.time() - start_write_auto:.2f}s")
 
     # ==============================
     # 统计日志
     # ==============================
-    def log_statistics(self, results, fastest_results):
-        total = len(results)
-        stream = sum(1 for *_, k in results if k == "stream")
-        playlist = sum(1 for *_, k in results if k == "playlist")
-        unknown = sum(1 for *_, k in results if k == "unknown")
-        timeout_count = sum(1 for *_, k in results if k == "timeout")
+    def log_statistics(self):
+        total = len(self.results)
+        stream = sum(1 for *_, k in self.results if k == "stream")
+        playlist = sum(1 for *_, k in self.results if k == "playlist")
+        unknown = sum(1 for *_, k in self.results if k == "unknown")
+        timeout_count = sum(1 for *_, k in self.results if k == "timeout")
         elapsed = (datetime.now() - self.start_time).seconds
         
         logger.info(
             f"===== 检测完成 | 总计:{total} | 流:{stream} | 列表:{playlist} | "
-            f"未知:{unknown} | 超时:{timeout_count} | 最快{len(fastest_results)}条入白名单 | 耗时:{elapsed}s ====="
+            f"未知:{unknown} | 超时:{timeout_count} | 最快{len(self.fastest_results)}条入白名单 | 耗时:{elapsed}s ====="
         )
         
         # 打印清洗统计
@@ -746,7 +748,7 @@ def main():
         checker.run()
         
         # 统计日志
-        checker.log_statistics(checker.results, checker.fastest_results)
+        checker.log_statistics()
         
         git_commit_push()
         logger.info("===== 全部流程执行完成 =====")
