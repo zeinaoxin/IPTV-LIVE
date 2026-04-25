@@ -30,23 +30,23 @@ FILE_PATHS = {
 }
 
 # ==============================================
-# 日志配置（优化：增加DEBUG级别和详细格式）
+# 日志配置（优化：减少详细输出，只显示关键信息）
 # ==============================================
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(lineno)d - %(message)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(FILE_PATHS["log"], mode='w', encoding='utf-8'),
         logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger(__name__)
-logger.info("=" * 80)
+logger.info("=" * 60)
 logger.info(f"项目根目录: {PROJECT_ROOT}")
 logger.info(f"脚本目录: {SCRIPT_DIR}")
 logger.info(f"assets目录: {ASSETS_DIR}")
 logger.info(f"本地源目录: {MY_URLS_DIR} ({'存在' if os.path.isdir(MY_URLS_DIR) else '不存在'})")
-logger.info("=" * 80)
+logger.info("=" * 60)
 
 # ==============================================
 # 全局配置
@@ -262,22 +262,6 @@ class StreamChecker:
         self.channel_results: Dict[str, List[Tuple[str, float, str, str]]] = {}  # 频道名 -> (url, ms, code, kind)
         self.results: List[Tuple[str, float, str, str]] = []  # 全量测速结果
         self.fastest_results: List[Tuple[str, float, str, str]] = []  # 优选结果
-        self.error_stats = {
-            "clean_no_format": 0,
-            "clean_empty_name": 0,
-            "clean_bad_url": 0,
-            "clean_domain_bl": 0,
-            "clean_vod": 0,
-            "fetch_success": 0,
-            "fetch_failed": 0,
-            "fetch_skipped": 0,
-            "check_timeout": 0,
-            "check_domain_bl": 0,
-            "check_vod": 0,
-            "check_html": 0,
-            "check_code_error": 0,
-            "check_unknown": 0
-        }
 
     # ---------- 本地源读取（assets/my_urls/*.txt） ----------
     def read_my_urls_dir(self, dirpath: str) -> List[str]:
@@ -419,16 +403,13 @@ class StreamChecker:
                 
                 # ---- 优化：屏蔽0ms等无效响应 ----
                 if ms < Config.MIN_RESPONSE_TIME:
-                    self.error_stats["check_timeout"] += 1
                     return False, ms, f"{ms}ms_too_fast", "timeout"
                 
                 ok = 200 <= code < 400 or code in (301, 302)
                 if not ok:
-                    self.error_stats["check_code_error"] += 1
                     return False, ms, str(code), None
                 
                 if is_html_ct(ct) or _looks_html(data):
-                    self.error_stats["check_html"] += 1
                     return False, ms, f"{code}/html", "timeout"
                 
                 if is_stream_ct(ct) and _looks_media(data):
@@ -440,13 +421,11 @@ class StreamChecker:
                 return True, ms, str(code), "unknown"
         except Exception as e:
             ms = round((time.perf_counter() - s) * 1000, 2)
-            logger.error(f"检查URL异常: {url}, 错误: {e}", exc_info=True)
             return False, ms, str(e), "timeout"
 
     def check_url(self, url, is_whitelist=False):
         t = Config.TIMEOUT_WHITELIST if is_whitelist else Config.TIMEOUT_CHECK
         if url_matches_domain_blacklist(url):
-            self.error_stats["check_domain_bl"] += 1
             return False, 0, "blacklist", "blacklist"
         
         if url.startswith(("http://", "https://")):
@@ -733,9 +712,6 @@ class StreamChecker:
         
         # 打印拉取统计
         logger.info(f"远程源拉取统计: {self.fetch_stats}")
-        
-        # 打印错误统计
-        logger.info(f"错误统计: {self.error_stats}")
 
 # ==============================================
 # 主函数
