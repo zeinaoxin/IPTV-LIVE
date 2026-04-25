@@ -1,5 +1,5 @@
 更新时间,#genre#
-20260425 15:28,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8
+20260425 15:41,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8
 
 
 央视频道,#genre#
@@ -735,7 +735,6 @@ CETV4,http://183.11.239.36:808/hls/79/index.m3u8
 广西卫视,http://222.169.85.8:9901/tsfile/live/0113_1.m3u8?key=txiptv&playlive=1&authid=0
 广西卫视,http://111.61.236.247:9081/hls/44/index.m3u8
 广西卫视,https://www.yangshipin.cn/tv/home?pid=600002509
-广西卫视,https://piccpndks.v.kcdnvip.com/audio/guangxi_2/index.m3u8
 广西卫视,https://haoyunlai.serv00.net/Smartv-1.php?id=guangxi
 广西卫视,http://hmfs.f3322.net:3388/hls/27/index.m3u8
 广西卫视,http://kkk.888.3116598.xyz/api.php?n=liujiahui&id=fXXc21&tk=bknhp6JvJlqE
