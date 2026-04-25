@@ -166,45 +166,36 @@ CLEAN_VOD = "vod_filtered"
 
 def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
     if not line:
-        logger.debug(f"行无效: 空行, 原因: CLEAN_NO_FORMAT")
         return None, CLEAN_NO_FORMAT
     
     line = line.replace("\r", "").replace("\n", " ").strip()
     if "," not in line or "://" not in line:
-        logger.debug(f"行格式无效: {line[:50]}..., 原因: CLEAN_NO_FORMAT")
         return None, CLEAN_NO_FORMAT
     
     idx = line.find("://")
     if idx < 1:
-        logger.debug(f"URL格式无效: {line[:50]}..., 原因: CLEAN_BAD_URL")
         return None, CLEAN_BAD_URL
     
     prefix = line[: idx - 1]
     pos = prefix.rfind(",")
     if pos < 0:
-        logger.debug(f"行格式无效: 缺少逗号分隔, 原因: CLEAN_NO_FORMAT")
         return None, CLEAN_NO_FORMAT
     
     name = re.sub(r"\s{2,}", " ", prefix[:pos].strip())
     if not name:
-        logger.debug(f"频道名无效: 空名称, 原因: CLEAN_EMPTY_NAME")
         return None, CLEAN_EMPTY_NAME
     
     rest = line[pos + 1:].strip()
     url = rest.split(",")[0].strip().split("$")[0].split("#")[0].strip()
     if not url or "://" not in url:
-        logger.debug(f"URL无效: {url}, 原因: CLEAN_BAD_URL")
         return None, CLEAN_BAD_URL
     
     if url_matches_domain_blacklist(url):
-        logger.debug(f"URL被域名黑名单拦截: {url}, 原因: CLEAN_DOMAIN_BL")
         return None, CLEAN_DOMAIN_BL
     
     if is_vod_or_image_url(url):
-        logger.debug(f"URL被点播/图片过滤: {url}, 原因: CLEAN_VOD")
         return None, CLEAN_VOD
     
-    logger.debug(f"行清洗成功: 频道名={name}, URL={url}")
     return (name, url), CLEAN_OK
 
 # ==============================================
@@ -271,6 +262,22 @@ class StreamChecker:
         self.channel_results: Dict[str, List[Tuple[str, float, str, str]]] = {}  # 频道名 -> (url, ms, code, kind)
         self.results: List[Tuple[str, float, str, str]] = []  # 全量测速结果
         self.fastest_results: List[Tuple[str, float, str, str]] = []  # 优选结果
+        self.error_stats = {
+            "clean_no_format": 0,
+            "clean_empty_name": 0,
+            "clean_bad_url": 0,
+            "clean_domain_bl": 0,
+            "clean_vod": 0,
+            "fetch_success": 0,
+            "fetch_failed": 0,
+            "fetch_skipped": 0,
+            "check_timeout": 0,
+            "check_domain_bl": 0,
+            "check_vod": 0,
+            "check_html": 0,
+            "check_code_error": 0,
+            "check_unknown": 0
+        }
 
     # ---------- 本地源读取（assets/my_urls/*.txt） ----------
     def read_my_urls_dir(self, dirpath: str) -> List[str]:
@@ -412,27 +419,24 @@ class StreamChecker:
                 
                 # ---- 优化：屏蔽0ms等无效响应 ----
                 if ms < Config.MIN_RESPONSE_TIME:
-                    logger.debug(f"URL响应过快（{ms}ms < {Config.MIN_RESPONSE_TIME}ms）: {url}")
+                    self.error_stats["check_timeout"] += 1
                     return False, ms, f"{ms}ms_too_fast", "timeout"
                 
                 ok = 200 <= code < 400 or code in (301, 302)
                 if not ok:
-                    logger.debug(f"URL响应状态码无效: {code}, URL: {url}")
+                    self.error_stats["check_code_error"] += 1
                     return False, ms, str(code), None
                 
                 if is_html_ct(ct) or _looks_html(data):
-                    logger.debug(f"URL返回HTML内容，非流媒体: {url}")
+                    self.error_stats["check_html"] += 1
                     return False, ms, f"{code}/html", "timeout"
                 
                 if is_stream_ct(ct) and _looks_media(data):
-                    logger.debug(f"URL确认是流媒体: {url}, 响应时间: {ms}ms")
                     return True, ms, str(code), "stream"
                 
                 if b"#EXTM3U" in data:
-                    logger.debug(f"URL是M3U播放列表: {url}, 响应时间: {ms}ms")
                     return True, ms, str(code), "playlist"
                 
-                logger.debug(f"URL类型未知但有效: {url}, 响应时间: {ms}ms")
                 return True, ms, str(code), "unknown"
         except Exception as e:
             ms = round((time.perf_counter() - s) * 1000, 2)
@@ -442,13 +446,12 @@ class StreamChecker:
     def check_url(self, url, is_whitelist=False):
         t = Config.TIMEOUT_WHITELIST if is_whitelist else Config.TIMEOUT_CHECK
         if url_matches_domain_blacklist(url):
-            logger.debug(f"URL被域名黑名单拦截: {url}")
+            self.error_stats["check_domain_bl"] += 1
             return False, 0, "blacklist", "blacklist"
         
         if url.startswith(("http://", "https://")):
             return self.check_http(url, t)
         
-        logger.debug(f"URL格式无效（非http/https）: {url}")
         return True, 0, "ok", "stream"
 
     # ---------- 远程源拉取 ----------
@@ -530,21 +533,16 @@ class StreamChecker:
                     
                     got = len(all_lines) - before
                     if got > 1:
-                        logger.info(f" ✓ {raw_url[:90]} → {got} 个源")
-                        self.fetch_stats["success"] += 1
+                        self.fetch_stats["success"] += got
                     elif got == 1:
-                        diag = c[:500].replace("\n", "\\n").replace("\r", "")
-                        logger.warning(f" ⚠ {raw_url[:90]} → 仅 {got} 个源 | 内容诊断: {diag}")
                         self.fetch_stats["success"] += 1
                     else:
-                        preview = c[:200].replace("\n", "\\n")
-                        logger.warning(f" ✗ {raw_url[:90]} → 0 个源 | 内容: {preview}")
                         self.fetch_stats["failed"] += 1
             except Exception as e:
-                logger.error(f" ✗ {raw_url[:90]} → 异常: {e}", exc_info=True)
                 self.fetch_stats["failed"] += 1
+                logger.error(f" ✗ {raw_url[:90]} → 异常: {e}", exc_info=True)
         
-        logger.info(f"远程源拉取完成: 总节点 {self.fetch_stats['total_urls']} → 有效源 {len(all_lines)}")
+        logger.info(f"远程源拉取完成: 总节点 {self.fetch_stats['total_urls']} → 有效源 {len(all_lines)}，成功 {self.fetch_stats['success']}，失败 {self.fetch_stats['failed']}")
         return all_lines
 
     # ---------- 手动白名单 ----------
@@ -569,12 +567,10 @@ class StreamChecker:
             
             _, url = res
             if url in seen:
-                logger.debug(f"URL重复: {url}, 已跳过")
                 continue
             
             seen.add(url)
             if url in self.blacklist_urls:
-                logger.debug(f"URL在黑名单中: {url}, 已跳过")
                 continue
             
             to_check.append((url, line))
@@ -737,6 +733,9 @@ class StreamChecker:
         
         # 打印拉取统计
         logger.info(f"远程源拉取统计: {self.fetch_stats}")
+        
+        # 打印错误统计
+        logger.info(f"错误统计: {self.error_stats}")
 
 # ==============================================
 # 主函数
