@@ -1,6 +1,6 @@
 name: 'WhiteList BlackList'
 
-on:
+于:
   schedule:
     - cron: '0 17 * * *'          # 北京时间每天 1:00（UTC 17:00）
   workflow_dispatch:
@@ -72,4 +72,13 @@ jobs:
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --cached --name-only | grep -q .;
+          if git diff --cached --name-only | grep -q .; then
+            git fetch origin main
+            git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 推送完成"
+          else
+            echo "ℹ️ 无变更，跳过"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
