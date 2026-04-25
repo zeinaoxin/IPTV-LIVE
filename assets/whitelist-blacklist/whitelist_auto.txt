@@ -1,23 +1,23 @@
 更新时间,#genre#
-20260425 19:17
+20260425 20:12
 
 自动,rtsp://185.50.56.16:554/neontelvizija
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228820/778771674.smil
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228916/778771746.smil
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228842/778771953.smil
+自动,https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc1us/master.m3u8
+自动,https://o11.163189.xyz/stream/live/aod/
 自动,https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8
-自动,http://cdn6.163189.xyz/163189/8tv
-自动,https://edge-f.swagit.com/live/glendaleaz/live-1-a-1/playlist.m3u8
-自动,https://stream.ads.ottera.tv/playlist.m3u8?network_id=743
-自动,http://cdn6.163189.xyz/163189/ch8
-自动,http://cdn6.163189.xyz/163189/ch5
-自动,http://player.cntv.cn/standard/live_HLSDRM20180919.swf?v=180.171.5.8.9.6.3.9&ChannelID=hebei&videoTVChannel=hebei&P2PChannelID=pd://cctv_p2p_hebei&tai=hebei&VideoName=hebei&channelID=hebei
-自动,https://m3u.ibert.me/txt/ycl_iptv.txt
-自动,http://cdn6.163189.xyz/163189/fhzx
-自动,http://vodcdn.video.taobao.com/oss/ali-video/0ea34400f2502a94ee14aea506e0042b/video.m3u8
-自动,https://abcnews-streams.akamaized.net/hls/live/2023568/abcnewshudson9/master_4000.m3u8
-自动,https://turnerlive.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8
-自动,https://wurlrifftrax.global.transmit.live/hls/68222b9cbe836edbe6f39e74/playlist.m3u8
-自动,http://vodcdn.video.taobao.com/oss/ali-video/1905c60363f40cea52f342ec59132da0/video.m3u8
-自动,https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV18.m3u8
-自动,http://vodcdn.video.taobao.com/oss/ali-video/6e098f7b47614885845efb7a45998eb1/1465875165/video.m3u8.m3u8
+自动,https://f-tx-edge-87.christianworldmedia.com/313watkins/mp4:313watkins/playlist.m3u8
+自动,https://wurl120sports.global.transmit.live/hls/679a907dce42a042c23ace37/v1/stadium_gracenote/samsung_us/latest/main/hls/playlist.m3u8
+自动,https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
+自动,https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8
+自动,https://d2ah48mnofquik.cloudfront.net/Backstage.m3u8
+自动,https://d25w9q07b2mtmw.cloudfront.net/live/master.m3u8
+自动,https://cdn.163189.xyz/163189/now
+自动,https://play.xluuss.com/play/rb2kQ7jd/index.m3u8
+自动,https://play.xluuss.com/play/DdwpvEXe/index.m3u8
+自动,https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV09.m3u8
+自动,https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV78.m3u8
+自动,https://play.xluuss.com/play/mepYlRya/index.m3u8
+自动,https://play.xluuss.com/play/mepYl7Qa/index.m3u8

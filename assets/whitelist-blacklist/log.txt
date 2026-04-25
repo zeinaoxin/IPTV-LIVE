@@ -1,1 +1,111 @@
-
+2026-04-25 11:58:52,243 - ============================================================
+2026-04-25 11:58:52,243 - 项目根目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE
+2026-04-25 11:58:52,243 - 脚本目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/whitelist-blacklist
+2026-04-25 11:58:52,243 - assets目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets
+2026-04-25 11:58:52,243 - 本地源目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls (存在)
+2026-04-25 11:58:52,243 - ============================================================
+2026-04-25 11:58:52,244 - ===== 开始执行 =====
+2026-04-25 11:58:52,480 - 加载URL黑名单: 227822 条
+2026-04-25 11:58:52,480 - ===== 开始流媒体检测 =====
+2026-04-25 11:58:52,484 - 手动白名单: 168 个频道
+2026-04-25 11:58:52,485 - 开始拉取 urls.txt 中的 91 个节点
+2026-04-25 11:58:52,758 -  ✓ https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt → 1019 个源
+2026-04-25 11:58:52,850 -  ✓ https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt → 410 个源
+2026-04-25 11:58:52,949 -  ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs/heads/master/live.m3u → 32 个源
+2026-04-25 11:58:53,405 -  ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u → 1128 个源
+2026-04-25 11:58:53,579 -  ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u → 799 个源
+2026-04-25 11:58:53,657 -  ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%92%AA%E5%92%95%E7%9B% → 165 个源
+2026-04-25 11:58:53,962 -  ✓ https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/%E5%B0%8F%E8%82%A5%E7%BE% → 196 个源
+2026-04-25 11:58:54,041 -  ✓ https://raw.githubusercontent.com/skddyj/iptv/refs/heads/main/IPTV.m3u → 82 个源
+2026-04-25 11:58:54,215 -  ✓ https://raw.githubusercontent.com/cyalias/mytvs-github/refs/heads/main/mytv.txt → 706 个源
+2026-04-25 11:58:54,337 -  ✓ https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/main/ipv4.txt → 179 个源
+2026-04-25 11:58:54,462 -  ✓ https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8 → 1892 个源
+2026-04-25 11:58:54,497 -  ✓ https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u → 125 个源
+2026-04-25 11:58:54,575 -  ✓ https://raw.githubusercontent.com/onlylove2023/iptv/refs/heads/main/IPTV.m3u → 61 个源
+2026-04-25 11:58:54,633 -  ✗ https://raw.githubusercontent.com/bj123sd/IPTV/refs/heads/main/hycg.txt → 异常: HTTP Error 404: Not Found
+2026-04-25 11:58:54,716 -  ✓ https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u → 82 个源
+2026-04-25 11:58:54,805 -  ✓ https://raw.githubusercontent.com/cyh92/iptv-api-weishi/refs/heads/master/output/weishi.m3 → 70 个源
+2026-04-25 11:58:55,316 -  ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/bbxx.txt → 15032 个源
+2026-04-25 11:58:55,815 -  ✓ https://raw.githubusercontent.com/kimwang1978/collect-txt/refs/heads/main/others_output.tx → 13073 个源
+2026-04-25 11:58:55,892 -  ✓ https://raw.githubusercontent.com/hujingguang/ChinaIPTV/refs/heads/main/cnTV_AutoUpdate.m3 → 53 个源
+2026-04-25 11:58:56,281 -  ✓ https://raw.githubusercontent.com/jiangnan1224/iptv_ipv4_live/refs/heads/main/live_ipv4.tx → 10474 个源
+2026-04-25 11:58:56,333 -  ✗ https://raw.githubusercontent.com/8080713/iptv-api666/refs/heads/main/output/result.m3u → 异常: HTTP Error 404: Not Found
+2026-04-25 11:58:56,476 -  ✓ https://raw.githubusercontent.com/liuchuang0321/K-TV/refs/heads/master/output/user_result. → 377 个源
+2026-04-25 11:58:56,556 -  ✓ https://raw.githubusercontent.com/wwb521/live/refs/heads/main/tv.txt → 57 个源
+2026-04-25 11:58:56,718 -  ✓ https://raw.githubusercontent.com/zhi35/iptv/refs/heads/master/iptv.m3u → 509 个源
+2026-04-25 11:58:56,803 -  ✓ https://raw.githubusercontent.com/cyh92/iptv-api-cctv/refs/heads/master/output/cctv.m3u → 54 个源
+2026-04-25 11:58:56,962 -  ✓ https://raw.githubusercontent.com/0610840119/iptv-api/refs/heads/master/output/xp_result.m → 669 个源
+2026-04-25 11:58:57,051 -  ✓ https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/master/TV-IPV4.m3u → 58 个源
+2026-04-25 11:58:57,151 -  ✓ https://raw.githubusercontent.com/MemoryCollection/IPTV/refs/heads/main/hotel.txt → 50 个源
+2026-04-25 11:58:57,224 -  ✓ https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u → 80 个源
+2026-04-25 11:58:57,413 -  ✓ https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/main/iptv_list.txt → 5698 个源
+2026-04-25 11:58:57,631 -  ✓ https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3u → 342 个源
+2026-04-25 11:58:57,713 -  ✓ https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt → 202 个源
+2026-04-25 11:58:57,796 -  ✓ https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt → 31 个源
+2026-04-25 11:58:57,919 -  ✓ https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.txt → 1049 个源
+2026-04-25 11:58:58,019 -  ✓ https://raw.githubusercontent.com/junge3333/juds6/main/yszb1.txt → 785 个源
+2026-04-25 11:58:58,108 -  ✓ https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.txt → 92 个源
+2026-04-25 11:58:58,193 -  ✓ https://raw.githubusercontent.com/maitel2020/iptv-self-use/main/iptv.txt → 71 个源
+2026-04-25 11:58:58,284 -  ✓ https://raw.githubusercontent.com/n3rddd/CTVLive/refs/heads/main/live.txt → 314 个源
+2026-04-25 11:58:58,382 -  ✓ https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/live.txt → 531 个源
+2026-04-25 11:58:58,483 -  ✓ https://raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt → 933 个源
+2026-04-25 11:58:58,679 -  ✓ https://raw.githubusercontent.com/alienlu/iptv/refs/heads/master/iptv.txt → 332 个源
+2026-04-25 11:58:58,759 -  ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/台湾香港澳门2023.m3 → 151 个源
+2026-04-25 11:58:58,870 -  ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国内电视台2023.m3u → 286 个源
+2026-04-25 11:58:58,951 -  ✓ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewT → 43 个源
+2026-04-25 11:58:59,007 -  ✓ https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt → 368 个源
+2026-04-25 11:58:59,649 -  ✓ https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt → 11973 个源
+2026-04-25 11:58:59,986 -  ✓ https://iptv.catvod.com/tv.m3u → 2 个源
+2026-04-25 11:59:13,491 -  ✓ https://xn--6orr3pi6g9uu.top/zb/zb.txt → 333 个源
+2026-04-25 11:59:14,176 -  ✓ https://tv.iill.top/m3u/Gather → 1303 个源
+2026-04-25 11:59:14,235 -  ✓ https://m.iill.top/Live.m3u → 541 个源
+2026-04-25 11:59:14,286 -  ✓ https://tv.iill.top/m3u/Sport → 36 个源
+2026-04-25 11:59:19,367 -  ✓ https://live.freetv.top/huyayqk.m3u → 2 个源
+2026-04-25 11:59:24,202 -  ✓ https://live.freetv.top/douyuyqk.m3u → 2 个源
+2026-04-25 11:59:25,666 -  ✓ https://live.zhoujie218.top/tv/iptv4.txt → 1049 个源
+2026-04-25 11:59:25,914 -  ✓ https://t.freetv.fun/m3u/playlist.txt → 4 个源
+2026-04-25 11:59:26,054 -  ✓ https://t.freetv.fun/m3u/taiwan.txt → 4 个源
+2026-04-25 11:59:26,194 -  ✓ https://t.freetv.fun/m3u/hong_kong.txt → 4 个源
+2026-04-25 11:59:26,335 -  ✓ https://t.freetv.fun/m3u/macao.txt → 4 个源
+2026-04-25 11:59:26,471 -  ✓ https://t.freetv.fun/m3u/japan.txt → 4 个源
+2026-04-25 11:59:26,749 -  ✓ https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u → 352 个源
+2026-04-25 11:59:26,969 -  ✓ https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u → 41 个源
+2026-04-25 11:59:27,200 -  ✓ https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u → 11 个源
+2026-04-25 11:59:27,419 -  ✓ https://live.hacks.tools/tv/ipv4/categories/纪录频道.m3u → 34 个源
+2026-04-25 11:59:27,619 -  ✓ https://live.hacks.tools/tv/ipv4/categories/其他频道.m3u → 115 个源
+2026-04-25 11:59:27,851 -  ✓ https://live.hacks.tools/tv/ipv4/categories/数字频道.m3u → 6 个源
+2026-04-25 11:59:28,040 -  ✓ https://live.hacks.tools/tv/ipv4/categories/体育频道.m3u → 4 个源
+2026-04-25 11:59:28,276 -  ✓ https://live.hacks.tools/tv/ipv4/categories/卫视频道.m3u → 44 个源
+2026-04-25 11:59:28,467 -  ✓ https://live.hacks.tools/tv/ipv4/categories/戏曲频道.m3u → 6 个源
+2026-04-25 11:59:28,648 -  ✓ https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u → 39 个源
+2026-04-25 11:59:28,885 -  ✓ https://live.hacks.tools/tv/ipv4/categories/音乐频道.m3u → 2 个源
+2026-04-25 11:59:29,078 -  ✓ https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u → 2 个源
+2026-04-25 11:59:29,272 -  ✓ https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u → 78 个源
+2026-04-25 11:59:29,461 -  ✓ https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u → 4 个源
+2026-04-25 11:59:29,686 -  ✓ https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u → 2 个源
+2026-04-25 11:59:30,669 -  ✓ https://tv.850930.xyz/kdsb.txt → 5167 个源
+2026-04-25 11:59:30,808 -  ✓ https://tv.850930.xyz/pix.m3u → 59 个源
+2026-04-25 11:59:30,902 -  ✓ https://live.zbds.org/tv/iptv4.txt → 1049 个源
+2026-04-25 11:59:31,242 -  ✓ https://iptv.zsdc.eu.org/home/iptv.m3u8 → 154 个源
+2026-04-25 11:59:31,817 -  ✓ https://freetv.fun/test_channels_original_new.txt → 4 个源
+2026-04-25 11:59:33,065 -  ✓ https://jihulab.com/-/snippets/5265/raw/main/.txt → 19 个源
+2026-04-25 11:59:33,140 -  ✓ https://iptv-org.github.io/iptv/languages/zho.m3u → 207 个源
+2026-04-25 11:59:33,447 -  ✓ https://iptv-org.github.io/iptv/countries/us.m3u → 1355 个源
+2026-04-25 11:59:33,506 -  ✓ https://iptv-org.github.io/iptv/countries/tw.m3u → 23 个源
+2026-04-25 11:59:36,594 -  ✓ https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-afc9-7b323e3e16c0/d4fe44c5-107c → 1830 个源
+2026-04-25 11:59:37,410 -  ✗ https://fm1077.serv00.net/SmartTV.m3u → 异常: HTTP Error 403: Forbidden
+2026-04-25 11:59:37,483 -  ✓ https://m3u.ibert.me/txt/fmml_ipv6.txt → 82 个源
+2026-04-25 11:59:37,540 -  ✓ https://m3u.ibert.me/txt/ycl_iptv.txt → 90 个源
+2026-04-25 11:59:37,599 -  ✓ https://m3u.ibert.me/txt/y_g.txt → 125 个源
+2026-04-25 11:59:37,868 -  ✓ https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt → 483 个源
+2026-04-25 11:59:43,669 -  ✓ https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F%A3/IPV6.txt → 185 个源
+2026-04-25 11:59:44,259 -  ✓ http://tot.totalh.net/tttt.txt → 760 个源
+2026-04-25 11:59:44,259 - urls.txt 完成：91 个节点 → 86253 个源
+2026-04-25 11:59:44,260 - 开始读取本地源目录 /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls，共 98 个文件
+2026-04-25 11:59:44,696 - 本地源目录读取完成，新增 19751 条源（目录: /home/runner/work/IPTV-LIVE/IPTV-LIVE/assets/my_urls）
+2026-04-25 11:59:44,696 - 本地源（目录）产生 19751 条源
+2026-04-25 11:59:46,938 - 待检测 13643 条
+2026-04-25 12:12:01,713 - 黑名单更新，新增462条
+2026-04-25 12:12:01,745 - ⚡ 速度优选: 有效源 13136 条 → 保留最快 20 条 | 速度范围: 0ms ~ 54.94ms | 淘汰 13116 条慢源
+2026-04-25 12:12:01,773 - ===== 检测完成 | 总计:13643 | 流:6421 | 列表:4886 | 未知:1829 | 超时:507 | 最快20条入白名单 | 耗时:789s =====
+2026-04-25 12:12:01,786 - 正在同步到GitHub仓库...
