@@ -1,13 +1,13 @@
 name: 'WhiteList BlackList'
-于:
+on:
   schedule:
-    - cron: '0 17 * * *'
+    - cron: '0 16 * * 4'
   workflow_dispatch:
     inputs:
       source_urls:
         description: '直播源地址（多个用空格/换行/逗号分隔，留空=使用urls.txt）'
         required: false
-        默认: ''
+        default: ''
 
 jobs:
   run-job:
