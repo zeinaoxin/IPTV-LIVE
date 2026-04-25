@@ -19,7 +19,9 @@ SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
 ASSETS_DIR = os.path.dirname(SCRIPT_DIR)
 PROJECT_ROOT = os.path.dirname(ASSETS_DIR)
+
 MY_URLS_DIR = os.path.join(ASSETS_DIR, "my_urls")
+
 FILE_PATHS = {
     "urls": os.path.join(ASSETS_DIR, "urls.txt"),
     "blacklist_auto": os.path.join(SCRIPT_DIR, "blacklist_auto.txt"),
@@ -30,23 +32,24 @@ FILE_PATHS = {
 }
 
 # ==============================================
-# 日志配置（优化：增加DEBUG级别和详细格式）
+# 日志配置
 # ==============================================
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(lineno)d - %(message)s',
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
     handlers=[
         logging.FileHandler(FILE_PATHS["log"], mode='w', encoding='utf-8'),
         logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger(__name__)
-logger.info("=" * 80)
+
+logger.info("=" * 60)
 logger.info(f"项目根目录: {PROJECT_ROOT}")
 logger.info(f"脚本目录: {SCRIPT_DIR}")
 logger.info(f"assets目录: {ASSETS_DIR}")
 logger.info(f"本地源目录: {MY_URLS_DIR} ({'存在' if os.path.isdir(MY_URLS_DIR) else '不存在'})")
-logger.info("=" * 80)
+logger.info("=" * 60)
 
 # ==============================================
 # 全局配置
@@ -60,8 +63,8 @@ class Config:
     MAX_FASTEST = 20
     # ---- 优化参数 ----
     MIN_RESPONSE_TIME = 50  # 最小有效响应时间（ms），屏蔽0ms等无效源
-    MAX_RETRIES = 2  # 重试次数
-    RETRY_TIMEOUT = 2.0  # 重试超时时间
+    MAX_RETRIES = 2        # 重试次数
+    RETRY_TIMEOUT = 2.0    # 重试超时时间
 
 # ==============================================
 # 正则：从任意文本中提取所有 http(s) URL
@@ -75,35 +78,33 @@ def git_commit_push():
     try:
         logger.info("正在同步到GitHub仓库...")
         os.chdir(PROJECT_ROOT)
-        subprocess.run(["git", "config", "--global", "user.name", "IPTV-Auto-Bot"], check=True, capture_output=True, text=True)
-        subprocess.run(["git", "config", "--global", "user.email", "bot@noreply.github.com"], check=True, capture_output=True, text=True)
-        
+
+        subprocess.run(["git", "config", "--global", "user.name", "IPTV-Auto-Bot"], check=True, capture_output=True)
+        subprocess.run(["git", "config", "--global", "user.email", "bot@noreply.github.com"], check=True, capture_output=True)
+
         status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True).stdout.strip()
         if not status:
             logger.info("✅ 无文件变更，无需提交")
             return True
-        
-        subprocess.run(
-            [
-                "git", "add", 
-                FILE_PATHS["blacklist_auto"], 
-                FILE_PATHS["whitelist_auto"], 
-                FILE_PATHS["whitelist_respotime"], 
-                FILE_PATHS["log"]
-            ], 
-            check=True, capture_output=True, text=True
-        )
-        
-        subprocess.run(["git", "commit", "-m", "Auto update whitelist and blacklist"], check=True, capture_output=True, text=True)
-        
+
+        subprocess.run([
+            "git", "add",
+            FILE_PATHS["blacklist_auto"],
+            FILE_PATHS["whitelist_auto"],
+            FILE_PATHS["whitelist_respotime"],
+            FILE_PATHS["log"],
+        ], check=True, capture_output=True)
+
+        subprocess.run(["git", "commit", "-m", "Auto update whitelist and blacklist"], check=True, capture_output=True)
+
         gh_token = os.getenv("GITHUB_TOKEN")
         repo = os.getenv("GITHUB_REPOSITORY")
         if gh_token and repo:
             push_url = f"https://x-access-token:{gh_token}@github.com/{repo}.git"
-            subprocess.run(["git", "push", push_url, "HEAD"], check=True, capture_output=True, text=True)
+            subprocess.run(["git", "push", push_url, "HEAD"], check=True, capture_output=True)
         else:
-            subprocess.run(["git", "push"], check=True, capture_output=True, text=True)
-        
+            subprocess.run(["git", "push"], check=True, capture_output=True)
+
         logger.info("✅ 已同步到GitHub仓库！")
         return True
     except subprocess.CalledProcessError as e:
@@ -112,7 +113,7 @@ def git_commit_push():
             hint = f" [ACTIONS={os.getenv('GITHUB_ACTIONS','?')} REPO={os.getenv('GITHUB_REPOSITORY','?')}]"
         except Exception:
             pass
-        logger.warning(f"Git推送失败:{hint} {e.stderr if e.stderr else ''}")
+        logger.warning(f"Git推送失败:{hint} {e.stderr.decode('utf-8','ignore') if e.stderr else ''}")
         return False
     except Exception as e:
         logger.warning(f"Git异常: {e}")
@@ -122,23 +123,32 @@ def git_commit_push():
 # 域名黑名单
 # ==============================================
 DOMAIN_BLACKLIST: Set[str] = {
-    "iptv.catvod.com", "dd.ddzb.fun", "goodiptv.club", "jiaojirentv.top", "alist.xicp.fun", "rihou.cc",
-    "php.jdshipin.com", "t.freetv.fun", "stream1.freetv.fun", "hlsztemgsplive.miguvideo", "stream2.freetv.fun",
+    "iptv.catvod.com",
+    "dd.ddzb.fun",
+    "goodiptv.club",
+    "jiaojirentv.top",
+    "alist.xicp.fun",
+    "rihou.cc",
+    "php.jdshipin.com",
+    "t.freetv.fun",
+    "stream1.freetv.fun",
+    "hlsztemgsplive.miguvideo",
+    "stream2.freetv.fun",
 }
 
 def url_matches_domain_blacklist(url: str) -> bool:
     try:
         host = (urlparse(url).hostname or "").lower()
         return any(host == d or host.endswith("." + d) for d in DOMAIN_BLACKLIST)
-    except Exception as e:
-        logger.error(f"域名黑名单匹配异常: {url}, 错误: {e}")
+    except Exception:
         return False
 
 # ==============================================
 # 点播/图片过滤
 # ==============================================
 VOD_DOMAINS: Set[str] = {
-    "kwimgs.com", "kuaishou.com", "ixigua.com", "douyin.com", "tiktokcdn.com", "bdstatic.com", "byteimg.com"
+    "kwimgs.com", "kuaishou.com", "ixigua.com", "douyin.com",
+    "tiktokcdn.com", "bdstatic.com", "byteimg.com"
 }
 VOD_EXTS: Set[str] = {".mp4", ".mkv", ".avi", ".wmv", ".mov", ".rmvb"}
 IMG_EXTS: Set[str] = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg"}
@@ -150,8 +160,7 @@ def is_vod_or_image_url(url: str) -> bool:
             return True
         path = urlparse(url).path.lower()
         return path.endswith(tuple(VOD_EXTS)) or path.endswith(tuple(IMG_EXTS))
-    except Exception as e:
-        logger.error(f"点播/图片URL检测异常: {url}, 错误: {e}")
+    except Exception:
         return False
 
 # ==============================================
@@ -166,53 +175,37 @@ CLEAN_VOD = "vod_filtered"
 
 def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
     if not line:
-        logger.debug(f"行无效: 空行, 原因: CLEAN_NO_FORMAT")
         return None, CLEAN_NO_FORMAT
-    
     line = line.replace("\r", "").replace("\n", " ").strip()
     if "," not in line or "://" not in line:
-        logger.debug(f"行格式无效: {line[:50]}..., 原因: CLEAN_NO_FORMAT")
         return None, CLEAN_NO_FORMAT
-    
     idx = line.find("://")
     if idx < 1:
-        logger.debug(f"URL格式无效: {line[:50]}..., 原因: CLEAN_BAD_URL")
         return None, CLEAN_BAD_URL
-    
     prefix = line[: idx - 1]
     pos = prefix.rfind(",")
     if pos < 0:
-        logger.debug(f"行格式无效: 缺少逗号分隔, 原因: CLEAN_NO_FORMAT")
         return None, CLEAN_NO_FORMAT
-    
     name = re.sub(r"\s{2,}", " ", prefix[:pos].strip())
     if not name:
-        logger.debug(f"频道名无效: 空名称, 原因: CLEAN_EMPTY_NAME")
         return None, CLEAN_EMPTY_NAME
-    
     rest = line[pos + 1:].strip()
     url = rest.split(",")[0].strip().split("$")[0].split("#")[0].strip()
     if not url or "://" not in url:
-        logger.debug(f"URL无效: {url}, 原因: CLEAN_BAD_URL")
         return None, CLEAN_BAD_URL
-    
     if url_matches_domain_blacklist(url):
-        logger.debug(f"URL被域名黑名单拦截: {url}, 原因: CLEAN_DOMAIN_BL")
         return None, CLEAN_DOMAIN_BL
-    
     if is_vod_or_image_url(url):
-        logger.debug(f"URL被点播/图片过滤: {url}, 原因: CLEAN_VOD")
         return None, CLEAN_VOD
-    
-    logger.debug(f"行清洗成功: 频道名={name}, URL={url}")
     return (name, url), CLEAN_OK
 
 # ==============================================
 # 媒体类型判定
 # ==============================================
 STREAM_CTS = [
-    "video/mp2t", "video/mp4", "video/x-flv", "application/vnd.apple.mpegurl",
-    "application/octet-stream", "application/x-mpegURL"
+    "video/mp2t", "video/mp4", "video/x-flv",
+    "application/vnd.apple.mpegurl", "application/octet-stream",
+    "application/x-mpegURL"
 ]
 
 def is_stream_ct(ct):
@@ -224,17 +217,16 @@ def is_html_ct(ct):
 def _read_chunk(resp, n=4096):
     try:
         return resp.read(n)
-    except Exception as e:
-        logger.error(f"读取响应数据异常: {e}")
+    except Exception:
         return b""
 
 def _looks_media(d):
     if not d:
         return False
     return (
-        d[:3] == b"FLV" or 
-        (len(d) >= 8 and d[4:8] == b"ftyp") or 
-        d[:3] == b"ID3" or 
+        d[:3] == b"FLV" or
+        (len(d) >= 8 and d[4:8] == b"ftyp") or
+        d[:3] == b"ID3" or
         (len(d) >= 188 and d[0] == 0x47)
     )
 
@@ -256,38 +248,33 @@ class StreamChecker:
         self.new_failed_urls: Set[str] = set()
         self.manual_urls = manual_urls or []
         self.clean_stats: Dict[str, int] = {
-            CLEAN_NO_FORMAT: 0,
-            CLEAN_EMPTY_NAME: 0,
-            CLEAN_BAD_URL: 0,
-            CLEAN_DOMAIN_BL: 0,
-            CLEAN_VOD: 0
-        }
-        self.fetch_stats = {
-            "total_urls": 0,
-            "success": 0,
-            "failed": 0,
-            "skipped": 0
+            CLEAN_NO_FORMAT: 0, CLEAN_EMPTY_NAME: 0, CLEAN_BAD_URL: 0,
+            CLEAN_DOMAIN_BL: 0, CLEAN_VOD: 0
         }
 
     # ---------- 本地源读取（assets/my_urls/*.txt） ----------
     def read_my_urls_dir(self, dirpath: str) -> List[str]:
-        """读取指定目录下所有 .txt 文件，支持两种行格式：- 组名,URL（标准）- 纯URL 返回清洗后的 '组名,URL' 行列表。"""
+        """
+        读取指定目录下所有 .txt 文件，支持两种行格式：
+        - 组名,URL（标准）
+        - 纯URL
+        返回清洗后的 '组名,URL' 行列表。
+        """
         lines: List[str] = []
         if not os.path.isdir(dirpath):
             logger.warning(f"本地源目录不存在，已跳过: {dirpath}")
             return lines
-        
+
         txt_files = sorted(
             [f for f in os.listdir(dirpath) if f.lower().endswith(".txt") and os.path.isfile(os.path.join(dirpath, f))]
         )
-        
         if not txt_files:
             logger.warning(f"本地源目录下无 .txt 文件，已跳过: {dirpath}")
             return lines
-        
+
         logger.info(f"开始读取本地源目录 {dirpath}，共 {len(txt_files)} 个文件")
+
         total_before = len(lines)
-        
         for fn in txt_files:
             fpath = os.path.join(dirpath, fn)
             try:
@@ -296,14 +283,14 @@ class StreamChecker:
                         raw_line = raw_line.strip()
                         if not raw_line or raw_line.startswith("#"):
                             continue
-                        
+
                         # 先尝试清洗为"组名,URL"标准行
                         res, reason = clean_source_line(raw_line)
                         if res:
                             name, url = res
                             lines.append(f"{name},{url}")
                             continue
-                        
+
                         # 如果标准格式解析失败，尝试当作纯URL
                         if re.match(r'https?://', raw_line, re.I):
                             u = raw_line.split(",")[0].split("$")[0].split("#")[0].strip()
@@ -311,13 +298,12 @@ class StreamChecker:
                                 lines.append(f"本地,{u}")
             except Exception as e:
                 logger.warning(f"读取本地源文件失败（已跳过）: {fpath}，原因: {e}")
-        
+
         added = len(lines) - total_before
         if added > 0:
             logger.info(f"本地源目录读取完成，新增 {added} 条源（目录: {dirpath}）")
         else:
             logger.info(f"本地源目录未产生有效源（目录: {dirpath}）")
-        
         return lines
 
     # ---------- 黑名单读写 ----------
@@ -340,20 +326,16 @@ class StreamChecker:
 
     def _save_blacklist(self):
         if not self.new_failed_urls:
-            logger.debug("无新失败URL，跳过黑名单更新")
             return
-        
         try:
             existing, has_h = [], False
             if os.path.exists(FILE_PATHS["blacklist_auto"]):
                 with open(FILE_PATHS["blacklist_auto"], "r", encoding="utf-8") as f:
                     existing = [l.rstrip("\n") for l in f]
-                
                 for l in existing[:5]:
                     if l.startswith("更新时间"):
                         has_h = True
                         break
-            
             parts = []
             if not has_h:
                 bj = datetime.now(timezone.utc) + timedelta(hours=8)
@@ -363,7 +345,6 @@ class StreamChecker:
                     "",
                     "blacklist,#genre#"
                 ]
-            
             seen = set()
             for l in existing:
                 if l and not l.startswith(("更新时间", "#")):
@@ -371,14 +352,11 @@ class StreamChecker:
                     if u:
                         seen.add(u)
                     parts.append(l)
-            
             for u in self.new_failed_urls:
                 if u not in seen:
                     parts.append(u)
-            
             with open(FILE_PATHS["blacklist_auto"], "w", encoding="utf-8") as f:
                 f.write("\n".join(parts))
-            
             logger.info(f"黑名单更新，新增{len(self.new_failed_urls)}条")
         except Exception as e:
             logger.error(f"保存黑名单失败: {e}")
@@ -388,9 +366,9 @@ class StreamChecker:
         try:
             with open(path, "r", encoding="utf-8") as f:
                 c = f.read()
-                if split_by_space:
-                    return [l.strip() for l in re.split(r"[\s\t\n]+", c) if l.strip().startswith("http")]
-                return [l.strip() for l in c.splitlines() if l.strip()]
+            if split_by_space:
+                return [l.strip() for l in re.split(r"[\s\t\n]+", c) if l.strip().startswith("http")]
+            return [l.strip() for l in c.splitlines() if l.strip()]
         except Exception as e:
             logger.warning(f"读取失败 {path}: {e}")
             return []
@@ -409,65 +387,45 @@ class StreamChecker:
                 
                 # ---- 优化：屏蔽0ms等无效响应 ----
                 if ms < Config.MIN_RESPONSE_TIME:
-                    logger.debug(f"URL响应过快（{ms}ms < {Config.MIN_RESPONSE_TIME}ms）: {url}")
                     return False, ms, f"{ms}ms_too_fast", "timeout"
                 
                 ok = 200 <= code < 400 or code in (301, 302)
                 if not ok:
-                    logger.debug(f"URL响应状态码无效: {code}, URL: {url}")
                     return False, ms, str(code), None
-                
                 if is_html_ct(ct) or _looks_html(data):
-                    logger.debug(f"URL返回HTML内容，非流媒体: {url}")
                     return False, ms, f"{code}/html", "timeout"
-                
                 if is_stream_ct(ct) and _looks_media(data):
-                    logger.debug(f"URL确认是流媒体: {url}, 响应时间: {ms}ms")
                     return True, ms, str(code), "stream"
-                
                 if b"#EXTM3U" in data:
-                    logger.debug(f"URL是M3U播放列表: {url}, 响应时间: {ms}ms")
                     return True, ms, str(code), "playlist"
-                
-                logger.debug(f"URL类型未知但有效: {url}, 响应时间: {ms}ms")
                 return True, ms, str(code), "unknown"
         except Exception as e:
             ms = round((time.perf_counter() - s) * 1000, 2)
-            logger.error(f"检查URL异常: {url}, 错误: {e}", exc_info=True)
             return False, ms, str(e), "timeout"
 
     def check_url(self, url, is_whitelist=False):
         t = Config.TIMEOUT_WHITELIST if is_whitelist else Config.TIMEOUT_CHECK
         if url_matches_domain_blacklist(url):
-            logger.debug(f"URL被域名黑名单拦截: {url}")
             return False, 0, "blacklist", "blacklist"
-        
         if url.startswith(("http://", "https://")):
             return self.check_http(url, t)
-        
-        logger.debug(f"URL格式无效（非http/https）: {url}")
         return True, 0, "ok", "stream"
 
     # ---------- 远程源拉取 ----------
     def fetch_remote(self, urls):
         all_lines = []
-        self.fetch_stats["total_urls"] = len(urls)
-        logger.info(f"开始拉取 {len(urls)} 个远程节点")
-        
         for raw_url in urls:
-            self.fetch_stats["total_urls"] += 1
             try:
                 safe_url = quote(unquote(raw_url), safe=":/?&=#%")
             except Exception:
                 safe_url = raw_url
-            
             try:
                 ctx = ssl._create_unverified_context()
                 req = urllib.request.Request(safe_url, headers={"User-Agent": Config.USER_AGENT})
                 with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=15) as r:
                     c = r.read().decode("utf-8", errors="replace")
                     before = len(all_lines)
-                    
+
                     # ---------- M3U 格式 ----------
                     if "#EXTM3U" in c[:200]:
                         name = ""
@@ -475,7 +433,6 @@ class StreamChecker:
                             l = l.strip()
                             if not l:
                                 continue
-                            
                             if l.startswith("#EXTINF"):
                                 m_group = re.search(r'group-title\s*=\s*["\']?([^"\',]+)', l)
                                 name = m_group.group(1).strip() if m_group else (l.split(",")[-1].strip() if "," in l else "")
@@ -484,19 +441,15 @@ class StreamChecker:
                                 if not url_candidate:
                                     name = ""
                                     continue
-                                
                                 if not re.match(r'https?://', url_candidate, re.I):
                                     url_candidate = urljoin(raw_url, url_candidate)
-                                
                                 if url_matches_domain_blacklist(url_candidate) or is_vod_or_image_url(url_candidate):
                                     name = ""
                                     continue
-                                
                                 group = name if name else "订阅源"
                                 res, _ = clean_source_line(f"{group},{url_candidate}")
                                 all_lines.append(f"{res[0]},{res[1]}" if res else f"{group},{url_candidate}")
                                 name = ""
-                    
                     else:
                         # ---------- 非 M3U ----------
                         raw_urls_found = RE_ALL_URLS.findall(c)
@@ -505,7 +458,7 @@ class StreamChecker:
                             if not u or is_vod_or_image_url(u) or url_matches_domain_blacklist(u):
                                 continue
                             all_lines.append(f"订阅源,{u}")
-                        
+
                         if len(all_lines) == before:
                             for l in c.splitlines():
                                 l = l.strip()
@@ -514,7 +467,6 @@ class StreamChecker:
                                 res, _ = clean_source_line(l)
                                 if res:
                                     all_lines.append(f"{res[0]},{res[1]}")
-                        
                         if len(all_lines) == before:
                             for l in c.splitlines():
                                 l = l.strip()
@@ -524,24 +476,18 @@ class StreamChecker:
                                     part = part.strip().rstrip(".,;:!?)")
                                     if re.match(r'https?://', part, re.I) and not is_vod_or_image_url(part) and not url_matches_domain_blacklist(part):
                                         all_lines.append(f"订阅源,{part}")
-                    
+
                     got = len(all_lines) - before
                     if got > 1:
                         logger.info(f" ✓ {raw_url[:90]} → {got} 个源")
-                        self.fetch_stats["success"] += 1
                     elif got == 1:
                         diag = c[:500].replace("\n", "\\n").replace("\r", "")
                         logger.warning(f" ⚠ {raw_url[:90]} → 仅 {got} 个源 | 内容诊断: {diag}")
-                        self.fetch_stats["success"] += 1
                     else:
                         preview = c[:200].replace("\n", "\\n")
                         logger.warning(f" ✗ {raw_url[:90]} → 0 个源 | 内容: {preview}")
-                        self.fetch_stats["failed"] += 1
             except Exception as e:
-                logger.error(f" ✗ {raw_url[:90]} → 异常: {e}", exc_info=True)
-                self.fetch_stats["failed"] += 1
-        
-        logger.info(f"远程源拉取完成: 总节点 {self.fetch_stats['total_urls']} → 有效源 {len(all_lines)}")
+                logger.error(f" ✗ {raw_url[:90]} → 异常: {e}")
         return all_lines
 
     # ---------- 手动白名单 ----------
@@ -563,57 +509,47 @@ class StreamChecker:
             if not res:
                 self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
                 continue
-            
             _, url = res
             if url in seen:
-                logger.debug(f"URL重复: {url}, 已跳过")
                 continue
-            
             seen.add(url)
             if url in self.blacklist_urls:
-                logger.debug(f"URL在黑名单中: {url}, 已跳过")
                 continue
-            
             to_check.append((url, line))
-        
-        logger.info(f"待检测 {len(to_check)} 条（去重后 {len(seen)} 条）")
+        logger.info(f"待检测 {len(to_check)} 条")
         return to_check, []
 
     # ---------- 主流程 ----------
     def run(self):
         logger.info("===== 开始流媒体检测 =====")
         self.load_whitelist()
-        
+
         lines = []
+
         # 远程源（urls.txt）
-        start_fetch = time.time()
         urls = self.read_file(FILE_PATHS["urls"], split_by_space=True)
         if urls:
             logger.info(f"开始拉取 urls.txt 中的 {len(urls)} 个节点")
             fetched = self.fetch_remote(urls)
-            logger.info(f"urls.txt 完成: {len(urls)} 个节点 → {len(fetched)} 个源，耗时: {time.time() - start_fetch:.2f}s")
+            logger.info(f"urls.txt 完成：{len(urls)} 个节点 → {len(fetched)} 个源")
             lines.extend(fetched)
         else:
             logger.warning("未找到 urls.txt")
-        
+
         # 本地源（assets/my_urls/*.txt）
-        start_local = time.time()
         my_urls_lines = self.read_my_urls_dir(MY_URLS_DIR)
         if my_urls_lines:
-            logger.info(f"本地源（目录）产生 {len(my_urls_lines)} 条源，耗时: {time.time() - start_local:.2f}s")
+            logger.info(f"本地源（目录）产生 {len(my_urls_lines)} 条源")
             lines.extend(my_urls_lines)
-        
+
         # 手动白名单 + 脚本传入
         lines.extend(self.whitelist_lines)
         lines.extend(self.manual_urls)
-        
+
         # 去重、过滤黑名单后进行测速
-        start_prepare = time.time()
         to_check, _ = self.prepare_lines(lines)
-        logger.info(f"准备完成: 耗时 {time.time() - start_prepare:.2f}s, 待检测 {len(to_check)} 条")
-        
+
         results = []
-        start_check = time.time()
         with ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as pool:
             fmap = {pool.submit(self.check_url, u, u in self.whitelist_urls): u for u, _ in to_check}
             for fut in as_completed(fmap):
@@ -624,29 +560,26 @@ class StreamChecker:
                     if not s and url not in self.whitelist_urls:
                         self.new_failed_urls.add(url)
                 except Exception as e:
-                    logger.error(f"检测异常 {url}: {e}", exc_info=True)
+                    logger.error(f"检测异常 {url}: {e}")
                     self.new_failed_urls.add(url)
-        
-        self._save_blacklist()
-        logger.info(f"测速完成: 耗时 {time.time() - start_check:.2f}s, 检测 {len(to_check)} 条URL")
 
-    # ==============================
-    # 速度优选核心逻辑
-    # ==============================
-    def optimize_by_speed(self, results):
-        logger.info("===== 开始速度优选 =====")
+        self._save_blacklist()
+
+        # ==============================
+        # 速度优选核心逻辑
+        # ==============================
         # 排除 timeout / blacklist，仅保留有效源
-        valid_results = [(url, ms, code, kind) for url, ms, code, kind in results if kind not in ("timeout", "blacklist")]
-        logger.info(f"有效源数量: {len(valid_results)}")
-        
+        valid_results = [(url, ms, code, kind) for url, ms, code, kind in results
+                         if kind not in ("timeout", "blacklist")]
+
         # 按响应速度升序（ms 越小越快）
         valid_results.sort(key=lambda x: x[1])
-        
+
         # 取速度最快的前 N 条
         max_fast = Config.MAX_FASTEST
         fastest_results = valid_results[:max_fast]
         kept, discarded = len(fastest_results), len(valid_results) - len(fastest_results)
-        
+
         if discarded > 0:
             # 打印速度分界线，方便调优
             if fastest_results:
@@ -656,57 +589,40 @@ class StreamChecker:
                     f"⚡ 速度优选: 有效源 {len(valid_results)} 条 → 保留最快 {kept} 条 | "
                     f"速度范围: {fastest_ms}ms ~ {slowest_ms}ms | 淘汰 {discarded} 条慢源"
                 )
-            else:
-                logger.info(f"⚡ 速度优选: 有效源 {len(valid_results)} 条（≤{max_fast}），全部保留")
         else:
-            logger.info(f"⚡ 速度优选: 有效源 {len(valid_results)} 条，全部保留")
-        
-        return fastest_results
+            logger.info(f"⚡ 速度优选: 有效源 {len(valid_results)} 条（≤{max_fast}），全部保留")
 
-    # ==============================
-    # 写入文件
-    # ==============================
-    def write_files(self, results, fastest_results):
+        # ==============================
+        # 写入文件
+        # ==============================
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
-        
+
         # whitelist_respotime.txt —— 保留全量测速记录（含超时/黑名单），方便排查
-        start_write = time.time()
         results.sort(key=lambda x: ({"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]))
         with open(FILE_PATHS["whitelist_respotime"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
             for url, ms, code, kind in results:
                 f.write(f"{ms},{url},{code},{kind}\n")
-        logger.info(f"写入whitelist_respotime.txt完成: 耗时 {time.time() - start_write:.2f}s")
-        
+
         # whitelist_auto.txt —— 仅写入速度最快的前 N 条（最终给 live.txt 使用）
-        start_write_auto = time.time()
         with open(FILE_PATHS["whitelist_auto"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
             for url, _, _, kind in fastest_results:
                 f.write(f"自动,{url}\n")
-        logger.info(f"写入whitelist_auto.txt完成: 耗时 {time.time() - start_write_auto:.2f}s")
 
-    # ==============================
-    # 统计日志
-    # ==============================
-    def log_statistics(self, results, fastest_results):
+        # ==============================
+        # 统计日志
+        # ==============================
         total = len(results)
         stream = sum(1 for *_, k in results if k == "stream")
         playlist = sum(1 for *_, k in results if k == "playlist")
         unknown = sum(1 for *_, k in results if k == "unknown")
         timeout_count = sum(1 for *_, k in results if k == "timeout")
         elapsed = (datetime.now() - self.start_time).seconds
-        
         logger.info(
             f"===== 检测完成 | 总计:{total} | 流:{stream} | 列表:{playlist} | "
-            f"未知:{unknown} | 超时:{timeout_count} | 最快{len(fastest_results)}条入白名单 | 耗时:{elapsed}s ====="
+            f"未知:{unknown} | 超时:{timeout_count} | 最快{kept}条入白名单 | 耗时:{elapsed}s ====="
         )
-        
-        # 打印清洗统计
-        logger.info(f"清洗统计: {self.clean_stats}")
-        
-        # 打印拉取统计
-        logger.info(f"远程源拉取统计: {self.fetch_stats}")
 
 # ==============================================
 # 主函数
@@ -716,16 +632,6 @@ def main():
         logger.info("===== 开始执行 =====")
         checker = StreamChecker()
         checker.run()
-        
-        # 速度优选
-        fastest_results = checker.optimize_by_speed(checker.results)
-        
-        # 写入文件
-        checker.write_files(checker.results, fastest_results)
-        
-        # 统计日志
-        checker.log_statistics(checker.results, fastest_results)
-        
         git_commit_push()
         logger.info("===== 全部流程执行完成 =====")
     except Exception as e:
