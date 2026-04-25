@@ -1,5 +1,5 @@
 更新时间,#genre#
-20260425 20:27,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8
+20260425 20:34,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8
 
 
 央视频道,#genre#
@@ -1119,13 +1119,11 @@ TVBS亚洲,http://38.64.72.148/hls/modn/list/4005/chunklist1.m3u8?
 无线新闻,http://cdn9.163189.xyz/smt1.1.php?id=inews_twn
 无线新闻,https://cdn6.101.qzz.io/163189/wxxw
 无线新闻,http://aktv.top/AKTV/live/aktv/null-20/AKTV.m3u8
-无线新闻,https://cdn6.163189.xyz/163189/wxxw
 无线新闻,rtmp://oc-play-ali.vipkid.com.cn/live/xianajiaoge-wxxw
 无线新闻,https://cdn9.163189.xyz/smt3.1.1.php?id=inews_twn
 ViuTV,http://r.jdshipin.com/vSJvl
 ViuTV,http://r.jdshipin.com/TcKr2
 ViuTV,https://cdn.163189.xyz/163189/viu
-Now新闻台,https://cdn.163189.xyz/163189/now
 八大戏剧台,http://61.221.215.25:8800/hls/39/index.m3u8
 三立戏剧,http://61.221.215.25:8800/hls/41/index.m3u8
 三立综合台,p3p://focus169.org:47731/64251e49000e34e7ea57d28a25014df2
