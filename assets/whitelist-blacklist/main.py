@@ -13,14 +13,14 @@ import sys
 import subprocess
 
 # ==============================================
-# 路径配置 智普清言 本地文件夹验证版本
+# 路径配置 智普清言 本地文件夹源 带测速
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
 ASSETS_DIR = os.path.dirname(SCRIPT_DIR)
 PROJECT_ROOT = os.path.dirname(ASSETS_DIR)
 
-MY_URLS_DIR = os.path.join(ASSETS_DIR, "my_urls")  # 本地源目录（含若干 .txt）
+MY_URLS_DIR = os.path.join(ASSETS_DIR, "my_urls")
 
 FILE_PATHS = {
     "urls": os.path.join(ASSETS_DIR, "urls.txt"),
@@ -60,6 +60,8 @@ class Config:
     TIMEOUT_CHECK = 3.0
     TIMEOUT_WHITELIST = 4.5
     MAX_WORKERS = 30
+    # ---- 速度优选：仅保留测速最快的前 N 条有效源写入白名单 ----
+    MAX_FASTEST = 20
 
 # ==============================================
 # 正则：从任意文本中提取所有 http(s) URL
@@ -253,7 +255,7 @@ class StreamChecker:
         读取指定目录下所有 .txt 文件，支持两种行格式：
         - 组名,URL（标准）
         - 纯URL
-        返回清洗后的 '组名,URL' 行列表（复用 clean_source_line）。
+        返回清洗后的 '组名,URL' 行列表。
         """
         lines: List[str] = []
         if not os.path.isdir(dirpath):
@@ -279,7 +281,7 @@ class StreamChecker:
                         if not raw_line or raw_line.startswith("#"):
                             continue
 
-                        # 先尝试清洗为“组名,URL”标准行
+                        # 先尝试清洗为"组名,URL"标准行
                         res, reason = clean_source_line(raw_line)
                         if res:
                             name, url = res
@@ -291,7 +293,6 @@ class StreamChecker:
                             u = raw_line.split(",")[0].split("$")[0].split("#")[0].strip()
                             if u and not url_matches_domain_blacklist(u) and not is_vod_or_image_url(u):
                                 lines.append(f"本地,{u}")
-                        # 其他格式直接丢弃（不记日志以避免刷屏）
             except Exception as e:
                 logger.warning(f"读取本地源文件失败（已跳过）: {fpath}，原因: {e}")
 
@@ -527,7 +528,7 @@ class StreamChecker:
         else:
             logger.warning("未找到 urls.txt")
 
-        # 本地源（assets/my_urls/*.txt）——已替换 my_urls.txt 逻辑
+        # 本地源（assets/my_urls/*.txt）
         my_urls_lines = self.read_my_urls_dir(MY_URLS_DIR)
         if my_urls_lines:
             logger.info(f"本地源（目录）产生 {len(my_urls_lines)} 条源")
@@ -556,30 +557,65 @@ class StreamChecker:
 
         self._save_blacklist()
 
-        results.sort(key=lambda x: ({"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]))
+        # ==============================
+        # 速度优选核心逻辑
+        # ==============================
+        # 排除 timeout / blacklist，仅保留有效源
+        valid_results = [(url, ms, code, kind) for url, ms, code, kind in results
+                         if kind not in ("timeout", "blacklist")]
 
+        # 按响应速度升序（ms 越小越快）
+        valid_results.sort(key=lambda x: x[1])
+
+        # 取速度最快的前 N 条
+        max_fast = Config.MAX_FASTEST
+        fastest_results = valid_results[:max_fast]
+        kept, discarded = len(fastest_results), len(valid_results) - len(fastest_results)
+
+        if discarded > 0:
+            # 打印速度分界线，方便调优
+            if fastest_results:
+                slowest_ms = fastest_results[-1][1]
+                fastest_ms = fastest_results[0][1]
+                logger.info(
+                    f"⚡ 速度优选: 有效源 {len(valid_results)} 条 → 保留最快 {kept} 条 | "
+                    f"速度范围: {fastest_ms}ms ~ {slowest_ms}ms | 淘汰 {discarded} 条慢源"
+                )
+            else:
+                logger.info(f"⚡ 速度优选: 有效源 0 条，无可用源")
+        else:
+            logger.info(f"⚡ 速度优选: 有效源 {len(valid_results)} 条（≤{max_fast}），全部保留")
+
+        # ==============================
+        # 写入文件
+        # ==============================
         bj = datetime.now(timezone.utc) + timedelta(hours=8)
 
+        # whitelist_respotime.txt —— 保留全量测速记录（含超时/黑名单），方便排查
+        results.sort(key=lambda x: ({"stream": 0, "playlist": 1, "unknown": 2}.get(x[3], 3), x[1]))
         with open(FILE_PATHS["whitelist_respotime"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
             for url, ms, code, kind in results:
                 f.write(f"{ms},{url},{code},{kind}\n")
 
+        # whitelist_auto.txt —— 仅写入速度最快的前 N 条（最终给 live.txt 使用）
         with open(FILE_PATHS["whitelist_auto"], "w", encoding="utf-8") as f:
             f.write(f"更新时间,#genre#\n{bj.strftime('%Y%m%d %H:%M')}\n\n")
-            for url, _, _, kind in results:
-                if kind not in ("timeout", "blacklist"):
-                    f.write(f"自动,{url}\n")
+            for url, _, _, kind in fastest_results:
+                f.write(f"自动,{url}\n")
 
+        # ==============================
+        # 统计日志
+        # ==============================
         total = len(results)
         stream = sum(1 for *_, k in results if k == "stream")
         playlist = sum(1 for *_, k in results if k == "playlist")
         unknown = sum(1 for *_, k in results if k == "unknown")
-        timeout = sum(1 for *_, k in results if k == "timeout")
+        timeout_count = sum(1 for *_, k in results if k == "timeout")
         elapsed = (datetime.now() - self.start_time).seconds
         logger.info(
             f"===== 检测完成 | 总计:{total} | 流:{stream} | 列表:{playlist} | "
-            f"未知:{unknown} | 超时:{timeout} | 耗时:{elapsed}s ====="
+            f"未知:{unknown} | 超时:{timeout_count} | 最快{kept}条入白名单 | 耗时:{elapsed}s ====="
         )
 
 # ==============================================
