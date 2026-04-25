@@ -1,8 +1,7 @@
 name: 'WhiteList BlackList'
-
 于:
   schedule:
-    - cron: '0 17 * * *'          # 北京时间每天 1:00（UTC 17:00）
+    - cron: '0 17 * * *'
   workflow_dispatch:
     inputs:
       source_urls:
@@ -46,6 +45,7 @@ jobs:
         run: |
           sudo warp-cli --accept-tos registration new
           sudo warp-cli --accept-tos connect
+
           MAX_ATTEMPTS=6
           ATTEMPT=1
           while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
@@ -72,6 +72,7 @@ jobs:
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
           if git diff --cached --name-only | grep -q .; then
             git fetch origin main
             git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
