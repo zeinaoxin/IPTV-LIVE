@@ -22859,3 +22859,5 @@ urllib.error.URLError: <urlopen error timed out>
 2026-04-25 14:54:03,417 - INFO - main - log_statistics - 735 - 远程源拉取统计: {'total_urls': 182, 'success': 85723, 'failed': 5, 'skipped': 0}
 2026-04-25 14:54:03,417 - INFO - main - log_statistics - 738 - 错误统计: {'clean_no_format': 0, 'clean_empty_name': 0, 'clean_bad_url': 0, 'clean_domain_bl': 0, 'clean_vod': 0, 'fetch_success': 0, 'fetch_failed': 0, 'fetch_skipped': 0, 'check_timeout': 0, 'check_domain_bl': 0, 'check_vod': 0, 'check_html': 0, 'check_code_error': 0, 'check_unknown': 0}
 2026-04-25 14:54:03,418 - INFO - main - git_commit_push - 76 - 正在同步到GitHub仓库...
+2026-04-25 14:54:07,286 - INFO - main - git_commit_push - 107 - ✅ 已同步到GitHub仓库！
+2026-04-25 14:54:07,287 - INFO - main - main - 753 - ===== 全部流程执行完成 =====
