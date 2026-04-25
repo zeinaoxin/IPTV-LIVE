@@ -11,10 +11,9 @@ from typing import List, Tuple, Set, Dict, Optional
 import logging
 import sys
 import subprocess
-import json
 
 # ==============================================
-# 路径配置 智普清言
+# 路径配置  智普清言
 # ==============================================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_ABS_PATH)
@@ -24,7 +23,6 @@ PROJECT_ROOT = os.path.dirname(ASSETS_DIR)
 FILE_PATHS = {
     "my_urls": os.path.join(ASSETS_DIR, "my_urls.txt"),
     "urls": os.path.join(ASSETS_DIR, "urls.txt"),
-    "first_source": os.path.join(ASSETS_DIR, "111.txt"),
     "blacklist_auto": os.path.join(SCRIPT_DIR, "blacklist_auto.txt"),
     "whitelist_manual": os.path.join(SCRIPT_DIR, "whitelist_manual.txt"),
     "whitelist_auto": os.path.join(SCRIPT_DIR, "whitelist_auto.txt"),
@@ -37,11 +35,11 @@ FILE_PATHS = {
 # ==============================================
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    format='%(asctime)s - %(message)s',
     handlers=[
-        logging.FileHandler(FILE_PATHS["log"], mode="w", encoding="utf-8"),
-        logging.StreamHandler(sys.stdout),
-    ],
+        logging.FileHandler(FILE_PATHS["log"], mode='w', encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)
+    ]
 )
 logger = logging.getLogger(__name__)
 
@@ -62,489 +60,10 @@ class Config:
     TIMEOUT_WHITELIST = 4.5
     MAX_WORKERS = 30
 
-RE_ALL_URLS = re.compile(r"https?://[^\s,\'\"<>}\])]+")
-
 # ==============================================
-# 环境与工具（Xvfb + xclip + Chromium）
+# 正则：从任意文本中提取所有 http(s) URL
 # ==============================================
-def is_running_in_ci() -> bool:
-    return bool(os.getenv("GITHUB_ACTIONS") or os.getenv("CI"))
-
-def _setup_xvfb_and_deps() -> bool:
-    """
-    在 Linux CI 上：
-    - 启动 Xvfb（DISPLAY=:99）
-    - 安装 xclip（读取剪贴板）
-    - 安装 Chromium（/usr/bin/chromium）
-    返回：是否就绪（True/False）
-    """
-    if not sys.platform.startswith("linux"):
-        return True
-
-    logger.info("[Linux] 初始化桌面/剪贴板/浏览器...")
-
-    # 1) Xvfb
-    try:
-        os.environ["DISPLAY"] = ":99"
-        subprocess.Popen(
-            ["Xvfb", ":99", "-screen", "0", "1920x1080x24", "-ac", "+extension", "GLX"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        time.sleep(1)
-        logger.info("✅ Xvfb 已启动 (DISPLAY=:99)")
-    except Exception as e:
-        logger.warning(f"Xvfb 启动失败: {e}")
-
-    # 2) xclip
-    try:
-        subprocess.run(["which", "xclip"], check=True, capture_output=True, timeout=5)
-    except Exception:
-        try:
-            subprocess.run(
-                ["sudo", "apt-get", "update", "-qq"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60,
-            )
-            subprocess.run(
-                ["sudo", "apt-get", "install", "-y", "-qq", "xclip"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60,
-            )
-            logger.info("✅ xclip 已安装")
-        except Exception as e:
-            logger.warning(f"xclip 安装失败: {e}")
-
-    # 3) Chromium（优先已有；若没有则安装）
-    chromium_candidates = [
-        "/usr/bin/chromium",
-        "/usr/bin/chromium-browser",
-        "/usr/bin/google-chrome-stable",
-        "/usr/bin/google-chrome",
-    ]
-    installed = any(os.path.isfile(p) for p in chromium_candidates)
-    if not installed:
-        logger.info("未检测到 Chromium，尝试安装 chromium-browser...")
-        try:
-            subprocess.run(
-                ["sudo", "apt-get", "install", "-y", "-qq", "chromium-browser"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120,
-            )
-            logger.info("✅ chromium-browser 已安装")
-        except Exception as e:
-            logger.warning(f"chromium-browser 安装失败: {e}")
-
-    # 再次确认路径
-    for p in chromium_candidates:
-        if os.path.isfile(p):
-            logger.info(f"检测到浏览器: {p}")
-            break
-    return True
-
-
-def get_clipboard_content() -> Optional[str]:
-    """跨平台读剪贴板（Linux 依赖 xclip）"""
-    try:
-        if sys.platform.startswith("linux"):
-            r = subprocess.run(
-                ["xclip", "-selection", "clipboard", "-o"],
-                capture_output=True, text=True, timeout=5,
-            )
-            if r.returncode == 0 and r.stdout.strip():
-                return r.stdout.strip()
-        elif sys.platform == "darwin":
-            r = subprocess.run(["pbpaste"], capture_output=True, text=True, timeout=5)
-            if r.returncode == 0:
-                return r.stdout.strip()
-        elif sys.platform == "win32":
-            r = subprocess.run(
-                ["powershell", "-command", "Get-Clipboard"],
-                capture_output=True, text=True, timeout=5,
-            )
-            if r.returncode == 0:
-                return r.stdout.strip()
-    except Exception as e:
-        logger.debug(f"读取剪贴板失败: {e}")
-    return None
-
-
-# ==============================================
-# Token：获取 + 验证
-# ==============================================
-def _ensure_drissionpage() -> bool:
-    """确保 DrissionPage 可用；失败返回 False"""
-    try:
-        import DrissionPage  # noqa: F401
-        return True
-    except Exception:
-        pass
-    try:
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "DrissionPage", "-q"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=120,
-        )
-        import DrissionPage  # noqa: F401
-        return True
-    except Exception as e:
-        logger.error(f"DrissionPage 安装失败: {e}")
-        return False
-
-
-def _find_browser_path() -> Optional[str]:
-    """按优先级查找 Chrome/Chromium 路径"""
-    candidates = [
-        "/usr/bin/chromium",
-        "/usr/bin/chromium-browser",
-        "/usr/bin/google-chrome-stable",
-        "/usr/bin/google-chrome",
-    ]
-    for p in candidates:
-        if os.path.isfile(p):
-            return p
-    return None
-
-
-def _token_from_clipboard_or_page(page) -> Optional[str]:
-    """统一从剪贴板/页面文本/storage 中提取 Token"""
-    token = None
-    # 1) 剪贴板
-    clip = get_clipboard_content()
-    if clip:
-        m = re.search(r"\b([a-f0-9]{16})\b", clip, re.I)
-        if m:
-            token = m.group(1)
-            logger.info("从系统剪贴板拿到 Token")
-            return token
-    # 2) 页面文本
-    try:
-        body = page.ele("tag:body").text
-        if body:
-            for line in body.splitlines():
-                if "token" in line.lower():
-                    m = re.search(r"\b([a-f0-9]{16})\b", line, re.I)
-                    if m:
-                        token = m.group(1)
-                        logger.info("从页面文本拿到 Token")
-                        return token
-    except Exception:
-        pass
-    # 3) storage
-    try:
-        storage_text = page.run_js("return JSON.stringify({...localStorage, ...sessionStorage})")
-        storage = json.loads(storage_text) if storage_text else {}
-        for k, v in storage.items():
-            if isinstance(v, str) and "token" in k.lower() and len(v.strip()) == 16:
-                if re.match(r"^[a-f0-9]{16}$", v.strip(), re.I):
-                    token = v.strip()
-                    logger.info("从 storage 拿到 Token")
-                    return token
-    except Exception:
-        pass
-    return None
-
-
-def _try_click_token_button(page) -> bool:
-    """在页面上尝试点击‘获取Token’（含滚动重试）"""
-    selectors = ["text=获取Token", "text=获取 Token", "text=Token"]
-    for sel in selectors:
-        try:
-            el = page.ele(sel, timeout=5)
-            if el:
-                el.click()
-                return True
-        except Exception:
-            continue
-    # 滚动后重试
-    try:
-        page.run_js("window.scrollTo(0, document.body.scrollHeight);")
-        page.wait(2)
-        elems = page.eles("text:Token")
-        for e in elems:
-            txt = (e.text or "").strip()
-            if txt and ("获取Token" in txt or "获取 Token" in txt):
-                e.click()
-                return True
-    except Exception:
-        pass
-    return False
-
-
-def get_taoiptv_token_by_drissionpage() -> Optional[str]:
-    if not _ensure_drissionpage():
-        return None
-    try:
-        from DrissionPage import ChromiumPage, ChromiumOptions
-    except Exception as e:
-        logger.warning(f"DrissionPage 导入失败: {e}")
-        return None
-
-    logger.info("[DrissionPage] 尝试获取 Token...")
-    browser_path = _find_browser_path()
-    if not browser_path:
-        logger.warning("[DrissionPage] 未找到 Chrome/Chromium，跳过")
-        return None
-
-    try:
-        co = ChromiumOptions()
-        co.set_argument("--no-sandbox")
-        co.set_argument("--disable-gpu")
-        co.set_argument("--disable-blink-features=AutomationControlled")
-        co.set_user_agent(Config.USER_AGENT)
-        co.set_browser_path(browser_path)  # 关键：显式指定
-
-        page = ChromiumPage(co)
-        logger.info("[DrissionPage] 打开 taoiptv.com...")
-        page.get("https://taoiptv.com")
-        logger.info("[DrissionPage] 等待防人机验证（~10s）...")
-        page.wait(10)  # 给 CF 足够时间
-
-        clicked = _try_click_token_button(page)
-        if not clicked:
-            logger.warning("[DrissionPage] 未找到‘获取Token’按钮（可能仍在验证）")
-            # 不再反复重试，直接退出
-            try:
-                page.quit()
-            except Exception:
-                pass
-            return None
-
-        page.wait(2)
-        token = _token_from_clipboard_or_page(page)
-
-        # 调试截图
-        try:
-            debug_dir = os.path.join(SCRIPT_DIR, "debug")
-            os.makedirs(debug_dir, exist_ok=True)
-            page.get_screenshot(path=os.path.join(debug_dir, "drissionpage.png"), full_page=True)
-        except Exception:
-            pass
-
-        page.quit()
-
-        if token and len(token) == 16 and re.match(r"^[a-f0-9]{16}$", token, re.I):
-            logger.info(f"[DrissionPage] 拿到 Token: {token}")
-            return token
-        else:
-            logger.warning("[DrissionPage] 未拿到有效 Token")
-            return None
-    except Exception as e:
-        logger.error(f"[DrissionPage] 异常: {e}", exc_info=True)
-        return None
-
-
-def get_taoiptv_token_by_playwright() -> Optional[str]:
-    try:
-        logger.info("[Playwright] 尝试获取 Token...")
-        try:
-            from playwright.sync_api import sync_playwright
-        except ImportError:
-            try:
-                subprocess.run(
-                    [sys.executable, "-m", "pip", "install", "playwright", "-q"],
-                    check=True, capture_output=True, timeout=120,
-                )
-                subprocess.run(
-                    [sys.executable, "-m", "playwright", "install", "chromium"],
-                    check=True, capture_output=True, timeout=300,
-                )
-                from playwright.sync_api import sync_playwright
-            except Exception as e:
-                logger.error(f"Playwright 安装失败: {e}")
-                return None
-
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=False,
-                args=[
-                    "--no-sandbox",
-                    "--disable-gpu",
-                    "--disable-blink-features=AutomationControlled",
-                ],
-            )
-            context = browser.new_context(
-                user_agent=Config.USER_AGENT,
-                viewport={"width": 1920, "height": 1080},
-            )
-            page = context.new_page()
-            try:
-                page.goto("https://taoiptv.com", wait_until="domcontentloaded", timeout=30000)
-                logger.info("[Playwright] 等待防人机验证...")
-                page.wait_for_timeout(10000)
-
-                clicked = False
-                for selector in [
-                    "text=获取Token",
-                    "text=获取 Token",
-                    "text=Token",
-                    "a:has-text('Token')",
-                    "span:has-text('Token')",
-                ]:
-                    try:
-                        element = page.locator(selector).first
-                        if element.is_visible(timeout=3000):
-                            element.click()
-                            clicked = True
-                            break
-                    except Exception:
-                        continue
-
-                if clicked:
-                    page.wait_for_timeout(2000)
-                    token = None
-                    clip = get_clipboard_content()
-                    if clip:
-                        m = re.search(r"\b([a-f0-9]{16})\b", clip, re.I)
-                        if m:
-                            token = m.group(1)
-                            logger.info("[Playwright] 从剪贴板拿到 Token")
-                            return token
-            finally:
-                browser.close()
-        return None
-    except Exception as e:
-        logger.error(f"[Playwright] 异常: {e}")
-        return None
-
-
-def _verify_token_once(token: str) -> bool:
-    """用 lives/51025.txt 验证 Token 是否与本机 IP 匹配且非阉割版（>3 条）"""
-    try:
-        url = f"https://taoiptv.com/lives/51025.txt?token={token}"
-        ctx = ssl._create_unverified_context()
-        req = urllib.request.Request(url, headers={"User-Agent": Config.USER_AGENT})
-        with urllib.request.build_opener(
-            urllib.request.HTTPSHandler(context=ctx)
-        ).open(req, timeout=15) as r:
-            html = r.read().decode("utf-8", errors="replace")
-        if "认证token参数不正确" in html or "Authentication Failed" in html:
-            return False
-        lines = [l for l in html.splitlines() if l.strip() and not l.startswith("#")]
-        if len(lines) <= 3:
-            logger.warning(f"[验证] Token 仅返回 {len(lines)} 行，视为无效/阉割版")
-            return False
-        return True
-    except Exception:
-        return False
-
-
-def get_taoiptv_token() -> Optional[str]:
-    """
-    统一入口：
-    - Token 与 IP 绑定，只能在“当前出口 IP”上实时获取。
-    - 非 CI 环境优先尝试自动获取；CI 环境默认跳过（可通过环境变量开启）。
-    """
-    # CI 环境默认不自动获取（避免被 Cloudflare 卡住）
-    if is_running_in_ci():
-        force_in_ci = os.getenv("TAO_FORCE_TOKEN_IN_CI", "0").strip().lower() in ("1", "true", "yes")
-        if not force_in_ci:
-            logger.info(
-                "当前为 CI 环境，默认不自动获取 Token（Token 与 IP 绑定，CI 频繁被 Cloudflare 拦截）。"
-                "如需启用，请在仓库 Secrets 或 Variables 中添加变量 TAO_FORCE_TOKEN_IN_CI=1"
-            )
-            return None
-        else:
-            logger.info("CI 环境已设置 TAO_FORCE_TOKEN_IN_CI=1，尝试自动获取 Token...")
-
-    # 非 CI（或 CI 强制开启）时尝试浏览器获取
-    if not _setup_xvfb_and_deps():
-        logger.warning("环境初始化失败，跳过 Token 获取")
-        return None
-
-    # DrissionPage
-    token = get_taoiptv_token_by_drissionpage()
-    if token:
-        if _verify_token_once(token):
-            logger.info(f"✅ Token 获取并验证成功: {token}")
-            return token
-        else:
-            logger.warning("DrissionPage 拿到的 Token 验证失败（与本机 IP 不匹配或已阉割）")
-
-    # Playwright 备选
-    token = get_taoiptv_token_by_playwright()
-    if token:
-        if _verify_token_once(token):
-            logger.info(f"✅ Token 获取并验证成功: {token}")
-            return token
-        else:
-            logger.warning("Playwright 拿到的 Token 验证失败")
-
-    logger.error("❌ 未能获取当前 IP 对应的有效 Token")
-    return None
-
-
-# ==============================================
-# 更新 my_urls.txt
-# ==============================================
-def update_my_urls_all(token: str) -> bool:
-    if not token or len(token) != 16:
-        return False
-    file_path = FILE_PATHS["my_urls"]
-    if not os.path.exists(file_path):
-        return False
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        count = len(re.findall(r"token=[a-f0-9]{16}", content, re.I))
-        if count == 0:
-            return False
-        content = re.sub(r"token=[a-f0-9]{16}", f"token={token}", content, flags=re.I)
-        content = re.sub(r"^#\s*更新时间:.*$", "", content, flags=re.MULTILINE)
-        content = re.sub(r"\n{2,}", "\n\n", content).strip() + "\n"
-        bj = datetime.now(timezone.utc) + timedelta(hours=8)
-        content = f"# 更新时间: {bj.strftime('%Y-%m-%d %H:%M:%S')} | Token: {token}\n" + content
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
-            f.flush()
-            os.fsync(f.fileno())
-        logger.info(f"✅ my_urls.txt更新成功！替换 {count} 个Token")
-        return True
-    except Exception as e:
-        logger.error(f"❌ 更新失败: {e}")
-        return False
-
-
-# ==============================================
-# 解析第一个远程源并保存到 assets/111.txt
-# ==============================================
-def fetch_and_save_first_source(token: Optional[str] = None) -> bool:
-    try:
-        file_path = FILE_PATHS["my_urls"]
-        if not os.path.exists(file_path):
-            return False
-        with open(file_path, "r", encoding="utf-8") as f:
-            lines = [l.strip() for l in f.readlines() if l.strip() and not l.strip().startswith("#")]
-        if not lines:
-            return False
-        first_url = None
-        for line in lines:
-            urls = RE_ALL_URLS.findall(line)
-            if urls:
-                first_url = urls[0]
-                break
-        if not first_url:
-            return False
-        if token and "token=" in first_url:
-            first_url = re.sub(r"token=[a-f0-9]{16}", f"token={token}", first_url, flags=re.I)
-        logger.info(f"正在解析第一个远程源: {first_url}")
-        ctx = ssl._create_unverified_context()
-        req = urllib.request.Request(first_url, headers={"User-Agent": Config.USER_AGENT})
-        with urllib.request.build_opener(
-            urllib.request.HTTPSHandler(context=ctx)
-        ).open(req, timeout=Config.TIMEOUT_FETCH) as resp:
-            content = resp.read().decode("utf-8", errors="replace")
-        if "认证token参数不正确" in content or "Authentication Failed" in content:
-            logger.error("❌ Token无效，获取第一个远程源失败")
-            return False
-        bj = datetime.now(timezone.utc) + timedelta(hours=8)
-        out = f"# 保存时间: {bj.strftime('%Y-%m-%d %H:%M:%S')}\n# 来源: {first_url}\n\n{content}"
-        with open(FILE_PATHS["first_source"], "w", encoding="utf-8") as f:
-            f.write(out)
-            f.flush()
-            os.fsync(f.fileno())
-        logger.info(f"✅ 111.txt 保存成功")
-        return True
-    except Exception as e:
-        logger.error(f"❌ 解析失败: {e}")
-        return False
-
+RE_ALL_URLS = re.compile(r'https?://[^\s,\'"<>}\])]+')
 
 # ==============================================
 # Git 提交推送
@@ -559,23 +78,34 @@ def git_commit_push():
         if not status:
             logger.info("✅ 无文件变更，无需提交")
             return True
-        subprocess.run(["git", "add", "assets/my_urls.txt", "assets/111.txt"], check=True, capture_output=True)
-        subprocess.run(["git", "commit", "-m", "Auto update TaoIPTV token and first source"], check=True, capture_output=True)
+        subprocess.run([
+            "git", "add",
+            FILE_PATHS["blacklist_auto"],
+            FILE_PATHS["whitelist_auto"],
+            FILE_PATHS["whitelist_respotime"],
+            FILE_PATHS["log"],
+        ], check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "Auto update whitelist and blacklist"], check=True, capture_output=True)
         gh_token = os.getenv("GITHUB_TOKEN")
         repo = os.getenv("GITHUB_REPOSITORY")
         if gh_token and repo:
-            subprocess.run(
-                ["git", "push", f"https://x-access-token:{gh_token}@github.com/{repo}.git", "HEAD"],
-                check=True, capture_output=True,
-            )
+            push_url = f"https://x-access-token:{gh_token}@github.com/{repo}.git"
+            subprocess.run(["git", "push", push_url, "HEAD"], check=True, capture_output=True)
         else:
             subprocess.run(["git", "push"], check=True, capture_output=True)
         logger.info("✅ 已同步到GitHub仓库！")
         return True
-    except Exception as e:
-        logger.warning(f"Git失败: {e}")
+    except subprocess.CalledProcessError as e:
+        hint = ""
+        try:
+            hint = f" [ACTIONS={os.getenv('GITHUB_ACTIONS','?')} REPO={os.getenv('GITHUB_REPOSITORY','?')}]"
+        except Exception:
+            pass
+        logger.warning(f"Git推送失败:{hint} {e.stderr.decode('utf-8','ignore') if e.stderr else ''}")
         return False
-
+    except Exception as e:
+        logger.warning(f"Git异常: {e}")
+        return False
 
 # ==============================================
 # 域名黑名单
@@ -591,7 +121,6 @@ def url_matches_domain_blacklist(url: str) -> bool:
         return any(host == d or host.endswith("." + d) for d in DOMAIN_BLACKLIST)
     except Exception:
         return False
-
 
 # ==============================================
 # 点播/图片过滤
@@ -609,9 +138,8 @@ def is_vod_or_image_url(url: str) -> bool:
     except Exception:
         return False
 
-
 # ==============================================
-# 行格式清洗
+# 行格式清洗（用于"组名,URL"格式的逐行处理）
 # ==============================================
 CLEAN_OK = "ok"
 CLEAN_NO_FORMAT = "no_format"
@@ -646,7 +174,6 @@ def clean_source_line(line: str) -> Tuple[Optional[Tuple[str, str]], str]:
         return None, CLEAN_VOD
     return (name, url), CLEAN_OK
 
-
 # ==============================================
 # 媒体类型判定
 # ==============================================
@@ -669,7 +196,6 @@ def _looks_html(d):
         return False
     d = d.lstrip(b"\xef\xbb\xbf").lstrip()
     return d[:5].lower().startswith((b"<!doc", b"<html"))
-
 
 # ==============================================
 # StreamChecker
@@ -749,9 +275,7 @@ class StreamChecker:
         try:
             ctx = ssl._create_unverified_context()
             req = urllib.request.Request(url, headers={"User-Agent": Config.USER_AGENT})
-            with urllib.request.build_opener(
-                urllib.request.HTTPSHandler(context=ctx)
-            ).open(req, timeout=timeout) as r:
+            with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=timeout) as r:
                 code = r.getcode()
                 ct = r.headers.get("Content-Type", "")
                 data = _read_chunk(r)
@@ -788,11 +312,10 @@ class StreamChecker:
             try:
                 ctx = ssl._create_unverified_context()
                 req = urllib.request.Request(safe_url, headers={"User-Agent": Config.USER_AGENT})
-                with urllib.request.build_opener(
-                    urllib.request.HTTPSHandler(context=ctx)
-                ).open(req, timeout=15) as r:
+                with urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx)).open(req, timeout=15) as r:
                     c = r.read().decode("utf-8", errors="replace")
                 before = len(all_lines)
+                # ---------- M3U 格式 ----------
                 if "#EXTM3U" in c[:200]:
                     name = ""
                     for l in c.splitlines():
@@ -801,9 +324,7 @@ class StreamChecker:
                             continue
                         if l.startswith("#EXTINF"):
                             m_group = re.search(r'group-title\s*=\s*["\']?([^"\',]+)', l)
-                            name = m_group.group(1).strip() if m_group else (
-                                l.split(",")[-1].strip() if "," in l else ""
-                            )
+                            name = m_group.group(1).strip() if m_group else (l.split(",")[-1].strip() if "," in l else "")
                         elif not l.startswith("#"):
                             url_candidate = l.strip().split("#")[0].strip().split("$")[0].strip()
                             if not url_candidate:
@@ -819,6 +340,7 @@ class StreamChecker:
                             all_lines.append(f"{res[0]},{res[1]}" if res else f"{group},{url_candidate}")
                             name = ""
                 else:
+                    # ---------- 非 M3U ----------
                     raw_urls_found = RE_ALL_URLS.findall(c)
                     for u in raw_urls_found:
                         u = u.strip().rstrip(".,;:!?)")
@@ -846,9 +368,11 @@ class StreamChecker:
                 if got > 1:
                     logger.info(f" ✓ {raw_url[:90]} → {got} 个源")
                 elif got == 1:
-                    logger.warning(f" ⚠ {raw_url[:90]} → 仅 {got} 个源 | {c[:500].replace(chr(10), ' ')}")
+                    diag = c[:500].replace("\n", "\\n").replace("\r", "")
+                    logger.warning(f" ⚠ {raw_url[:90]} → 仅 {got} 个源 | 内容诊断: {diag}")
                 else:
-                    logger.warning(f" ✗ {raw_url[:90]} → 0 个源 | {c[:200].replace(chr(10), ' ')}")
+                    preview = c[:200].replace("\n", "\\n")
+                    logger.warning(f" ✗ {raw_url[:90]} → 0 个源 | 内容: {preview}")
             except Exception as e:
                 logger.error(f" ✗ {raw_url[:90]} → 异常: {e}")
         return all_lines
@@ -871,9 +395,11 @@ class StreamChecker:
                 self.clean_stats[reason] = self.clean_stats.get(reason, 0) + 1
                 continue
             _, url = res
-            if url in seen or url in self.blacklist_urls:
+            if url in seen:
                 continue
             seen.add(url)
+            if url in self.blacklist_urls:
+                continue
             to_check.append((url, line))
         logger.info(f"待检测 {len(to_check)} 条")
         return to_check, []
@@ -937,27 +463,19 @@ class StreamChecker:
             f"未知:{unknown} | 超时:{timeout} | 耗时:{elapsed}s ====="
         )
 
-
 # ==============================================
 # 主函数
 # ==============================================
 def main():
     try:
         logger.info("===== 开始执行 =====")
-        token = get_taoiptv_token()
-        if token:
-            update_my_urls_all(token)
-            fetch_and_save_first_source(token)
-            git_commit_push()
-        else:
-            logger.warning("未获取到有效 Token，跳过 my_urls.txt / 111.txt 更新")
         checker = StreamChecker()
         checker.run()
-        logger.info("===== 全部完成 =====")
+        git_commit_push()
+        logger.info("===== 全部流程执行完成 =====")
     except Exception as e:
         logger.error(f"主程序异常: {e}", exc_info=True)
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()
