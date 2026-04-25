@@ -1,23 +1,23 @@
 更新时间,#genre#
-20260425 16:14
+20260425 18:55
 
 自动,rtsp://185.50.56.16:554/neontelvizija
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228820/778771674.smil
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228916/778771746.smil
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228842/778771953.smil
-自动,http://player.cntv.cn/standard/live_HLSDRM20180606.swf?v=180.171.5.8.9.6.3.9&vdnSID=&vdnIP=&vdnCountryCode=&vdnProvinceCode=&vdnCityCode=&vdnISPCode=&tai=cctv12&ChannelID=cctv12&videoTVChannel=cctv12&P2PChannelID=pd://cctv_p2p_cctv12
-自动,http://cdn6.163189.xyz/163189/fhzw
-自动,http://cdn6.163189.xyz/163189/fhhk
-自动,http://player.cntv.cn/standard/live_HLSDRM20180919.swf?v=180.171.5.8.9.6.3.9&ChannelID=cctv10&videoTVChannel=cctv10&P2PChannelID=pd://cctv_p2p_cctv10&tai=cctv10&VideoName=cctv10&channelID=cctv10
-自动,http://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_5.m3u8
-自动,http://player.cntv.cn/standard/live_HLSDRM20180606.swf?ChannelID=zhejiang&P2PChannelID=pd://cctv_p2p_zhejiang
-自动,http://player.cntv.cn/standard/live_HLSDRM20180524.swf?ChannelID=cetv4&videoTVChannel=cetv4&P2PChannelID=pd://cctv_p2p_hdcetv4&tai=cetv4&VideoName=cetv4&channelID=cetv4
-自动,https://raw.githubusercontent.com/zzmaze/iptv/main/itvlist.txt
-自动,http://playtv-live.ifeng.com/live/06OLEEWQKN4_audio.m3u8
-自动,http://cdn6.163189.xyz/163189/fhzx
-自动,http://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master_1660.m3u8
-自动,https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt
-自动,https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt
-自动,https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u
-自动,https://plex-xumoent-nbcnn-x17gi.fast.nbcuni.com/live/master_1.m3u8
+自动,http://198.204.240.250:82/live/cctv4k.m3u8?jsbt=1760148172&jsbk=8ce47519e62b009dfa80f8fbfb2dd932
+自动,http://198.204.240.250:82/live/cctv4k.m3u8?jsbt=1760495957&jsbk=138a7cd8fb02f369c744cf0ceb413e85
 自动,https://cdn6.163189.xyz/163189/as
+自动,http://mytv.cdn.loc.cc/o12.php?id=fct
+自动,https://cdn6.163189.xyz/163189/asam
+自动,http://live-hls-web-aja.getaj.net/AJA/02.m3u8
+自动,https://raw.githubusercontent.com/mlzlzj/hnyuan/refs/heads/main/iptv_list.txt
+自动,https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u
+自动,https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.txt
+自动,https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt
+自动,https://raw.githubusercontent.com/altn2025/iptv/main/iptv.m3u
+自动,http://173.208.223.226:82/live/cctv16md.m3u8?jsbt=1772069348&jsbk=71ccb68cbde431d790236c8c40a056e3
+自动,https://live.zbds.top/tv/iptv4.txt
+自动,http://cdn.163189.xyz/163189/now
+自动,http://69.30.246.194/live/cctv16.m3u8
+自动,http://vodcdn.video.taobao.com/oss/ali-video/6b406c70e3007a5c66a2085c39b13d80/video.m3u8
