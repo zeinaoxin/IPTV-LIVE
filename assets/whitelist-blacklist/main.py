@@ -2,13 +2,31 @@ import urllib.request
 from urllib.parse import quote, unquote
 import re
 import os
+import sys  # 新增：用于调用pip安装依赖
 from datetime import datetime, timedelta, timezone
-import opencc
 import time
 import subprocess
 import ssl
 import hashlib
 from concurrent.futures import ThreadPoolExecutor
+
+# ===================== 新增：自动安装 opencc 依赖 =====================
+def install_opencc():
+    """自动安装 opencc 依赖（若未安装）"""
+    try:
+        import opencc  # 尝试导入，若成功则跳过
+        print("[INFO] opencc 已安装，无需重复安装")
+    except ImportError:
+        print("[INFO] opencc 未找到，正在安装...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "opencc"])
+            print("[INFO] opencc 安装成功")
+        except Exception as e:
+            print(f"[ERROR] opencc 安装失败: {e}")
+            # 若安装失败，程序继续运行（仅影响繁体转简体功能，但不中断）
+
+# 调用安装函数
+install_opencc()
 
 # ===================== 全局核心配置 =====================
 # 指定按TXT文件内顺序排列的分类，其余自动字典序排序，按需增删
