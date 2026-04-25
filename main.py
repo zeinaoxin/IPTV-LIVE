@@ -28,7 +28,7 @@ TVG_URL = "https://ghfast.top/https://github.com/CCSH/IPTV/raw/refs/heads/main/e
 LOGO_URL_TPL = "https://ghfast.top/https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/logo/{}.png"
 
 # 所有单个频道最多保留的有效源数量，-1=无限制
-SINGLE_CHANNEL_MAX_COUNT = 20  # 减少每个频道的源数量，优先速度
+SINGLE_CHANNEL_MAX_COUNT = 25  # 减少每个频道的源数量，优先速度
 
 # ===================== Live Update 新增：域名/后缀拦截（优化速度） =====================
 # 坏域名（整域拦截，不区分子域名）- 优先快速过滤
