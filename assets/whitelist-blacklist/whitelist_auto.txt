@@ -1,23 +1,23 @@
 更新时间,#genre#
-20260425 22:54
+20260425 23:22
 
 自动,rtsp://185.50.56.16:554/neontelvizija
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228820/778771674.smil
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228916/778771746.smil
 自动,rtsp://182.139.234.40/PLTV/88888896/224/3221228842/778771953.smil
-自动,http://cdn6.163189.xyz/163189/fhzw
 自动,http://cdn6.163189.xyz/163189/fhhk
 自动,http://live-hls-web-aja.getaj.net/AJA/04.m3u8
-自动,https://live-hls-web-aje-fa.getaj.net/AJE/03.m3u8
-自动,http://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_4.m3u8
-自动,http://skai-live.siliconweb.com/media/cambria4/index.m3u8
-自动,https://cantv.streamguys1.com/cantv/cantv21hls/playlist.m3u8
-自动,https://raw.githubusercontent.com/Cx4x/6/refs/heads/main/iiqy.m3u
-自动,http://player.cntv.cn/standard/live_HLSDRM20180919.swf?v=180.171.5.8.9.6.3.9&ChannelID=hebei&videoTVChannel=hebei&P2PChannelID=pd://cctv_p2p_hebei&tai=hebei&VideoName=hebei&channelID=hebei
-自动,https://raw.githubusercontent.com/lml1971/tv/refs/heads/main/tv.txt
-自动,https://cdn3.wowza.com/5/RXJNMFI3VlVkOEFP/scottsdale/G0040_007/chunklist.m3u8
 自动,https://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_4.m3u8
-自动,http://r.jdshipin.com/sFw4S
-自动,https://live-hls-web-aje-fa.getaj.net/AJE/01.m3u8
-自动,https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
-自动,http://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_5.m3u8?zshijd
+自动,http://player.cntv.cn/standard/live_HLSDRM20180919.swf?v=180.171.5.8.9.6.3.9&ChannelID=hebei&videoTVChannel=hebei&P2PChannelID=pd://cctv_p2p_hebei&tai=hebei&VideoName=hebei&channelID=hebei
+自动,https://lotus.stingray.com/manifest/qello-qello001-montreal/samsungtvplus/f3b3b889-e519-3156-810f-18850e58a304/3291200/manifest.m3u8
+自动,http://cdn6.163189.xyz/163189/fhzw
+自动,https://lotus.stingray.com/manifest/naturescape-a003-montreal/samsungtvplus/f7ed86a4-b8ac-38e0-a745-710077a95be6/1020800/manifest.m3u8
+自动,http://r.jdshipin.com/GeWKr?id=mzt720
+自动,https://live-hls-web-aje-fa.getaj.net/AJE/04.m3u8
+自动,http://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_4.m3u8
+自动,https://lotus.stingray.com/manifest/qello-qello001-montreal/samsungtvplus/f3b3b889-e519-3156-810f-18850e58a304/1751200/manifest.m3u8
+自动,https://cmc-ono.amagi.tv/playlist360_p.m3u8
+自动,https://lotus.stingray.com/manifest/naturescape-a003-montreal/samsungtvplus/f7ed86a4-b8ac-38e0-a745-710077a95be6/1751200/manifest.m3u8
+自动,http://cdn.163189.xyz/163189/now
+自动,https://cantv.streamguys1.com/cantv/cantv36hls/playlist.m3u8
+自动,https://agp-nimble.streamguys1.com/SLOC/SLOC/playlist.m3u8
