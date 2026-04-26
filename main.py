@@ -25,6 +25,14 @@ URL_FETCH_TIMEOUT = 5
 TVG_URL = "https://ghfast.top/https://github.com/CCSH/IPTV/raw/refs/heads/main/e.xml.gz"
 LOGO_URL_TPL = "https://ghfast.top/https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/logo/{}.png"
 
+# ===================== 黑名单特征集（轻量级快速拦截） =====================
+BLOCK_FEATURES = (
+    "[", "【", "catvod.com", "公众号", 
+    "kkk.jjjj.jiduo.me", "freetv.top", "freetv.fun", 
+    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz",
+    "p3p://", "rtsp://"
+)
+
 # ===================== 通用工具函数 =====================
 def get_project_dirs() -> dict:
     script_abspath = os.path.abspath(__file__)
@@ -161,7 +169,6 @@ class ChannelClassifier:
             self.all_urls[chn_type] = set()
 
     def check_url_exist(self, chn_type: str, url: str) -> bool:
-        # 仅用于同分类下基础去重，避免同源写多遍
         if url in self.all_urls.get(chn_type, set()) or "127.0.0.1" in url:
             return True
         return False
@@ -223,8 +230,8 @@ def process_single_line(line: str, classifier: ChannelClassifier, corrections: d
     if not line or ',' not in line:
         return
     
-    # ===== 新增黑名单功能：直接屏蔽含有这些字符的源 =====
-    if "[" in line or "catvod.com" in line or "【" in line:
+    # ===== 黑名单功能：命中任意特征直接丢弃，不进入后续流程 =====
+    if any(block in line for block in BLOCK_FEATURES):
         return
 
     idx = line.rfind(',')
@@ -379,7 +386,7 @@ if __name__ == "__main__":
     corrections = load_corrections(dirs["corrections_name"])
     main_dict, local_dict = load_channel_dictionaries(dirs["main_channel"], dirs["local_channel"])
     
-    # 初始化分类器（不再传入黑名单）
+    # 初始化分类器
     classifier = ChannelClassifier(main_dict, local_dict)
 
     # 1) 处理手动白名单
@@ -389,7 +396,7 @@ if __name__ == "__main__":
     for line in whitelist_manual:
         process_single_line(line, classifier, corrections)
 
-    # 2) 处理自动白名单（不做筛选，直接全部加载）
+    # 2) 处理自动白名单
     print(f"[PROCESS] 处理自动白名单")
     whitelist_respotime = read_txt(dirs["whitelist_respotime"])
     classifier.other_lines.append("白名单测速,#genre#")
