@@ -33,6 +33,7 @@ BLOCK_FEATURES = (
     "p3p://", "rtsp://",
     "iptv.cdn.ha.chinamobile.com", "www.douzhicloud.site", 
     "e1.woc.iiiya.cn", "php.jdshipin.com", 
+    "dbiptv.sn.chinamobile.com", "www.zzlag.top", 
     "chinamobile.com/PLTV/88888888/8", "hlsztemgsplive.miguvideo.com", 
     "api.mytv666.top", "live.sxrtv.com", "hls-gateway.vpstv.net"
 )
