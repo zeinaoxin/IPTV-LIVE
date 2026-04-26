@@ -222,6 +222,11 @@ def convert_m3u_to_txt(m3u_content: str) -> list:
 def process_single_line(line: str, classifier: ChannelClassifier, corrections: dict):
     if not line or ',' not in line:
         return
+    
+    # ===== 新增黑名单功能：直接屏蔽含有这些字符的源 =====
+    if "[" in line or "catvod.com" in line or "【" in line:
+        return
+
     idx = line.rfind(',')
     channel_name_raw = line[:idx].strip()
     channel_url_raw = line[idx+1:].strip()
