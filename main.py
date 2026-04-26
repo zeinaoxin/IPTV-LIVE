@@ -29,8 +29,10 @@ LOGO_URL_TPL = "https://ghfast.top/https://raw.githubusercontent.com/CCSH/IPTV/r
 BLOCK_FEATURES = (
     "[", "【", "catvod.com", "公众号", 
     "kkk.jjjj.jiduo.me", "freetv.top", "freetv.fun", 
-    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz"， "iptv.cdn.ha.chinamobile.com"， "www.douzhicloud.site", "api.mytv666.top", "live.sxrtv.com", "hls-gateway.vpstv.net",
-    "p3p://", "rtsp://"
+    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz",
+    "p3p://", "rtsp://",
+    "iptv.cdn.ha.chinamobile.com", "www.douzhicloud.site", 
+    "api.mytv666.top", "live.sxrtv.com", "hls-gateway.vpstv.net"
 )
 
 # ===================== 通用工具函数 =====================
@@ -334,7 +336,7 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
         sort_list = main_dict.get(chn_type, []) or classifier.local_dict.get(chn_type, [])
         if not chn_data:  # 无内容分类直接跳过
             continue
-        sorted_data = sort_channel_data(chn_data, chn_type, sort_list, classifier)
+        sorted_data = sort_channel_data(chn_type, chn_type, sort_list, classifier)
         if sorted_data:
             full_lines.append(f"{chn_type},#genre#")
             full_lines.extend(sorted_data)
