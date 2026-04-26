@@ -1,2 +1,0 @@
-﻿山西卫视,http://112.193.114.183:9901/tsfile/live/0118_1.m3u8?key=txiptv
-2026-04-20 11:03:54,https://taoiptv.com/time.mp4
