@@ -29,7 +29,7 @@ LOGO_URL_TPL = "https://ghfast.top/https://raw.githubusercontent.com/CCSH/IPTV/r
 BLOCK_FEATURES = (
     "[", "【", "catvod.com", "公众号", 
     "kkk.jjjj.jiduo.me", "freetv.top", "freetv.fun", 
-    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz",
+    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz"， "iptv.cdn.ha.chinamobile.com"， "www.douzhicloud.site", "api.mytv666.top", "live.sxrtv.com", "hls-gateway.vpstv.net",
     "p3p://", "rtsp://"
 )
 
