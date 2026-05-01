@@ -1,5 +1,5 @@
 更新时间,#genre#
-20260501 15:32,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8
+20260501 15:39,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8
 
 央视频道,#genre#
 CCTV1,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226016/index.m3u8
@@ -17692,7 +17692,6 @@ amc电影台,mitv://generationnexxxt.com:19806/3dc5467282034921b7124f4be60f4782
 周星星,https://live.ottiptv.cc/huya/11342412
 周星星,http://live.nctv.top/huya.php?id=11342412
 周星星,http://11.xmyxc.cn/api/php/yy.php?id=29945997
-周星星,https://www.goodiptv.club/huya/11342412
 周星星,http://iptv.jxpan.vip:18888/aio/huya/11342412
 周星驰,https://live.ottiptv.cc/huya/11336587
 周星驰,http://huanqiuzhibo.cn/manifest/douyu.php?id=122402
@@ -17991,52 +17990,3 @@ amc电影台,mitv://generationnexxxt.com:19806/3dc5467282034921b7124f4be60f4782
 欧美大片,http://1.94.31.214:35455/douyu/2793084
 华语经典,http://zzy789.xyz/douyu1.php?id=434971
 华语经典,http://159.75.85.63:35455/douyu/434971
-
-咪咕直播,#genre#
-咪咕视频,http://39.134.67.148/ottrrs.hl.chinamobile.com/hlj/yd/0/3221226398/.m3u8
-咪咕视频,http://39.134.67.108/PLTV/88888888/224/3221225895/1.m3u8
-咪咕视频,http://39.134.67.108/PLTV/88888888/224/3221226027/1.m3u8
-咪咕视频,http://39.134.64.87:6610/PLTV/88888888/224/3221226398/index.m3u8?IASHttpSessionId=
-咪咕体育,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226398/index.m3u8
-咪咕体育,http://39.134.67.108/PLTV/88888888/224/3221225897/1.m3u8
-咪咕体育,http://39.134.67.108/PLTV/88888888/224/3221226031/1.m3u8
-咪咕直播1,http://home.wwang.pw:35455/itv/1000000006000270004.m3u8?cdn=ystenlive
-
-埋堆堆,#genre#
-埋堆堆1,http://124.248.69.76:35455/huya/23749096
-埋堆堆1,http://cfss.cc/cdn/hy/23749096.flv
-埋堆堆2,http://124.248.69.76:35455/huya/23735126
-埋堆堆2,http://cfss.cc/cdn/hy/23735126.flv
-埋堆堆3,http://124.248.69.76:35455/huya/23865152
-埋堆堆3,http://cfss.cc/cdn/hy/23865152.flv
-埋堆堆4,http://124.248.69.76:35455/huya/3903196
-埋堆堆4,http://cfss.cc/cdn/hy/23903196.flv
-埋堆堆5,http://124.248.69.76:35455/huya/23740156
-埋堆堆5,http://cfss.cc/cdn/hy/23740156.flv
-埋堆堆7,http://124.248.69.76:35455/huya/23865058
-埋堆堆7,http://cfss.cc/cdn/hy/23865058.flv
-埋堆堆8,http://124.248.69.76:35455/huya/23734183
-埋堆堆8,http://cfss.cc/cdn/hy/23734183.flv
-埋堆堆9,http://124.248.69.76:35455/huya/23865036
-埋堆堆9,http://cfss.cc/cdn/hy/23865036.flv
-埋堆堆10,http://cfss.cc/cdn/hy/23734246.flv
-埋堆堆11,http://124.248.69.76:35455/huya/23863796
-埋堆堆11,http://cfss.cc/cdn/hy/23863796.flv
-埋堆堆11,http://live.nctv.top/huya.php?id=23863796
-埋堆堆11,http://www.xzbn.site:35455/huya/23863796
-埋堆堆12,http://124.248.69.76:35455/huya/23749083
-埋堆堆12,http://cfss.cc/cdn/hy/23749083.flv
-埋堆堆13,http://124.248.69.76:35455/huya/3824164
-埋堆堆13,http://cfss.cc/cdn/hy/23824164.flv
-埋堆堆13,http://live.nctv.top/huya.php?id=23824164
-埋堆堆13,http://www.xzbn.site:35455/huya/23824164
-埋堆堆14,http://124.248.69.76:35455/huya/23863804
-埋堆堆14,http://cfss.cc/cdn/hy/23863804.flv
-埋堆堆15,http://124.248.69.76:35455/huya/23865142
-埋堆堆15,http://cfss.cc/cdn/hy/23865142.flv
-埋堆堆16,http://124.248.69.76:35455/huya/23903183
-埋堆堆16,http://cfss.cc/cdn/hy/23903183.flv
-埋堆堆17,http://124.248.69.76:35455/huya/23903130
-埋堆堆17,http://cfss.cc/cdn/hy/23903130.flv
-埋堆堆18,http://124.248.69.76:35455/huya/23734169
-埋堆堆18,http://cfss.cc/cdn/hy/23734169.flv
