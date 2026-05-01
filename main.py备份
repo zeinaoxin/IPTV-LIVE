@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timedelta, timezone
 import opencc
 import time
+import concurrent.futures  # 【新增】用于并发测速
 
 # ===================== 全局核心配置 =====================
 # 指定按TXT文件内顺序排列的分类，其余自动字典序排序，按需增删
@@ -27,16 +28,11 @@ LOGO_URL_TPL = "https://ghfast.top/https://raw.githubusercontent.com/CCSH/IPTV/r
 
 # ===================== 黑名单特征集（轻量级快速拦截） =====================
 BLOCK_FEATURES = (
-    "[", "【", "catvod.com", "公众号", 
-    "kkk.jjjj.jiduo.me", "freetv.top", "freetv.fun", 
-    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz",
-    "p3p://", "rtsp://",
-    "/tsfile/live/", 
-    "iptv.cdn.ha.chinamobile.com", "www.douzhicloud.site", 
-    "e1.woc.iiiya.cn", "php.jdshipin.com", 
-    "dbiptv.sn.chinamobile.com", "www.zzlag.top", 
-    "chinamobile.com/PLTV/88888888/8", "hlsztemgsplive.miguvideo.com", 
-    "api.mytv666.top", "live.sxrtv.com", "hls-gateway.vpstv.net"
+    "[", "【", "catvod.com", "公众号", "kkk.jjjj.jiduo.me", "freetv.top", "freetv.fun",
+    "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz", "p3p://", "rtsp://", "/tsfile/live/",
+    "iptv.cdn.ha.chinamobile.com", "www.douzhicloud.site", "e1.woc.iiiya.cn", "php.jdshipin.com",
+    "dbiptv.sn.chinamobile.com", "www.zzlag.top", "chinamobile.com/PLTV/88888888/8",
+    "hlsztemgsplive.miguvideo.com", "api.mytv666.top", "live.sxrtv.com", "hls-gateway.vpstv.net"
 )
 
 # ===================== 通用工具函数 =====================
@@ -110,15 +106,13 @@ def load_corrections(corrections_path: str) -> dict:
 
 # ===================== 频道名称/URL处理 =====================
 def clean_channel_name(name: str) -> str:
-    if not name:
-        return ""
+    if not name: return ""
     for item in REMOVAL_LIST:
         name = name.replace(item, "")
     name = traditional_to_simplified(name)
     return name.strip()
 
 def clean_channel_url(url: str) -> str:
-    """统一清理URL：去多余前后缀/标记符，保证后续比对一致性"""
     url = url.strip()
     url = url.split('$')[0].strip()
     url = url.split('#')[0].strip()
@@ -139,18 +133,15 @@ def load_channel_dictionaries(main_dir: str, local_dir: str) -> tuple:
         print(f"[INFO] 加载主频道 {chn_type}: {len(lines)} 个")
 
     local_channels = {
-        "儿童频道": "儿童频道.txt", "国际台": "国际台.txt", "纪录片": "纪录片.txt",
-        "戏曲频道": "戏曲频道.txt", "上海频道": "上海频道.txt", "湖南频道": "湖南频道.txt",
-        "湖北频道": "湖北频道.txt", "广东频道": "广东频道.txt", "浙江频道": "浙江频道.txt",
-        "山东频道": "山东频道.txt", "江苏频道": "江苏频道.txt", "安徽频道": "安徽频道.txt",
-        "海南频道": "海南频道.txt", "内蒙频道": "内蒙频道.txt", "辽宁频道": "辽宁频道.txt",
-        "陕西频道": "陕西频道.txt", "山西频道": "山西频道.txt", "云南频道": "云南频道.txt",
-        "北京频道": "北京频道.txt", "重庆频道": "重庆频道.txt", "福建频道": "福建频道.txt",
-        "甘肃频道": "甘肃频道.txt", "广西频道": "广西频道.txt", "贵州频道": "贵州频道.txt",
-        "河北频道": "河北频道.txt", "河南频道": "河南频道.txt", "黑龙江频道": "黑龙江频道.txt",
-        "吉林频道": "吉林频道.txt", "江西频道": "江西频道.txt", "宁夏频道": "宁夏频道.txt",
-        "青海频道": "青海频道.txt", "四川频道": "四川频道.txt", "天津频道": "天津频道.txt",
-        "新疆频道": "新疆频道.txt"
+        "儿童频道": "儿童频道.txt", "国际台": "国际台.txt", "纪录片": "纪录片.txt", "戏曲频道": "戏曲频道.txt",
+        "上海频道": "上海频道.txt", "湖南频道": "湖南频道.txt", "湖北频道": "湖北频道.txt", "广东频道": "广东频道.txt",
+        "浙江频道": "浙江频道.txt", "山东频道": "山东频道.txt", "江苏频道": "江苏频道.txt", "安徽频道": "安徽频道.txt",
+        "海南频道": "海南频道.txt", "内蒙频道": "内蒙频道.txt", "辽宁频道": "辽宁频道.txt", "陕西频道": "陕西频道.txt",
+        "山西频道": "山西频道.txt", "云南频道": "云南频道.txt", "北京频道": "北京频道.txt", "重庆频道": "重庆频道.txt",
+        "福建频道": "福建频道.txt", "甘肃频道": "甘肃频道.txt", "广西频道": "广西频道.txt", "贵州频道": "贵州频道.txt",
+        "河北频道": "河北频道.txt", "河南频道": "河南频道.txt", "黑龙江频道": "黑龙江频道.txt", "吉林频道": "吉林频道.txt",
+        "江西频道": "江西频道.txt", "宁夏频道": "宁夏频道.txt", "青海频道": "青海频道.txt", "四川频道": "四川频道.txt",
+        "天津频道": "天津频道.txt", "新疆频道": "新疆频道.txt"
     }
     local_dict = {}
     for chn_type, filename in local_channels.items():
@@ -169,7 +160,6 @@ class ChannelClassifier:
         self.other_lines = []
         self.other_urls = set()
         self.all_urls = {}
-        
         for chn_type in list(main_dict.keys()) + list(local_dict.keys()):
             self.channel_data[chn_type] = []
             self.all_urls[chn_type] = set()
@@ -189,19 +179,15 @@ class ChannelClassifier:
             self.other_lines.append(line)
 
     def classify(self, channel_name: str, channel_url: str, line: str):
-        if not channel_url:
-            return
-            
+        if not channel_url: return
         for chn_type, chn_names in self.main_dict.items():
             if channel_name in chn_names and not self.check_url_exist(chn_type, channel_url):
                 self.add_channel_line(chn_type, line, channel_url)
                 return
-                
         for chn_type, chn_names in self.local_dict.items():
             if channel_name in chn_names and not self.check_url_exist(chn_type, channel_url):
                 self.add_channel_line(chn_type, line, channel_url)
                 return
-                
         self.add_other_line(line, channel_url)
 
     def get_channel_data(self, chn_type: str) -> list:
@@ -212,8 +198,7 @@ class ChannelClassifier:
 
 # ===================== 数据处理与生成 =====================
 def is_m3u_content(text: str) -> bool:
-    if not text:
-        return False
+    if not text: return False
     first_line = text.strip().splitlines()[0].strip()
     return first_line.startswith("#EXTM3U")
 
@@ -224,8 +209,7 @@ def convert_m3u_to_txt(m3u_content: str) -> list:
     for line in lines:
         if line.startswith("#EXTINF"):
             m = re.search(r',(.+)$', line)
-            if m:
-                channel_name = m.group(1).strip()
+            if m: channel_name = m.group(1).strip()
         elif not line.startswith("#"):
             if '://' in line and channel_name:
                 result.append(f"{channel_name},{line}")
@@ -233,25 +217,18 @@ def convert_m3u_to_txt(m3u_content: str) -> list:
     return result
 
 def process_single_line(line: str, classifier: ChannelClassifier, corrections: dict):
-    if not line or ',' not in line:
-        return
+    if not line or ',' not in line: return
+    if any(block in line for block in BLOCK_FEATURES): return
     
-    # ===== 黑名单功能：命中任意特征直接丢弃，不进入后续流程 =====
-    if any(block in line for block in BLOCK_FEATURES):
-        return
-
     idx = line.rfind(',')
     channel_name_raw = line[:idx].strip()
     channel_url_raw = line[idx+1:].strip()
-    if not channel_url_raw or '://' not in channel_url_raw:
-        return
+    if not channel_url_raw or '://' not in channel_url_raw: return
     
     channel_url = clean_channel_url(channel_url_raw)
     channel_name = clean_channel_name(channel_name_raw)
-    
     if corrections and channel_name in corrections:
         channel_name = corrections[channel_name]
-        
     classifier.classify(channel_name, channel_url, f"{channel_name},{channel_url}")
 
 def process_remote_url(url: str, classifier: ChannelClassifier, corrections: dict):
@@ -270,20 +247,16 @@ def process_remote_url(url: str, classifier: ChannelClassifier, corrections: dic
         print(f"[ERROR] 远程源处理失败: {url} - {str(e)}")
 
 def sort_channel_data(channel_data: list, chn_type: str, chn_names_list: list or None, classifier: ChannelClassifier) -> list:
-    """排序逻辑：1.按频道字典序；2.每个频道的源将 hl.chinamobile.com 强制置顶"""
-    if not channel_data:
-        return []
-        
+    if not channel_data: return []
     if chn_names_list:
         name_to_order = {name: idx for idx, name in enumerate(chn_names_list)}
         sorted_data = sorted(channel_data, key=lambda line: name_to_order.get(line.split(',')[0].strip(), 999))
     else:
         sorted_data = channel_data
-
+        
     result = []
     current_channel = None
     current_sources = []
-    
     for line in sorted_data:
         channel_name = line.split(',')[0].strip()
         if channel_name != current_channel:
@@ -296,30 +269,26 @@ def sort_channel_data(channel_data: list, chn_type: str, chn_names_list: list or
             current_sources = [line]
         else:
             current_sources.append(line)
-            
     if current_sources:
         mobile_sources = [s for s in current_sources if "hl.chinamobile.com" in s]
         other_sources = [s for s in current_sources if "hl.chinamobile.com" not in s]
         result.extend(mobile_sources)
         result.extend(other_sources)
-        
     return result
 
 def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
     formatted_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y%m%d %H:%M")
     version = f"{formatted_time},http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226537/index.m3u8"
     header = ["更新时间,#genre#", version, ""]
-
+    
     lite_lines = header.copy()
     lite_sort_types = [
         "央视频道", "卫视频道", "港澳台", "电影频道", "电视剧频道", "综艺频道", "NewTV", "iHOT",
         "体育频道", "音乐频道", "游戏频道", "解说频道"
     ]
-    
     for chn_type in lite_sort_types:
         chn_data = classifier.get_channel_data(chn_type)
-        if not chn_data:  # 无内容分类直接跳过
-            continue
+        if not chn_data: continue
         sorted_data = sort_channel_data(chn_data, chn_type, main_dict.get(chn_type, []), classifier)
         if sorted_data:
             lite_lines.append(f"{chn_type},#genre#")
@@ -328,60 +297,75 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
 
     full_lines = lite_lines.copy()
     full_other_types = [
-        "儿童频道", "国际台", "纪录片", "戏曲频道", "上海频道", "湖南频道", "湖北频道", "广东频道",
-        "浙江频道", "山东频道", "江苏频道", "安徽频道", "海南频道", "内蒙频道", "辽宁频道", "陕西频道",
-        "山西频道", "云南频道", "北京频道", "重庆频道", "福建频道", "甘肃频道", "广西频道", "贵州频道",
-        "河北频道", "河南频道", "黑龙江频道", "吉林频道", "江西频道", "宁夏频道", "青海频道", "四川频道",
-        "天津频道", "新疆频道", "春晚", "直播中国", "MTV", "收音机频道"
+        #------------此处删除了地方台
     ]
-    
     for chn_type in full_other_types:
         chn_data = classifier.get_channel_data(chn_type)
         sort_list = main_dict.get(chn_type, []) or classifier.local_dict.get(chn_type, [])
-        if not chn_data:  # 无内容分类直接跳过
-            continue
-        sorted_data = sort_channel_data(chn_type, chn_type, sort_list, classifier)
+        if not chn_data: continue
+        sorted_data = sort_channel_data(chn_data, chn_type, sort_list, classifier)
         if sorted_data:
             full_lines.append(f"{chn_type},#genre#")
             full_lines.extend(sorted_data)
             full_lines.append("")
 
-    # 清理尾部可能产生的多余空行
-    while full_lines and not full_lines[-1]:
-        full_lines.pop()
-    while lite_lines and not lite_lines[-1]:
-        lite_lines.pop()
-
+    while full_lines and not full_lines[-1]: full_lines.pop()
+    while lite_lines and not lite_lines[-1]: lite_lines.pop()
     return full_lines, lite_lines
 
 def make_m3u(txt_file: str, m3u_file: str, tvg_url: str, logo_tpl: str):
     try:
-        if not os.path.exists(txt_file):
-            print(f"[ERROR] M3U源文件不存在: {txt_file}")
-            return
+        if not os.path.exists(txt_file): return
         m3u_content = f"#EXTM3U x-tvg-url=\"{tvg_url}\"\n"
         lines = read_txt(txt_file, strip=True, skip_empty=True)
         group_name = ""
         for line in lines:
-            if "," not in line:
-                continue
+            if "," not in line: continue
             parts = line.split(',', 1)
-            if len(parts) != 2:
-                continue
+            if len(parts) != 2: continue
             if "#genre#" in parts[1]:
                 group_name = parts[0].strip()
                 continue
             channel_name, channel_url = parts[0].strip(), parts[1].strip()
-            if not channel_url or "://" not in channel_url:
-                continue
+            if not channel_url or "://" not in channel_url: continue
             logo_url = logo_tpl.format(channel_name)
-            m3u_content += (
-                f"#EXTINF:-1 tvg-name=\"{channel_name}\" tvg-logo=\"{logo_url}\" group-title=\"{group_name}\",{channel_name}\n"
-                f"{channel_url}\n"
-            )
+            m3u_content += (f"#EXTINF:-1 tvg-name=\"{channel_name}\" tvg-logo=\"{logo_url}\" group-title=\"{group_name}\",{channel_name}\n{channel_url}\n")
         write_txt(m3u_file, m3u_content)
     except Exception as e:
         print(f"[ERROR] 生成M3U失败 {m3u_file}: {str(e)}")
+
+
+# ===================== 【新增】电影频道测速模块 =====================
+def test_single_url(item: str, timeout: int = 3) -> bool:
+    """测试单条 URL 是否可连通"""
+    try:
+        if "," not in item: return False
+        url = item.split(",", 1)[1]
+        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        # 超时时间设为 3 秒，能连上就说明源可用
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
+def filter_movie_channels(movie_list: list) -> list:
+    """多线程并发测速，筛除无效电影源"""
+    valid_items = []
+    # 开 50 个线程并发，速度极快
+    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+        future_to_item = {executor.submit(test_single_url, item): item for item in movie_list}
+        for future in concurrent.futures.as_completed(future_to_item):
+            item = future_to_item[future]
+            try:
+                if future.result():
+                    valid_items.append(item)
+                else:
+                    # 打印被淘汰的源方便排查
+                    print(f"[SPEED-TEST] 淘汰无效源: {item.split(',')[1]}")
+            except Exception:
+                pass
+    return valid_items
+
 
 # ===================== 主函数执行 =====================
 if __name__ == "__main__":
@@ -392,60 +376,66 @@ if __name__ == "__main__":
     corrections = load_corrections(dirs["corrections_name"])
     main_dict, local_dict = load_channel_dictionaries(dirs["main_channel"], dirs["local_channel"])
     
-    # 初始化分类器
     classifier = ChannelClassifier(main_dict, local_dict)
-
+    
     # 1) 处理手动白名单
     print(f"[PROCESS] 处理手动白名单")
     whitelist_manual = read_txt(dirs["whitelist_manual"])
     classifier.other_lines.append("白名单,#genre#")
     for line in whitelist_manual:
         process_single_line(line, classifier, corrections)
-
+        
     # 2) 处理自动白名单
     print(f"[PROCESS] 处理自动白名单")
     whitelist_respotime = read_txt(dirs["whitelist_respotime"])
     classifier.other_lines.append("白名单测速,#genre#")
     for line in whitelist_respotime:
-        if "#genre#" in line or "," not in line or "://" not in line:
-            continue
+        if "#genre#" in line or "," not in line or "://" not in line: continue
         parts = line.split(",")
         url_part = next((p for p in parts[1:] if '://' in p), None)
-        if not url_part:
-            continue
+        if not url_part: continue
         channel_part = parts[1].split(',')[0].strip() if ',' in parts[1] else ""
         combined_line = f"{channel_part},{url_part}" if channel_part else f"_白名单测速,{url_part}"
         process_single_line(combined_line, classifier, corrections)
-
+        
     # 3) 处理远程URL源
     print(f"[PROCESS] 处理远程URL源")
     urls = read_txt(dirs["urls"])
     for url in urls:
         if url.startswith("http"):
             process_remote_url(url, classifier, corrections)
+            
+    # 3.5) 【新增】仅对“电影频道”进行测速过滤
+    print(f"[PROCESS] ===== 开始对【电影频道】进行测速过滤 =====")
+    movie_data = classifier.channel_data.get("电影频道", [])
+    if movie_data:
+        original_count = len(movie_data)
+        valid_movies = filter_movie_channels(movie_data)
+        classifier.channel_data["电影频道"] = valid_movies
+        print(f"[PROCESS] ===== 电影频道测速完成：保留 {len(valid_movies)}/{original_count} 条有效源 =====")
+    else:
+        print(f"[PROCESS] ===== 电影频道无源，跳过测速 =====")
 
     # 4) 生成文件
     live_full, live_lite = generate_live_text(classifier, main_dict)
     live_full_path = os.path.join(dirs["root"], "live.txt")
     live_lite_path = os.path.join(dirs["root"], "live_lite.txt")
     others_path = os.path.join(dirs["root"], "others.txt")
-    
     write_txt(live_full_path, live_full)
     write_txt(live_lite_path, live_lite)
     write_txt(others_path, classifier.get_all_other())
-
+    
     # 5) 生成 M3U
     print(f"[GENERATE] 生成M3U文件")
     make_m3u(live_full_path, os.path.join(dirs["root"], "live.m3u"), TVG_URL, LOGO_URL_TPL)
     make_m3u(live_lite_path, os.path.join(dirs["root"], "live_lite.m3u"), TVG_URL, LOGO_URL_TPL)
-
+    
     # 6) 统计
     timeend = datetime.now()
     elapsed = timeend - timestart
     minutes, seconds = int(elapsed.total_seconds() // 60), int(elapsed.total_seconds() % 60)
     live_count = len(live_full)
     others_count = len(classifier.get_all_other())
-    
     print("=" * 60)
     print(f"[END] 程序执行完成: {timeend.strftime('%Y%m%d %H:%M:%S')}")
     print(f"[STAT] 执行时间: {minutes} 分 {seconds} 秒")
