@@ -297,11 +297,7 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict) -> tuple:
 
     full_lines = lite_lines.copy()
     full_other_types = [
-        "儿童频道", "国际台", "纪录片", "戏曲频道", "上海频道", "湖南频道", "湖北频道", "广东频道",
-        "浙江频道", "山东频道", "江苏频道", "安徽频道", "海南频道", "内蒙频道", "辽宁频道", "陕西频道",
-        "山西频道", "云南频道", "北京频道", "重庆频道", "福建频道", "甘肃频道", "广西频道", "贵州频道",
-        "河北频道", "河南频道", "黑龙江频道", "吉林频道", "江西频道", "宁夏频道", "青海频道", "四川频道",
-        "天津频道", "新疆频道", "春晚", "直播中国", "MTV", "收音机频道"
+        #------------此处删除了地方台
     ]
     for chn_type in full_other_types:
         chn_data = classifier.get_channel_data(chn_type)
