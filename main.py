@@ -30,7 +30,7 @@ BLOCK_FEATURES = (
     "[", "【", "catvod.com", "公众号", 
     "kkk.jjjj.jiduo.me", "freetv.top", "freetv.fun", 
     "hwrr.jx.chinamobile.com", "kkk.888.3116598.xyz",
-    "p3p://", "rtsp://",
+    "p3p://", "rtsp://"， "/tsfile/live/", 
     "iptv.cdn.ha.chinamobile.com", "www.douzhicloud.site", 
     "e1.woc.iiiya.cn", "php.jdshipin.com", 
     "dbiptv.sn.chinamobile.com", "www.zzlag.top", 
