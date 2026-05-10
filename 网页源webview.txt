@@ -53,7 +53,7 @@ CETV4,webview://https://tv.gxtv.cn/channel/channelivePlay_67eace939278435bb4bca9
 香港动作喜剧,webview://https://www.yy.com/1355480591
 下饭神剧,webview://https://www.yy.com/23512910
 外国科幻,webview://https://www.yy.com/1382736851/
-83射雕英雄传,webview://https://www.yy.com/1354210357
+83射雕英雄传,webview://https://www.yy.com/618597
 雍正王朝,webview://https://www.yy.com/1356043620
 天龙八部【黄日华】,webview://https://www.yy.com/1351814644
 武林外传,webview://https://www.yy.com/1355652820
