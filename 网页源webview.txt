@@ -38,12 +38,6 @@ CCTV16,webview://https://tv.cctv.com/live/cctv16/
 CCTV17,webview://https://tv.cctv.com/live/cctv17/
 CCTV4(欧),webview://https://tv.cctv.com/live/cctveurope/
 CCTV4(美),webview://https://tv.cctv.com/live/cctvamerica/
-CGTN英语,webview://https://yangshipin.cn/tv/home?pid=600014550
-CGTN记录,webview://https://yangshipin.cn/tv/home?pid=600084781
-CGTN俄语,webview://https://yangshipin.cn/tv/home?pid=600084758
-CGTN法语,webview://https://yangshipin.cn/tv/home?pid=600084704
-CGTN西语,webview://https://yangshipin.cn/tv/home?pid=600084744
-CGTN阿语,webview://https://yangshipin.cn/tv/home?pid=600084782
 CCTV风云剧场,webview://https://yangshipin.cn/tv/home?pid=600099658
 CCTV第一剧场,webview://https://yangshipin.cn/tv/home?pid=600099655
 CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
@@ -58,7 +52,7 @@ CETV4,webview://https://tv.gxtv.cn/channel/channelivePlay_67eace939278435bb4bca9
 鹿鼎记【陈小春】,webview://https://www.yy.com/28265277/
 香港动作喜剧,webview://https://www.yy.com/1355480591
 下饭神剧,webview://https://www.yy.com/23512910
-侏罗纪世界,webview://https://www.yy.com/1382736851/
+外国科幻,webview://https://www.yy.com/1382736851/
 83射雕英雄传,webview://https://www.yy.com/1354210357
 雍正王朝,webview://https://www.yy.com/1356043620
 天龙八部【黄日华】,webview://https://www.yy.com/1351814644
