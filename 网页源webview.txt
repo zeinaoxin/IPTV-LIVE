@@ -53,7 +53,37 @@ CETV4,webview://https://tv.gxtv.cn/channel/channelivePlay_67eace939278435bb4bca9
 
 影视频道,#genre#
 鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+周星驰电影【虎牙】,webview://http://liveshare.huya.com/iframe/11342412
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
+鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
 
+黑龙江频道,#genre#
+黑龙江卫视,webview://https://www.dbw.cn/zhibodan/zhibo_dan/hljws/
+黑龙江文体,webview://https://www.dbw.cn/zhibodan/zhibo_dan/hljwt/
+黑龙江影视,webview://https://www.dbw.cn/zhibodan/zhibo_dan/hljys/
+黑龙江新闻法治,webview://https://www.dbw.cn/zhibodan/zhibo_dan/heilongjiang/
+黑龙江都市,webview://https://www.dbw.cn/zhibodan/zhibo_dan/hljds/
+黑龙江农业科教,webview://https://www.dbw.cn/zhibodan/zhibo_dan/hljnykj/
+黑龙江少儿,webview://https://www.dbw.cn/zhibodan/zhibo_dan/hljse/
+哈尔滨新闻综合,webview://https://www.hrbtv.net/folder79/folder81/
+哈尔滨生活,webview://https://www.hrbtv.net/folder79/folder85/
+哈尔滨影视,webview://https://www.hrbtv.net/folder79/folder87/
+大庆新闻综合,webview://https://dqgbdst.dqrtv.cn/tv/2281?uin=1463
+大庆绝对现场,webview://https://dqgbdst.dqrtv.cn/live/112246?uin=1463
+大庆教育频道,webview://https://web.guangdianyun.tv/tv/2283?uin=1463
 
 卫视频道,#genre#
 北京卫视,webview://https://yangshipin.cn/tv/home?pid=600002309
@@ -293,17 +323,6 @@ GRTN教育频道,webview://https://www.gdtv.cn/tvChannelDetail/104
 信阳浉河,webview://https://wap.xytv.cn/share/page/tvLive?tvid=5&webProId=1&tvType=1&webTenId=1&invCode=&userName=&origin=1&webSoleId=e61a40bfa9414965984a6dcea76b3c60
 信阳平桥,webview://https://wap.xytv.cn/share/page/tvLive?tvid=4&webProId=1&tvType=1&webTenId=1&invCode=&userName=&origin=1&webSoleId=26c2c106d4b34cbcade8fb115eb5e51e
 
-黑龙江频道,#genre#
-黑龙江卫视,webview://https://www.hljtv.com/live/folder418/
-黑龙江文体,webview://https://www.hljtv.com/live/folder423/
-黑龙江影视,webview://https://www.hljtv.com/live/folder425/
-黑龙江新闻法治,webview://https://www.hljtv.com/live/folder424/
-黑龙江都市,webview://https://www.hljtv.com/live/folder419/
-黑龙江农业科教,webview://https://www.hljtv.com/live/folder420/
-黑龙江少儿,webview://https://www.hljtv.com/live/folder422/
-哈尔滨新闻综合,webview://https://www.hrbtv.net/folder79/folder81/
-哈尔滨生活,webview://https://www.hrbtv.net/folder79/folder85/
-哈尔滨影视,webview://https://www.hrbtv.net/folder79/folder87/
 
 湖北频道,#genre#
 湖北卫视,webview://https://news.hbtv.com.cn/app/tv/431
