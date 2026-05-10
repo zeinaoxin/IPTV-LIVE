@@ -40,3 +40,5 @@ CHC动作电影HD,http://171.125.90.184:7000/rtp/226.0.2.94:8012
 北京IPTV淘电影,http://home.xayo.cc:33333/udp/239.3.1.250:8001
 
 精彩影视,http://www.alphauncle.com:2715/rtp/239.0.0.26:5140
+
+周星驰电影,https://hs-flv-web.yy.com/live/15013_xv_1354658049_1354658049_0_0_0-15013_xa_1354658049_1354658049_0_0_0-0-0-0-0-0-1778353420400318.flv?codec=orig&appid=15013&rts_tk=00a3fae943db188cdf05c26a8b807d90&secret=d29f4c7d50befad0f411b6a9343d4125&t=1778408886&stream_key=15013_xv_1354658049_1354658049_0_0_0&r_stream_key=15013_xa_1354658049_1354658049_0_0_0&channelid=1354658049&mtk=1&line_seq=12&cp_id=11&rts=1&ctx=eyJydHNfYXV0aCI6MiwiZGVmX3Bhc3MiOjF9&r=enter&playeruid=2094788049&uuid=98232f55-9a46-430a-8c5a-1814ea072528
