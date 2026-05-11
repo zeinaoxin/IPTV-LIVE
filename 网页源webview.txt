@@ -41,18 +41,16 @@ CCTV4(美),webview://https://tv.cctv.com/live/cctvamerica/
 CCTV风云剧场,webview://https://yangshipin.cn/tv/home?pid=600099658
 CCTV第一剧场,webview://https://yangshipin.cn/tv/home?pid=600099655
 CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
-CETV1,webview://https://tv.gxtv.cn/channel/channelivePlay_ffa6b6e1b32b4a16a73eb3ef66f8bfc7.html
-CETV2,webview://https://tv.gxtv.cn/channel/channelivePlay_80d0ffb42c114eaf9663708629ff0a3e.html
-CETV4,webview://https://tv.gxtv.cn/channel/channelivePlay_67eace939278435bb4bca90800fb4225.html
 
 影视频道,#genre#
+测试频道,webview://https://wap.yy.com/mobileweb/1354658049/0#/entertainment
 鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
 周星驰【虎牙】,webview://http://liveshare.huya.com/iframe/11342412
 王晶电影,webview://http://liveshare.huya.com/iframe/11602058
-鹿鼎记【陈小春】,webview://https://www.yy.com/28265277/
+鹿鼎记【陈小春】,webview://https://www.yy.com/52882
 香港动作喜剧,webview://https://www.yy.com/1355480591
 下饭神剧,webview://https://www.yy.com/23512910
-外国科幻,webview://https://www.yy.com/1382736851/
+终结者系列,webview://https://www.yy.com/1382736851/
 83射雕英雄传,webview://https://www.yy.com/618597
 雍正王朝,webview://https://www.yy.com/1356043620
 天龙八部【黄日华】,webview://https://www.yy.com/1351814644
