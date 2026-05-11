@@ -43,7 +43,6 @@ CCTV第一剧场,webview://https://yangshipin.cn/tv/home?pid=600099655
 CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 
 影视频道,#genre#
-测试频道,webview://https://wap.yy.com/mobileweb/618597/0#/entertainment
 鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
 周星驰【虎牙】,webview://http://liveshare.huya.com/iframe/11342412
 王晶电影,webview://http://liveshare.huya.com/iframe/11602058
