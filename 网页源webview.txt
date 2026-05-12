@@ -47,6 +47,7 @@ CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 周星驰【虎牙】,webview://http://liveshare.huya.com/iframe/11342412
 王晶电影,webview://http://liveshare.huya.com/iframe/11602058
 鹿鼎记【陈小春】,webview://https://www.yy.com/52882
+鹿鼎记【陈小春】②,webview://http://liveshare.huya.com/iframe/23650774
 香港动作喜剧,webview://https://www.yy.com/1355480591
 下饭神剧,webview://https://www.yy.com/23512910
 终结者系列,webview://https://www.yy.com/1382736851/
@@ -84,7 +85,6 @@ CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 小黄人,webview://http://liveshare.huya.com/iframe/11342428
 黑夜传说,webview://http://liveshare.huya.com/iframe/30080231
 武林外传,webview://http://liveshare.huya.com/iframe/30080141
-鹿鼎记【陈小春】,webview://http://liveshare.huya.com/iframe/23650774
 倚天屠龙记,webview://http://liveshare.huya.com/iframe/11342403
 天龙八部,webview://http://liveshare.huya.com/iframe/20985816
 刘老根,webview://http://liveshare.huya.com/iframe/23652426
