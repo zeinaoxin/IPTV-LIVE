@@ -51,8 +51,10 @@ CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 下饭神剧,webview://https://www.yy.com/23512910
 终结者系列,webview://https://www.yy.com/1382736851/
 83射雕英雄传,webview://https://www.yy.com/618597
+神雕侠侣,webview://https://www.yy.com/12531
 雍正王朝,webview://https://www.yy.com/1356043620
 天龙八部【黄日华】,webview://https://www.yy.com/1351814644
+新白娘子传奇,webview://https://www.yy.com/1354490667
 武林外传,webview://https://www.yy.com/1355652820
 武打电影,webview://https://www.yy.com/1354936131
 赵本山,webview://https://www.yy.com/32160832
@@ -60,6 +62,7 @@ CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 赌神,webview://https://www.yy.com/1354889044
 经典港片,webview://https://www.yy.com/23531261
 成龙电影,webview://http://liveshare.huya.com/iframe/11342386
+李连杰电影,webview://https://www.yy.com/74613175
 沈腾电影,webview://http://liveshare.huya.com/iframe/11601968
 五福星,webview://http://liveshare.huya.com/iframe/11282233
 漫威电影,webview://http://liveshare.huya.com/iframe/11352950
