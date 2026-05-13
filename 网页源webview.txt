@@ -47,11 +47,12 @@ CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 大话西游,webview://https://www.yy.com/1382851590
 周星驰【虎牙】,webview://http://liveshare.huya.com/iframe/11342412
 王晶电影,webview://http://liveshare.huya.com/iframe/11602058
-鹿鼎记【陈小春】,webview://https://www.yy.com/52882
-鹿鼎记【陈小春】②,webview://http://liveshare.huya.com/iframe/23650774
+鹿鼎记①,webview://https://www.yy.com/52882
+鹿鼎记②,webview://http://liveshare.huya.com/iframe/23650774
 香港动作喜剧,webview://https://www.yy.com/1355480591
 国内功夫大片,webview://https://www.yy.com/1382736902
-动作大片,webview://https://www.yy.com/1354888739/
+动作大片①,webview://https://www.yy.com/1354888739/
+动作大片②,webview://http://liveshare.huya.com/iframe/23728651
 院线动作,webview://https://www.yy.com/1382736900
 燃爆动作,webview://https://www.yy.com/1382736801
 精彩动作电影,webview://https://www.yy.com/1382736823
@@ -97,7 +98,6 @@ CCTV怀旧剧场,webview://https://yangshipin.cn/tv/home?pid=600099620
 速度与激情,webview://http://liveshare.huya.com/iframe/29982635
 骇客帝国,webview://http://liveshare.huya.com/iframe/29982648
 汤姆科鲁兹,webview://http://liveshare.huya.com/iframe/26355792
-动作大片,webview://http://liveshare.huya.com/iframe/23728651
 诺兰电影,webview://http://liveshare.huya.com/iframe/30080257
 憨豆,webview://http://liveshare.huya.com/iframe/20969133
 憨豆先生,webview://https://www.yy.com/1354936239
