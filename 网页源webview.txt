@@ -44,6 +44,7 @@ CCTV4K,webview://https://yangshipin.cn/tv/home?pid=600002264
 CCTV8K,webview://https://yangshipin.cn/tv/home?pid=600156816
 
 影视频道,#genre#
+CCTV1【B站】,https://cdn-3.ttvb.eu.org//bilibili/21686237
 鹿鼎记【周星驰版】,webview://https://www.yy.com/1354658049
 大话西游,webview://https://www.yy.com/1382851590
 周星驰【虎牙】,https://cdn-3.ttvb.eu.org//huya/11342412
