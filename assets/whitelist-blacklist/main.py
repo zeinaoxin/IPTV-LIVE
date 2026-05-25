@@ -5,7 +5,7 @@
 功能：
 1. 读取 assets/my_urls/ 下所有 .txt 文件
 2. 解析并按 URL 去重
-3. 多线程检测每个直播源的连通性
+3. 多线程检测每个直播源的连通性（同一IP失效5次则全黑，存活5次则全白）
 4. 可连通的源写入 whitelist_auto.txt / whitelist_manual.txt
 5. 不可连通的源写入 blacklist_auto.txt
 6. 自动 git commit & push
@@ -16,6 +16,7 @@ import re
 import sys
 import subprocess
 import logging
+import threading
 from datetime import datetime, timezone, timedelta
 from typing import Tuple, List
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -24,6 +25,8 @@ from urllib.error import URLError, HTTPError
 from http.client import HTTPException
 import socket
 import ssl
+import ipaddress
+from urllib.parse import urlparse
 
 # ======================== 路径配置 ========================
 SCRIPT_ABS_PATH = os.path.abspath(__file__)
@@ -44,6 +47,8 @@ FILE_PATHS = {
 CHECK_TIMEOUT     = 8     # 单个源请求超时（秒）
 CHECK_CONCURRENCY = 50    # 最大并发线程数
 CHECK_RETRIES     = 1     # 失败后重试次数（0=不重试，1=重试1次）
+MAX_FAILURES_PER_IP = 5   # 同一IP失效阈值
+MIN_SUCCESS_PER_IP = 5    # 同一IP存活阈值
 
 # ======================== 日志配置 ========================
 logging.basicConfig(
@@ -64,6 +69,21 @@ SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = False
 SSL_CTX.verify_mode = ssl.CERT_NONE
 
+# ------------------------------------------------------------------ #
+#                        辅助函数：提取IP                             #
+# ------------------------------------------------------------------ #
+
+def extract_ip_from_url(url: str) -> str:
+    """从URL中提取IP地址（支持IPv4/IPv6）"""
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if hostname:
+        try:
+            ipaddress.ip_address(hostname)
+            return hostname
+        except ValueError:
+            return ""
+    return ""
 
 # ------------------------------------------------------------------ #
 #                        解析 & 读取 & 去重                            #
@@ -129,13 +149,13 @@ def read_and_dedup(dirpath: str) -> List[Tuple[str, str]]:
 
 
 # ------------------------------------------------------------------ #
-#                      多线程连通性检测                                 #
+#                      多线程连通性检测（带IP黑名单优化）               #
 # ------------------------------------------------------------------ #
 
 def _check_one(name: str, url: str) -> Tuple[str, str, bool]:
     """
     检测单个 URL 是否可达（纯标准库）
-    返回
+    返回 (name, url, is_alive)
 
     策略：
       - .m3u8 / .m3u → GET，读前 1 KB 验证内容
@@ -192,7 +212,7 @@ def check_all_urls(
     sources: List[Tuple[str, str]],
 ) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
     """
-    多线程并发检测所有直播源
+    多线程并发检测所有直播源（同一IP失效5次则全黑，存活5次则全白）
     返回 (存活列表, 失效列表)
     """
     alive: List[Tuple[str, str]] = []
@@ -200,9 +220,54 @@ def check_all_urls(
     total = len(sources)
     done = 0
 
+    # 构建IP到源的映射
+    ip_to_sources = {}
+    for name, url in sources:
+        ip = extract_ip_from_url(url)
+        if ip:
+            if ip not in ip_to_sources:
+                ip_to_sources[ip] = []
+            ip_to_sources[ip].append((name, url))
+
+    # 初始化IP状态和计数
+    ip_failure_count = {ip: 0 for ip in ip_to_sources}
+    ip_success_count = {ip: 0 for ip in ip_to_sources}
+    ip_status = {ip: "pending" for ip in ip_to_sources}  # pending, blacklisted, whitelisted
+    lock = threading.Lock()
+
+    def _check_one_wrapper(name: str, url: str) -> Tuple[str, str, bool]:
+        """带IP黑名单/白名单检查的检测函数"""
+        ip = extract_ip_from_url(url)
+        with lock:
+            if ip and ip_status[ip] != "pending":
+                return name, url, ip_status[ip] == "whitelisted"
+
+        # 实际检测
+        is_alive = _check_one(name, url)
+
+        with lock:
+            if ip:
+                if is_alive:
+                    ip_success_count[ip] += 1
+                    if ip_success_count[ip] >= MIN_SUCCESS_PER_IP:
+                        ip_status[ip] = "whitelisted"
+                        # 将该IP下的所有源（包括未检测的）加入alive
+                        for src in ip_to_sources.get(ip, []):
+                            if src not in alive:  # 避免重复添加
+                                alive.append(src)
+                else:
+                    ip_failure_count[ip] += 1
+                    if ip_failure_count[ip] >= MAX_FAILURES_PER_IP:
+                        ip_status[ip] = "blacklisted"
+                        # 将该IP下的所有源（包括未检测的）加入dead
+                        for src in ip_to_sources.get(ip, []):
+                            if src not in dead:  # 避免重复添加
+                                dead.append(src)
+            return name, url, is_alive
+
     with ThreadPoolExecutor(max_workers=CHECK_CONCURRENCY) as pool:
         futures = {
-            pool.submit(_check_one, name, url): (name, url)
+            pool.submit(_check_one_wrapper, name, url): (name, url)
             for name, url in sources
         }
 
@@ -214,7 +279,6 @@ def check_all_urls(
                 alive.append((name, url))
             else:
                 dead.append((name, url))
-                logger.info(f"  ❌ 失效: {name},{url}")
 
             if done % 50 == 0 or done == total:
                 logger.info(
@@ -338,10 +402,11 @@ def main():
         logger.info(f"===== 执行完成 | 共 0 条源 | 耗时 {elapsed}s =====")
         return
 
-    # 2. 多线程连通性检测
+    # 2. 多线程连通性检测（带IP黑名单/白名单优化）
     logger.info(
         f"开始连通性检测，共 {len(sources)} 条源 "
-        f"（超时 {CHECK_TIMEOUT}s，并发 {CHECK_CONCURRENCY}，重试 {CHECK_RETRIES} 次）"
+        f"（超时 {CHECK_TIMEOUT}s，并发 {CHECK_CONCURRENCY}，重试 {CHECK_RETRIES} 次，"
+        f"同一IP失效{MAX_FAILURES_PER_IP}次则全黑，存活{MIN_SUCCESS_PER_IP}次则全白）"
     )
     alive, dead = check_all_urls(sources)
 
