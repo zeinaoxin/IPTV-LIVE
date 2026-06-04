@@ -269,3 +269,13 @@
 2026-06-04 18:48:14,179 - 检测完成: 存活 19957 条，失效 0 条
 2026-06-04 18:48:14,200 - 写入完成: 白名单 19957 条，黑名单 0 条
 2026-06-04 18:48:14,200 - 正在同步到GitHub仓库...
+2026-06-04 18:48:15,104 - Git推送失败: To https://github.com/zeinaoxin/IPTV-LIVE
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/zeinaoxin/IPTV-LIVE'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+2026-06-04 18:48:15,104 - ===== 执行完成 | 白名单 19957 条 | 黑名单 0 条 | 耗时 2177s =====
